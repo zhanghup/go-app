@@ -1,8 +1,10 @@
 package app
 
+import "github.com/go-xorm/xorm"
+
 type PageResult struct {
-	Total int64         `json:"total"`
-	Datas  interface{} `json:"datas"`
+	Total int64       `json:"total"`
+	Datas interface{} `json:"datas"`
 }
 type PageParam struct {
 	Index int  `json:"index"`
@@ -82,7 +84,7 @@ type User struct {
 	Avatar   *string `json:"avatar"`
 	IdCard   *string `json:"id_card"`
 	Birth    *int64  `json:"birth"`
-	Sex      *string `json:"sex"`   // 0：未知，1：男，2：女
+	Sex      *string `json:"sex"`    // 0：未知，1：男，2：女
 	Mobile   *string `json:"mobile"` // 联系电话
 	Admin    *int    `json:"admin"`
 }
@@ -108,9 +110,9 @@ type Resource struct {
 	Datas       []byte `json:"datas" xorm:"longblob"`
 }
 
-//func Sync(e *xorm.Engine) {
-//	err := e.Sync2(new(Dict), new(DictItem), new(Menu), new(Role), new(RoleUser), new(Perm), new(User), new(UserToken), new(Resource))
-//	if err != nil {
-//		cfg.LogError(err.Error())
-//	}
-//}
+func Sync(e *xorm.Engine) {
+	err := e.Sync2(new(Dict), new(DictItem), new(Menu), new(Role), new(RoleUser), new(Perm), new(User), new(UserToken), new(Resource))
+	if err != nil {
+		panic(err)
+	}
+}
