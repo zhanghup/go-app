@@ -1,0 +1,7 @@
+extend type Query{
+    users:[User]
+}
+
+type User @goModel(model:"github.com/zhanghup/go-app.User"){
+    id: String
+}
