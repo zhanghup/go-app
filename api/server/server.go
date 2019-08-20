@@ -9,7 +9,6 @@ import (
 
 func main() {
 	g := gin.Default()
-
 	api.Playground(g, "/query")
 
 	c := gs.Config{Resolvers: &api.Resolver{}}

@@ -16,3 +16,11 @@ type Query {
 type Mutation {
     world: String
 }
+
+interface base {
+    id: String
+    created: Int
+    updated: Int
+    weight: Int
+    status: Int
+}

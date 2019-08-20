@@ -2,6 +2,33 @@ extend type Query{
     users:[User]
 }
 
-type User @goModel(model:"github.com/zhanghup/go-app.User"){
-    id: String
+
+
+type UserB{
+    "用户类型"
+    type: String
+    "账户"
+    account: String
+    "密码"
+    password: String
+    "用户名称"
+    name: String
+    "头像"
+    avatar: String
+    "身份证"
+    id_card: String
+    "出生年月"
+    birth: Int
+    "性别[0: 未知,1: 女,2: 男]"
+    sex: Int
+    "移动电话"
+    mobile: String
+    "是否为管理员[0: 否,1: 是]"
+    admin: Int
 }
+
+type User @goModel(model:"github.com/zhanghup/go-app.User")  {
+    id: String
+
+}
+
