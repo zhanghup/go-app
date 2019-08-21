@@ -4,11 +4,13 @@ package api
 
 import (
 	"context"
-	"github.com/zhanghup/go-app"
+	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-app/api/gs"
 )
 
-type Resolver struct{}
+type Resolver struct {
+	DB xorm.Engine
+}
 
 func (r *Resolver) Mutation() gs.MutationResolver {
 	return &mutationResolver{r}
@@ -25,10 +27,6 @@ func (this mutationResolver) World(ctx context.Context) (*string, error) {
 }
 
 type queryResolver struct{ *Resolver }
-
-func (this queryResolver) Users(ctx context.Context) ([]*app.User, error) {
-	return nil, nil
-}
 
 func (this queryResolver) Hello(ctx context.Context) (*string, error) {
 	a := "world"

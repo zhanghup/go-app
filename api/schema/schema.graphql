@@ -17,7 +17,7 @@ type Mutation {
     world: String
 }
 
-interface base {
+interface web {
     id: String
     created: Int
     updated: Int
