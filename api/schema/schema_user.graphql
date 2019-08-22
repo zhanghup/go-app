@@ -43,10 +43,13 @@ type User @goModel(model:"github.com/zhanghup/go-app.User")  {
     mobile: String
     "是否为管理员[0: 否,1: 是]"
     admin: Int
-
+    "创建时间"
     created: Int
+    "更新时间"
     updated: Int
+    "排序"
     weight: Int
+    "状态[0:隐藏,1:显示]"
     status: Int
 
 }

@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-app/api/gs"
+	"github.com/zhanghup/go-tools"
 )
 
 type Resolver struct {
@@ -22,13 +23,11 @@ func (r *Resolver) Query() gs.QueryResolver {
 type mutationResolver struct{ *Resolver }
 
 func (this mutationResolver) World(ctx context.Context) (*string, error) {
-	a := "hello"
-	return &a, nil
+	return tools.Ptr().String("hello"), nil
 }
 
 type queryResolver struct{ *Resolver }
 
 func (this queryResolver) Hello(ctx context.Context) (*string, error) {
-	a := "world"
-	return &a, nil
+	return tools.Ptr().String("world"), nil
 }
