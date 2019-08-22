@@ -6,10 +6,6 @@ import (
 	"github.com/zhanghup/go-app"
 )
 
-type Web interface {
-	IsWeb()
-}
-
 type NewUser struct {
 	// 用户类型
 	Type string `json:"type"`

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/99designs/gqlgen/handler"
 	"github.com/gin-gonic/gin"
+	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-app/api"
 	"github.com/zhanghup/go-app/api/gs"
 )
@@ -11,7 +12,12 @@ func main() {
 	g := gin.Default()
 	api.Playground(g, "/query")
 
-	c := gs.Config{Resolvers: &api.Resolver{}}
+	e, err := xorm.NewEngine("sqlite3", "./test.db")
+	if err != nil {
+		panic(err)
+	}
+
+	c := gs.Config{Resolvers: &api.Resolver{DB: e}}
 	hu := handler.GraphQL(gs.NewExecutableSchema(c))
 	g.POST("/query", func(c *gin.Context) {
 		c.Request.Header.Set("Content-Type", "application/json")

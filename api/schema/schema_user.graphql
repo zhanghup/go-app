@@ -20,7 +20,7 @@ type Users{
     users:[User!]
 }
 
-type User implements web @goModel(model:"github.com/zhanghup/go-app.User")  {
+type User @goModel(model:"github.com/zhanghup/go-app.User")  {
     id: String
 
     "用户类型"

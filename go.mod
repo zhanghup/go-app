@@ -7,6 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-xorm/xorm v0.7.6
 	github.com/vektah/gqlparser v1.1.2
+	golang.org/x/tools v0.0.0-20190822000311-fc82fb2afd64 // indirect
 )
 
 replace github.com/99designs/gqlgen => github.com/zhanghup/go-gqlgen v0.9.3

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"github.com/zhanghup/go-app"
 	"github.com/zhanghup/go-app/api/gs"
 )
@@ -12,6 +13,7 @@ func (this queryResolver) Users(ctx context.Context, query *gs.QUser) (*gs.Users
 		select * from {{ table "user" }} u
 		where 1 = 1
 	`)
+	fmt.Println(users)
 	return nil, nil
 }
 

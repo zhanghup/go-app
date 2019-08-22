@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 	"sync"
 
@@ -380,14 +379,6 @@ type Query {
 type Mutation {
     world: String
 }
-
-interface web {
-    id: String
-    created: Int
-    updated: Int
-    weight: Int
-    status: Int
-}
 `},
 	&ast.Source{Name: "schema/schema_user.graphql", Input: `extend type Query{
     users(query:QUser):Users
@@ -411,7 +402,7 @@ type Users{
     users:[User!]
 }
 
-type User implements web @goModel(model:"github.com/zhanghup/go-app.User")  {
+type User @goModel(model:"github.com/zhanghup/go-app.User")  {
     id: String
 
     "用户类型"
@@ -2910,17 +2901,6 @@ func (ec *executionContext) unmarshalInputUpdUser(ctx context.Context, obj inter
 
 // region    ************************** interface.gotpl ***************************
 
-func (ec *executionContext) _web(ctx context.Context, sel ast.SelectionSet, obj *Web) graphql.Marshaler {
-	switch obj := (*obj).(type) {
-	case nil:
-		return graphql.Null
-	case *app.User:
-		return ec._User(ctx, sel, obj)
-	default:
-		panic(fmt.Errorf("unexpected type %T", obj))
-	}
-}
-
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
@@ -3022,7 +3002,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var userImplementors = []string{"User", "web"}
+var userImplementors = []string{"User"}
 
 func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *app.User) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.RequestContext, sel, userImplementors)

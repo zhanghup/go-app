@@ -9,7 +9,7 @@ import (
 )
 
 type Resolver struct {
-	DB xorm.Engine
+	DB *xorm.Engine
 }
 
 func (r *Resolver) Mutation() gs.MutationResolver {
