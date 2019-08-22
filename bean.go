@@ -72,7 +72,7 @@ type Perm struct {
 	Mask *string `json:"mask"` // 权限
 }
 
-// 给用户
+// 用户
 type User struct {
 	Bean `xorm:"extends"`
 
@@ -84,7 +84,7 @@ type User struct {
 	Avatar   *string `json:"avatar"`
 	IdCard   *string `json:"id_card"`
 	Birth    *int64  `json:"birth"`
-	Sex      *string `json:"sex"`    // 0：未知，1：男，2：女
+	Sex      *int `json:"sex"`    // 0：未知，1：男，2：女
 	Mobile   *string `json:"mobile"` // 联系电话
 	Admin    *int    `json:"admin"`
 }
