@@ -6,6 +6,46 @@ import (
 	"github.com/zhanghup/go-app"
 )
 
+type Dicts struct {
+	Total *int        `json:"total"`
+	Dicts []*app.Dict `json:"dicts"`
+}
+
+type NewDict struct {
+	// 字典编码
+	Code *string `json:"code"`
+	// 字典名称
+	Name *string `json:"name"`
+	// 备注
+	Remark *string `json:"remark"`
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态[0:隐藏,1:显示]
+	Status *int `json:"status"`
+}
+
+type NewDictItem struct {
+	// 字典id
+	Code *string `json:"code"`
+	// 名称
+	Name *string `json:"name"`
+	// 值
+	Value *string `json:"value"`
+	// 扩展
+	Extension *string `json:"extension"`
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态[0:隐藏,1:显示]
+	Status *int `json:"status"`
+}
+
+type NewRole struct {
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态[0:隐藏,1:显示]
+	Status *int `json:"status"`
+}
+
 type NewUser struct {
 	// 用户类型
 	Type string `json:"type"`
@@ -18,7 +58,7 @@ type NewUser struct {
 	// 头像
 	Avatar *string `json:"avatar"`
 	// 身份证
-	IDCard *string `json:"id_card"`
+	ICard *string `json:"i_card"`
 	// 出生年月
 	Birth *int `json:"birth"`
 	// 性别[0: 未知,1: 女,2: 男]
@@ -33,10 +73,58 @@ type NewUser struct {
 	Status *int `json:"status"`
 }
 
+type QDict struct {
+	Index *int `json:"index"`
+	Size  *int `json:"size"`
+	Count *int `json:"count"`
+}
+
+type QRole struct {
+	Index *int `json:"index"`
+	Size  *int `json:"size"`
+	Count *int `json:"count"`
+}
+
 type QUser struct {
 	Index *int `json:"index"`
 	Size  *int `json:"size"`
 	Count *int `json:"count"`
+}
+
+type Roles struct {
+	Total *int        `json:"total"`
+	Roles []*app.Role `json:"roles"`
+}
+
+type UpdDict struct {
+	// 字典名称
+	Name *string `json:"name"`
+	// 备注
+	Remark *string `json:"remark"`
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态[0:隐藏,1:显示]
+	Status *int `json:"status"`
+}
+
+type UpdDictItem struct {
+	// 名称
+	Name *string `json:"name"`
+	// 值
+	Value *string `json:"value"`
+	// 扩展
+	Extension *string `json:"extension"`
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态[0:隐藏,1:显示]
+	Status *int `json:"status"`
+}
+
+type UpdRole struct {
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态[0:隐藏,1:显示]
+	Status *int `json:"status"`
 }
 
 type UpdUser struct {
@@ -51,7 +139,7 @@ type UpdUser struct {
 	// 头像
 	Avatar *string `json:"avatar"`
 	// 身份证
-	IDCard *string `json:"id_card"`
+	ICard *string `json:"i_card"`
 	// 出生年月
 	Birth *int `json:"birth"`
 	// 性别[0: 未知,1: 女,2: 男]

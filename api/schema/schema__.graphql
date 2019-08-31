@@ -1,0 +1,55 @@
+#extend type Query{
+#    users(query:QUser!):Users
+#    user(id: String!):User
+#}
+#
+#extend type Mutation {
+#    user_create(input:NewUser!):User
+#    user_update(id: String!,input:UpdUser!):Boolean!
+#    user_removes(ids: [String!]):Boolean!
+#}
+#
+#input QUser{
+#    index: Int
+#    size: Int
+#    count: Int
+#}
+#
+#type Users{
+#    total: Int
+#    users:[User!]
+#}
+#
+#type User @goModel(model:"github.com/zhanghup/go-app.User")  {
+#    id: String
+#
+#
+#
+#    "创建时间"
+#    created: Int
+#    "更新时间"
+#    updated: Int
+#    "排序"
+#    weight: Int
+#    "状态[0:隐藏,1:显示]"
+#    status: Int
+#
+#}
+#
+#input NewUser {
+#
+#
+#    "排序"
+#    weight: Int
+#    "状态[0:隐藏,1:显示]"
+#    status: Int
+#}
+#
+#input UpdUser {
+#
+#    "排序"
+#    weight: Int
+#    "状态[0:隐藏,1:显示]"
+#    status: Int
+#}
+#

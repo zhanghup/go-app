@@ -1,12 +1,12 @@
 extend type Query{
-    users(query:QUser):Users
-    user(id: String):User
+    users(query:QUser!):Users
+    user(id: String!):User
 }
 
 extend type Mutation {
-    create_user(input:NewUser!):User
-    update_user(id: String,input:UpdUser!):Boolean
-    remove_user(id: String):Boolean
+    user_create(input:NewUser!):User
+    user_update(id: String!,input:UpdUser!):Boolean!
+    user_removes(ids: [String!]):Boolean!
 }
 
 input QUser{
@@ -34,7 +34,7 @@ type User @goModel(model:"github.com/zhanghup/go-app.User")  {
     "头像"
     avatar: String
     "身份证"
-    id_card: String
+    i_card: String
     "出生年月"
     birth: Int
     "性别[0: 未知,1: 女,2: 男]"
@@ -66,7 +66,7 @@ input NewUser {
     "头像"
     avatar: String
     "身份证"
-    id_card: String
+    i_card: String
     "出生年月"
     birth: Int
     "性别[0: 未知,1: 女,2: 男]"
@@ -93,7 +93,7 @@ input UpdUser {
     "头像"
     avatar: String
     "身份证"
-    id_card: String
+    i_card: String
     "出生年月"
     birth: Int
     "性别[0: 未知,1: 女,2: 男]"

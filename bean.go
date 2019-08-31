@@ -24,10 +24,9 @@ type Bean struct {
 type Dict struct {
 	Bean `xorm:"extends"`
 
+	Code   *string `json:"code" xorm:"unique"`
 	Name   *string `json:"name"`
 	Remark *string `json:"remark"`
-
-	Values []DictItem `json:"values" xorm:"-"`
 }
 type DictItem struct {
 	Bean `xorm:"extends"`
@@ -82,9 +81,9 @@ type User struct {
 	Slat     *string `json:"slot"`
 	Name     *string `json:"name"`
 	Avatar   *string `json:"avatar"`
-	IdCard   *string `json:"id_card"`
+	ICard    *string `json:"i_card"`
 	Birth    *int64  `json:"birth"`
-	Sex      *int `json:"sex"`    // 0：未知，1：男，2：女
+	Sex      *int    `json:"sex"`    // 0：未知，1：男，2：女
 	Mobile   *string `json:"mobile"` // 联系电话
 	Admin    *int    `json:"admin"`
 }

@@ -1,4 +1,4 @@
-package api
+package gs
 
 import (
 	"context"
@@ -13,26 +13,31 @@ import (
 
 const DATA_LOADEN = "go-app-dataloaden"
 
+type Loader interface {
+	Common(obj interface{}) *CommonLoader
+}
+
 type dataLoaden struct {
 	sync  sync.Mutex
-	store tools.Map
-	db    *xorm.Engine
+	store tools.IMap
+	db    *xorm.Session
 }
-func DataLoaden(ctx context.Context) *dataLoaden {
+
+func DataLoaden(ctx context.Context) Loader {
 	return ctx.Value(DATA_LOADEN).(*dataLoaden)
 }
 func DataLoadenMiddleware(db *xorm.Engine, next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), DATA_LOADEN, &dataLoaden{
 			sync:  sync.Mutex{},
-			store: tools.NewMap(),
-			db:    db,
+			store: tools.NewCache(),
+			db:    db.Context(r.Context()),
 		})
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-func (this *dataLoaden) CommonFn(db *xorm.Engine, obj interface{}) *CommonLoader {
+func (this *dataLoaden) Common(obj interface{}) *CommonLoader {
 	this.sync.Lock()
 	defer this.sync.Unlock()
 
@@ -56,7 +61,7 @@ func (this *dataLoaden) CommonFn(db *xorm.Engine, obj interface{}) *CommonLoader
 
 			ll := reflect.New(reflect.SliceOf(reflect.TypeOf(obj).Elem()))
 
-			err := db.Table(obj).In("id", keys).Find(ll.Interface())
+			err := this.db.Table(obj).In("id", keys).Find(ll.Interface())
 			if err != nil {
 				return nil, []error{err}
 			}

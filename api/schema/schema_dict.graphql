@@ -1,0 +1,128 @@
+extend type Query{
+    dicts(query:QDict!):Dicts
+    dict(id: String!):Dict
+}
+
+extend type Mutation {
+    dict_create(input:NewDict!):Dict
+    dict_update(id: String!,input:UpdDict!):Boolean!
+    dict_removes(ids: [String!]):Boolean!
+
+    dict_item_create(input:NewDictItem!):Dict
+    dict_item_update(id: String!,input:UpdDictItem!):Boolean!
+    dict_item_removes(ids: [String!]):Boolean!
+}
+
+input QDict{
+    index: Int
+    size: Int
+    count: Int
+}
+
+type Dicts{
+    total: Int
+    dicts:[Dict!]
+}
+
+type Dict @goModel(model:"github.com/zhanghup/go-app.Dict")  {
+    id: String
+
+    "字典编码"
+    code: String
+    "字典名称"
+    name: String
+    "备注"
+    remark: String
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态[0:隐藏,1:显示]"
+    status: Int
+
+    "选项列表"
+    values: [DictItem!]
+
+}
+
+input NewDict {
+    "字典编码"
+    code: String
+    "字典名称"
+    name: String
+    "备注"
+    remark: String
+
+    "排序"
+    weight: Int
+    "状态[0:隐藏,1:显示]"
+    status: Int
+}
+
+input UpdDict {
+    "字典名称"
+    name: String
+    "备注"
+    remark: String
+
+    "排序"
+    weight: Int
+    "状态[0:隐藏,1:显示]"
+    status: Int
+}
+
+type DictItem @goModel(model:"github.com/zhanghup/go-app.DictItem")  {
+    id: String
+
+    "字典id"
+    code: String
+    "名称"
+    name: String
+    "值"
+    value: String
+    "扩展"
+    extension: String
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态[0:隐藏,1:显示]"
+    status: Int
+
+}
+
+input NewDictItem{
+    "字典id"
+    code: String
+    "名称"
+    name: String
+    "值"
+    value: String
+    "扩展"
+    extension: String
+
+    "排序"
+    weight: Int
+    "状态[0:隐藏,1:显示]"
+    status: Int
+}
+
+input UpdDictItem{
+    "名称"
+    name: String
+    "值"
+    value: String
+    "扩展"
+    extension: String
+
+    "排序"
+    weight: Int
+    "状态[0:隐藏,1:显示]"
+    status: Int
+}

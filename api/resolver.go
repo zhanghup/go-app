@@ -10,7 +10,8 @@ import (
 )
 
 type Resolver struct {
-	DB *xorm.Engine
+	DB     func(ctx context.Context) *xorm.Session
+	Loader func(ctx context.Context) gs.Loader
 }
 
 func (r *Resolver) Mutation() gs.MutationResolver {

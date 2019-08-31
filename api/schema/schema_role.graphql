@@ -1,0 +1,55 @@
+extend type Query{
+    roles(query:QRole!):Roles
+    role(id: String!):Role
+}
+
+extend type Mutation {
+    role_create(input:NewRole!):Role
+    role_update(id: String!,input:UpdRole!):Boolean!
+    role_removes(ids: [String!]):Boolean!
+}
+
+input QRole{
+    index: Int
+    size: Int
+    count: Int
+}
+
+type Roles{
+    total: Int
+    roles:[Role!]
+}
+
+type Role @goModel(model:"github.com/zhanghup/go-app.Role")  {
+    id: String
+
+
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态[0:隐藏,1:显示]"
+    status: Int
+
+}
+
+input NewRole {
+
+
+    "排序"
+    weight: Int
+    "状态[0:隐藏,1:显示]"
+    status: Int
+}
+
+input UpdRole {
+
+    "排序"
+    weight: Int
+    "状态[0:隐藏,1:显示]"
+    status: Int
+}
+
