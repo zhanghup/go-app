@@ -16,4 +16,4 @@ replace github.com/99designs/gqlgen => github.com/zhanghup/go-gqlgen v0.9.3
 
 replace github.com/gin-gonic/gin => github.com/zhanghup/go-gin v0.0.0-20190818132815-0b17e4c65c1e
 
-replace github.com/go-xorm/xorm => github.com/zhanghup/go-xorm v1.0.0
+replace github.com/go-xorm/xorm => github.com/zhanghup/go-xorm v1.0.4

@@ -128,6 +128,33 @@ func MainTest(t *testing.T, obj string, params ...map[string]interface{}) {
 	}, nil)
 	assert.NoError(t, err, err)
 
+	query, err := tools.Str().Template(`
+		query {{ title .object -}}Query($query:Q{{- title .object -}}!){
+			{{ .object -}}s(query:$query){
+				total
+				data{
+				{{.shows}}
+				}
+			}
+		}
+	`, map[string]interface{}{
+		"object": obj,
+		"shows":  shows,
+	}, nil)
+	assert.NoError(t, err, err)
+
+	get, err := tools.Str().Template(`
+		query {{ title .object -}}Get($id:String!){
+			{{ .object -}}(id:$id){
+				{{.shows}}
+			}
+		}
+	`, map[string]interface{}{
+		"object": obj,
+		"shows":  shows,
+	}, nil)
+	assert.NoError(t, err, err)
+
 	// graphql 修改
 	update, err := tools.Str().Template(`
 		mutation {{ title .object -}}Update($id:String!,$input:Upd{{- title .object -}}!){
@@ -146,7 +173,7 @@ func MainTest(t *testing.T, obj string, params ...map[string]interface{}) {
 	}, nil)
 	assert.NoError(t, err, err)
 
-	fmt.Println(create, update, remove)
+	fmt.Println(create, query, get,update, remove)
 	// 新增
 	result := map[string]interface{}{}
 	_, err = Query(t, create, map[string]interface{}{"input": createParam}, &result)
@@ -154,6 +181,18 @@ func MainTest(t *testing.T, obj string, params ...map[string]interface{}) {
 	newId := ((result["user_create"]).(map[string]interface{})["id"]).(string)
 
 	result = map[string]interface{}{}
+
+	// 批量查询
+	_, err = Query(t, query, map[string]interface{}{
+		"query": map[string]interface{}{},
+	}, &result)
+	assert.NoError(t, err)
+
+	// 单个查询
+	_, err = Query(t, get, map[string]interface{}{
+		"id": newId,
+	}, &result)
+	assert.NoError(t, err)
 
 	// 更新
 	_, err = Query(t, update, map[string]interface{}{

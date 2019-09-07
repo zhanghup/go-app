@@ -1,23 +1,28 @@
 extend type Query{
+    "用户列表（分页）"
     users(query:QUser!):Users
+    "用户获取单个"
     user(id: String!):User
 }
 
 extend type Mutation {
+    "用户新建"
     user_create(input:NewUser!):User
+    "用户更新"
     user_update(id: String!,input:UpdUser!):Boolean!
+    "用户批量删除"
     user_removes(ids: [String!]):Boolean!
 }
 
 input QUser{
     index: Int
     size: Int
-    count: Int
+    count: Boolean
 }
 
 type Users{
     total: Int
-    users:[User!]
+    data:[User!]
 }
 
 type User @goModel(model:"github.com/zhanghup/go-app.User")  {

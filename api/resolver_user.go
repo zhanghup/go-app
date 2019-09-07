@@ -2,23 +2,23 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"github.com/zhanghup/go-app"
 	"github.com/zhanghup/go-app/api/gs"
+	"github.com/zhanghup/go-tools"
 )
 
 func (this queryResolver) Users(ctx context.Context, query gs.QUser) (*gs.Users, error) {
-	users := make([]app.User, 0)
-	this.DB(ctx).SF(`
+	users := make([]*app.User, 0)
+	_, total, err := this.DB(ctx).SF(`
 		select * from {{ table "user" }} u
 		where 1 = 1
-	`)
-	fmt.Println(users)
-	return nil, nil
+	`).Page2(query.Index, query.Size, query.Count, &users)
+	tools.Str().JSONStringPrintln(users)
+	return &gs.Users{Data: users, Total: &total}, err
 }
 
 func (this queryResolver) User(ctx context.Context, id string) (*app.User, error) {
-	panic("implement me")
+	return this.UserLoader(ctx, id)
 }
 
 func (this mutationResolver) UserCreate(ctx context.Context, input gs.NewUser) (*app.User, error) {
@@ -34,8 +34,5 @@ func (this mutationResolver) UserUpdate(ctx context.Context, id string, input gs
 }
 
 func (this mutationResolver) UserRemoves(ctx context.Context, id []string) (bool, error) {
-	_, err := this.DB(ctx).Table(new(app.User)).SF(`
-		delete from {{ table "user" }} where id in :ids
-	`, map[string]interface{}{"ids": id}).Execute()
-	return err == nil, err
+	return this.Removes(ctx, new(app.User), id)
 }

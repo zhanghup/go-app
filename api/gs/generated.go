@@ -68,7 +68,7 @@ type ComplexityRoot struct {
 	}
 
 	Dicts struct {
-		Dicts func(childComplexity int) int
+		Data  func(childComplexity int) int
 		Total func(childComplexity int) int
 	}
 
@@ -107,7 +107,7 @@ type ComplexityRoot struct {
 	}
 
 	Roles struct {
-		Roles func(childComplexity int) int
+		Data  func(childComplexity int) int
 		Total func(childComplexity int) int
 	}
 
@@ -130,8 +130,8 @@ type ComplexityRoot struct {
 	}
 
 	Users struct {
+		Data  func(childComplexity int) int
 		Total func(childComplexity int) int
-		Users func(childComplexity int) int
 	}
 }
 
@@ -304,12 +304,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DictItem.Weight(childComplexity), true
 
-	case "Dicts.dicts":
-		if e.complexity.Dicts.Dicts == nil {
+	case "Dicts.data":
+		if e.complexity.Dicts.Data == nil {
 			break
 		}
 
-		return e.complexity.Dicts.Dicts(childComplexity), true
+		return e.complexity.Dicts.Data(childComplexity), true
 
 	case "Dicts.total":
 		if e.complexity.Dicts.Total == nil {
@@ -583,12 +583,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Role.Weight(childComplexity), true
 
-	case "Roles.roles":
-		if e.complexity.Roles.Roles == nil {
+	case "Roles.data":
+		if e.complexity.Roles.Data == nil {
 			break
 		}
 
-		return e.complexity.Roles.Roles(childComplexity), true
+		return e.complexity.Roles.Data(childComplexity), true
 
 	case "Roles.total":
 		if e.complexity.Roles.Total == nil {
@@ -702,19 +702,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Weight(childComplexity), true
 
+	case "Users.data":
+		if e.complexity.Users.Data == nil {
+			break
+		}
+
+		return e.complexity.Users.Data(childComplexity), true
+
 	case "Users.total":
 		if e.complexity.Users.Total == nil {
 			break
 		}
 
 		return e.complexity.Users.Total(childComplexity), true
-
-	case "Users.users":
-		if e.complexity.Users.Users == nil {
-			break
-		}
-
-		return e.complexity.Users.Users(childComplexity), true
 
 	}
 	return 0, false
@@ -797,86 +797,38 @@ type Mutation {
     world: String
 }
 `},
-	&ast.Source{Name: "schema/schema__.graphql", Input: `#extend type Query{
-#    users(query:QUser!):Users
-#    user(id: String!):User
-#}
-#
-#extend type Mutation {
-#    user_create(input:NewUser!):User
-#    user_update(id: String!,input:UpdUser!):Boolean!
-#    user_removes(ids: [String!]):Boolean!
-#}
-#
-#input QUser{
-#    index: Int
-#    size: Int
-#    count: Int
-#}
-#
-#type Users{
-#    total: Int
-#    users:[User!]
-#}
-#
-#type User @goModel(model:"github.com/zhanghup/go-app.User")  {
-#    id: String
-#
-#
-#
-#    "创建时间"
-#    created: Int
-#    "更新时间"
-#    updated: Int
-#    "排序"
-#    weight: Int
-#    "状态[0:隐藏,1:显示]"
-#    status: Int
-#
-#}
-#
-#input NewUser {
-#
-#
-#    "排序"
-#    weight: Int
-#    "状态[0:隐藏,1:显示]"
-#    status: Int
-#}
-#
-#input UpdUser {
-#
-#    "排序"
-#    weight: Int
-#    "状态[0:隐藏,1:显示]"
-#    status: Int
-#}
-#
-`},
 	&ast.Source{Name: "schema/schema_dict.graphql", Input: `extend type Query{
+    "字典列表（分页）"
     dicts(query:QDict!):Dicts
+    "字典单个对象"
     dict(id: String!):Dict
 }
 
 extend type Mutation {
+    "字典新建"
     dict_create(input:NewDict!):Dict
+    "字典更新"
     dict_update(id: String!,input:UpdDict!):Boolean!
+    "字典批量删除"
     dict_removes(ids: [String!]):Boolean!
 
+    "字典项新建"
     dict_item_create(input:NewDictItem!):Dict
+    "字典项更新"
     dict_item_update(id: String!,input:UpdDictItem!):Boolean!
+    "字典项批量删除"
     dict_item_removes(ids: [String!]):Boolean!
 }
 
 input QDict{
     index: Int
     size: Int
-    count: Int
+    count: Boolean
 }
 
 type Dicts{
     total: Int
-    dicts:[Dict!]
+    data:[Dict!]
 }
 
 type Dict @goModel(model:"github.com/zhanghup/go-app.Dict")  {
@@ -982,31 +934,34 @@ input UpdDictItem{
     status: Int
 }`},
 	&ast.Source{Name: "schema/schema_role.graphql", Input: `extend type Query{
+    "角色列表（分页）"
     roles(query:QRole!):Roles
+    "角色获取单个"
     role(id: String!):Role
 }
 
 extend type Mutation {
+    "角色新建"
     role_create(input:NewRole!):Role
+    "角色更新"
     role_update(id: String!,input:UpdRole!):Boolean!
+    "角色批量删除"
     role_removes(ids: [String!]):Boolean!
 }
 
 input QRole{
     index: Int
     size: Int
-    count: Int
+    count: Boolean
 }
 
 type Roles{
     total: Int
-    roles:[Role!]
+    data:[Role!]
 }
 
 type Role @goModel(model:"github.com/zhanghup/go-app.Role")  {
     id: String
-
-
 
     "创建时间"
     created: Int
@@ -1038,25 +993,30 @@ input UpdRole {
 
 `},
 	&ast.Source{Name: "schema/schema_user.graphql", Input: `extend type Query{
+    "用户列表（分页）"
     users(query:QUser!):Users
+    "用户获取单个"
     user(id: String!):User
 }
 
 extend type Mutation {
+    "用户新建"
     user_create(input:NewUser!):User
+    "用户更新"
     user_update(id: String!,input:UpdUser!):Boolean!
+    "用户批量删除"
     user_removes(ids: [String!]):Boolean!
 }
 
 input QUser{
     index: Int
     size: Int
-    count: Int
+    count: Boolean
 }
 
 type Users{
     total: Int
-    users:[User!]
+    data:[User!]
 }
 
 type User @goModel(model:"github.com/zhanghup/go-app.User")  {
@@ -2134,7 +2094,7 @@ func (ec *executionContext) _Dicts_total(ctx context.Context, field graphql.Coll
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Dicts_dicts(ctx context.Context, field graphql.CollectedField, obj *Dicts) (ret graphql.Marshaler) {
+func (ec *executionContext) _Dicts_data(ctx context.Context, field graphql.CollectedField, obj *Dicts) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -2153,7 +2113,7 @@ func (ec *executionContext) _Dicts_dicts(ctx context.Context, field graphql.Coll
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Dicts, nil
+		return obj.Data, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3277,7 +3237,7 @@ func (ec *executionContext) _Roles_total(ctx context.Context, field graphql.Coll
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Roles_roles(ctx context.Context, field graphql.CollectedField, obj *Roles) (ret graphql.Marshaler) {
+func (ec *executionContext) _Roles_data(ctx context.Context, field graphql.CollectedField, obj *Roles) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -3296,7 +3256,7 @@ func (ec *executionContext) _Roles_roles(ctx context.Context, field graphql.Coll
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Roles, nil
+		return obj.Data, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3855,7 +3815,7 @@ func (ec *executionContext) _Users_total(ctx context.Context, field graphql.Coll
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Users_users(ctx context.Context, field graphql.CollectedField, obj *Users) (ret graphql.Marshaler) {
+func (ec *executionContext) _Users_data(ctx context.Context, field graphql.CollectedField, obj *Users) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -3874,7 +3834,7 @@ func (ec *executionContext) _Users_users(ctx context.Context, field graphql.Coll
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Users, nil
+		return obj.Data, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5258,7 +5218,7 @@ func (ec *executionContext) unmarshalInputQDict(ctx context.Context, obj interfa
 			}
 		case "count":
 			var err error
-			it.Count, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Count, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5288,7 +5248,7 @@ func (ec *executionContext) unmarshalInputQRole(ctx context.Context, obj interfa
 			}
 		case "count":
 			var err error
-			it.Count, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Count, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5318,7 +5278,7 @@ func (ec *executionContext) unmarshalInputQUser(ctx context.Context, obj interfa
 			}
 		case "count":
 			var err error
-			it.Count, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Count, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5624,8 +5584,8 @@ func (ec *executionContext) _Dicts(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = graphql.MarshalString("Dicts")
 		case "total":
 			out.Values[i] = ec._Dicts_total(ctx, field, obj)
-		case "dicts":
-			out.Values[i] = ec._Dicts_dicts(ctx, field, obj)
+		case "data":
+			out.Values[i] = ec._Dicts_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5865,8 +5825,8 @@ func (ec *executionContext) _Roles(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = graphql.MarshalString("Roles")
 		case "total":
 			out.Values[i] = ec._Roles_total(ctx, field, obj)
-		case "roles":
-			out.Values[i] = ec._Roles_roles(ctx, field, obj)
+		case "data":
+			out.Values[i] = ec._Roles_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5943,8 +5903,8 @@ func (ec *executionContext) _Users(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = graphql.MarshalString("Users")
 		case "total":
 			out.Values[i] = ec._Users_total(ctx, field, obj)
-		case "users":
-			out.Values[i] = ec._Users_users(ctx, field, obj)
+		case "data":
+			out.Values[i] = ec._Users_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

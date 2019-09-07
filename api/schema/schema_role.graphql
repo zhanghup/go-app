@@ -1,29 +1,32 @@
 extend type Query{
+    "角色列表（分页）"
     roles(query:QRole!):Roles
+    "角色获取单个"
     role(id: String!):Role
 }
 
 extend type Mutation {
+    "角色新建"
     role_create(input:NewRole!):Role
+    "角色更新"
     role_update(id: String!,input:UpdRole!):Boolean!
+    "角色批量删除"
     role_removes(ids: [String!]):Boolean!
 }
 
 input QRole{
     index: Int
     size: Int
-    count: Int
+    count: Boolean
 }
 
 type Roles{
     total: Int
-    roles:[Role!]
+    data:[Role!]
 }
 
 type Role @goModel(model:"github.com/zhanghup/go-app.Role")  {
     id: String
-
-
 
     "创建时间"
     created: Int

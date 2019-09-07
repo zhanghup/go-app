@@ -12,15 +12,15 @@
 #input QUser{
 #    index: Int
 #    size: Int
-#    count: Int
+#    count: Boolean
 #}
 #
 #type Users{
 #    total: Int
-#    users:[User!]
+#    data:[User!]
 #}
 #
-#type User @goModel(model:"github.com/zhanghup/go-app.User")  {
+#type User {
 #    id: String
 #
 #

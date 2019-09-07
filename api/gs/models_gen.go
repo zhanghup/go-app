@@ -8,7 +8,7 @@ import (
 
 type Dicts struct {
 	Total *int        `json:"total"`
-	Dicts []*app.Dict `json:"dicts"`
+	Data  []*app.Dict `json:"data"`
 }
 
 type NewDict struct {
@@ -74,26 +74,26 @@ type NewUser struct {
 }
 
 type QDict struct {
-	Index *int `json:"index"`
-	Size  *int `json:"size"`
-	Count *int `json:"count"`
+	Index *int  `json:"index"`
+	Size  *int  `json:"size"`
+	Count *bool `json:"count"`
 }
 
 type QRole struct {
-	Index *int `json:"index"`
-	Size  *int `json:"size"`
-	Count *int `json:"count"`
+	Index *int  `json:"index"`
+	Size  *int  `json:"size"`
+	Count *bool `json:"count"`
 }
 
 type QUser struct {
-	Index *int `json:"index"`
-	Size  *int `json:"size"`
-	Count *int `json:"count"`
+	Index *int  `json:"index"`
+	Size  *int  `json:"size"`
+	Count *bool `json:"count"`
 }
 
 type Roles struct {
 	Total *int        `json:"total"`
-	Roles []*app.Role `json:"roles"`
+	Data  []*app.Role `json:"data"`
 }
 
 type UpdDict struct {
@@ -156,5 +156,5 @@ type UpdUser struct {
 
 type Users struct {
 	Total *int        `json:"total"`
-	Users []*app.User `json:"users"`
+	Data  []*app.User `json:"data"`
 }

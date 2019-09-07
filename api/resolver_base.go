@@ -31,8 +31,9 @@ func (this *Resolver) Update(ctx context.Context, tab interface{}, id string, ob
 	return true, nil
 }
 
-func (this *Resolver) Remove(ctx context.Context, tab interface{}, id string) {
-
+func (this *Resolver) Removes(ctx context.Context, table interface{}, ids []string) (bool, error) {
+	_, err := this.DB(ctx).Table(table).In("id", ids).Delete(table)
+	return err == nil, err
 }
 
 func (this *Resolver) UserLoader(ctx context.Context, id string) (*app.User, error) {
