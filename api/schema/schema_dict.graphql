@@ -14,7 +14,7 @@ extend type Mutation {
     dict_removes(ids: [String!]):Boolean!
 
     "字典项新建"
-    dict_item_create(input:NewDictItem!):Dict
+    dict_item_create(input:NewDictItem!):DictItem
     "字典项更新"
     dict_item_update(id: String!,input:UpdDictItem!):Boolean!
     "字典项批量删除"

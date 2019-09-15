@@ -100,7 +100,9 @@ type ComplexityRoot struct {
 
 	Role struct {
 		Created func(childComplexity int) int
+		Desc    func(childComplexity int) int
 		Id      func(childComplexity int) int
+		Name    func(childComplexity int) int
 		Status  func(childComplexity int) int
 		Updated func(childComplexity int) int
 		Weight  func(childComplexity int) int
@@ -143,7 +145,7 @@ type MutationResolver interface {
 	DictCreate(ctx context.Context, input NewDict) (*app.Dict, error)
 	DictUpdate(ctx context.Context, id string, input UpdDict) (bool, error)
 	DictRemoves(ctx context.Context, ids []string) (bool, error)
-	DictItemCreate(ctx context.Context, input NewDictItem) (*app.Dict, error)
+	DictItemCreate(ctx context.Context, input NewDictItem) (*app.DictItem, error)
 	DictItemUpdate(ctx context.Context, id string, input UpdDictItem) (bool, error)
 	DictItemRemoves(ctx context.Context, ids []string) (bool, error)
 	RoleCreate(ctx context.Context, input NewRole) (*app.Role, error)
@@ -555,12 +557,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Role.Created(childComplexity), true
 
+	case "Role.desc":
+		if e.complexity.Role.Desc == nil {
+			break
+		}
+
+		return e.complexity.Role.Desc(childComplexity), true
+
 	case "Role.id":
 		if e.complexity.Role.Id == nil {
 			break
 		}
 
 		return e.complexity.Role.Id(childComplexity), true
+
+	case "Role.name":
+		if e.complexity.Role.Name == nil {
+			break
+		}
+
+		return e.complexity.Role.Name(childComplexity), true
 
 	case "Role.status":
 		if e.complexity.Role.Status == nil {
@@ -813,7 +829,7 @@ extend type Mutation {
     dict_removes(ids: [String!]):Boolean!
 
     "字典项新建"
-    dict_item_create(input:NewDictItem!):Dict
+    dict_item_create(input:NewDictItem!):DictItem
     "字典项更新"
     dict_item_update(id: String!,input:UpdDictItem!):Boolean!
     "字典项批量删除"
@@ -963,6 +979,11 @@ type Roles{
 type Role @goModel(model:"github.com/zhanghup/go-app.Role")  {
     id: String
 
+    "角色描述"
+    name: String
+    "角色名称"
+    desc: String
+
     "创建时间"
     created: Int
     "更新时间"
@@ -975,7 +996,10 @@ type Role @goModel(model:"github.com/zhanghup/go-app.Role")  {
 }
 
 input NewRole {
-
+    "角色描述"
+    name: String
+    "角色名称"
+    desc: String
 
     "排序"
     weight: Int
@@ -984,6 +1008,10 @@ input NewRole {
 }
 
 input UpdRole {
+    "角色描述"
+    name: String
+    "角色名称"
+    desc: String
 
     "排序"
     weight: Int
@@ -2326,10 +2354,10 @@ func (ec *executionContext) _Mutation_dict_item_create(ctx context.Context, fiel
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*app.Dict)
+	res := resTmp.(*app.DictItem)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalODict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx, field.Selections, res)
+	return ec.marshalODictItem2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_dict_item_update(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3053,6 +3081,74 @@ func (ec *executionContext) _Role_id(ctx context.Context, field graphql.Collecte
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Id, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Role_name(ctx context.Context, field graphql.CollectedField, obj *app.Role) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Role",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Role_desc(ctx context.Context, field graphql.CollectedField, obj *app.Role) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Role",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Desc, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5096,6 +5192,18 @@ func (ec *executionContext) unmarshalInputNewRole(ctx context.Context, obj inter
 
 	for k, v := range asMap {
 		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+			it.Desc, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "weight":
 			var err error
 			it.Weight, err = ec.unmarshalOInt2ᚖint(ctx, v)
@@ -5372,6 +5480,18 @@ func (ec *executionContext) unmarshalInputUpdRole(ctx context.Context, obj inter
 
 	for k, v := range asMap {
 		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+			it.Desc, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "weight":
 			var err error
 			it.Weight, err = ec.unmarshalOInt2ᚖint(ctx, v)
@@ -5793,6 +5913,10 @@ func (ec *executionContext) _Role(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = graphql.MarshalString("Role")
 		case "id":
 			out.Values[i] = ec._Role_id(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._Role_name(ctx, field, obj)
+		case "desc":
+			out.Values[i] = ec._Role_desc(ctx, field, obj)
 		case "created":
 			out.Values[i] = ec._Role_created(ctx, field, obj)
 		case "updated":
@@ -6589,6 +6713,10 @@ func (ec *executionContext) marshalODict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑapp�
 	return ec._Dict(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalODictItem2githubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx context.Context, sel ast.SelectionSet, v app.DictItem) graphql.Marshaler {
+	return ec._DictItem(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalODictItem2ᚕᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx context.Context, sel ast.SelectionSet, v []*app.DictItem) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -6627,6 +6755,13 @@ func (ec *executionContext) marshalODictItem2ᚕᚖgithubᚗcomᚋzhanghupᚋgo�
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) marshalODictItem2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx context.Context, sel ast.SelectionSet, v *app.DictItem) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DictItem(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODicts2githubᚗcomᚋzhanghupᚋgoᚑappᚋapiᚋgsᚐDicts(ctx context.Context, sel ast.SelectionSet, v Dicts) graphql.Marshaler {

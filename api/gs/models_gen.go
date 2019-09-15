@@ -40,6 +40,10 @@ type NewDictItem struct {
 }
 
 type NewRole struct {
+	// 角色描述
+	Name *string `json:"name"`
+	// 角色名称
+	Desc *string `json:"desc"`
 	// 排序
 	Weight *int `json:"weight"`
 	// 状态[0:隐藏,1:显示]
@@ -121,6 +125,10 @@ type UpdDictItem struct {
 }
 
 type UpdRole struct {
+	// 角色描述
+	Name *string `json:"name"`
+	// 角色名称
+	Desc *string `json:"desc"`
 	// 排序
 	Weight *int `json:"weight"`
 	// 状态[0:隐藏,1:显示]

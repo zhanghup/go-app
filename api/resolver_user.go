@@ -7,9 +7,21 @@ import (
 	"github.com/zhanghup/go-tools"
 )
 
+func (this *Resolver) UserLoader(ctx context.Context, id string) (*app.User, error) {
+	obj, err := this.Loader(ctx).Common(new(app.User)).Load(id)
+	if err != nil {
+		return nil, err
+	}
+	user, ok := obj.(app.User)
+	if !ok {
+		return nil, nil
+	}
+	return &user, nil
+}
+
 func (this queryResolver) Users(ctx context.Context, query gs.QUser) (*gs.Users, error) {
 	users := make([]*app.User, 0)
-	_, total, err := this.DB(ctx).SF(`
+	_, total, err := this.DB.SF(`
 		select * from {{ table "user" }} u
 		where 1 = 1
 	`).Page2(query.Index, query.Size, query.Count, &users)

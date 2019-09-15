@@ -7,7 +7,7 @@ import (
 )
 
 func TestUserTemplate(t *testing.T) {
-	test.MainTest(t, "user", map[string]interface{}{
+	test.NewMt().MainTest(t, "user", map[string]interface{}{
 		"type":     "a",
 		"account":  tools.ObjectString(),
 		"password": "Aa123456",

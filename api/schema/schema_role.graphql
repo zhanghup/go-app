@@ -28,6 +28,11 @@ type Roles{
 type Role @goModel(model:"github.com/zhanghup/go-app.Role")  {
     id: String
 
+    "角色描述"
+    name: String
+    "角色名称"
+    desc: String
+
     "创建时间"
     created: Int
     "更新时间"
@@ -40,7 +45,10 @@ type Role @goModel(model:"github.com/zhanghup/go-app.Role")  {
 }
 
 input NewRole {
-
+    "角色描述"
+    name: String
+    "角色名称"
+    desc: String
 
     "排序"
     weight: Int
@@ -49,6 +57,10 @@ input NewRole {
 }
 
 input UpdRole {
+    "角色描述"
+    name: String
+    "角色名称"
+    desc: String
 
     "排序"
     weight: Int
