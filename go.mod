@@ -9,8 +9,9 @@ require (
 	github.com/go-xorm/xorm v0.7.6
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.4.0
+	github.com/vektah/dataloaden v0.3.0 // indirect
 	github.com/vektah/gqlparser v1.1.2
-	github.com/zhanghup/go-tools v1.0.14
+	github.com/zhanghup/go-tools v1.0.15
 )
 
 replace github.com/99designs/gqlgen => github.com/zhanghup/go-gqlgen v0.9.3

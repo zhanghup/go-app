@@ -7,7 +7,7 @@ import (
 )
 
 func (this *Resolver) RoleLoader(ctx context.Context, id string) (*app.Role, error) {
-	obj, err := this.Loader(ctx).Common(new(app.Role)).Load(id)
+	obj, err := this.Loader(ctx).Object(new(app.Role)).Load(id)
 	if err != nil {
 		return nil, err
 	}

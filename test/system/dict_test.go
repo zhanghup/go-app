@@ -35,3 +35,37 @@ func TestDictTemplate(t *testing.T) {
 		"status": 1,
 	})
 }
+
+func TestQuery(t *testing.T) {
+	r, err := test.Query(t, `
+		query Q{
+			dicts(query:{
+
+			}){
+				total
+				data{
+					id
+					code
+					name
+					remark
+					created
+					updated
+					weight
+					status
+					values{
+						id
+						code
+						name
+						value
+						extension
+						created
+						updated
+						weight
+						status
+					}
+				}
+			}
+		}
+	`, nil, )
+	fmt.Println(string(r.Body.String()), err)
+}

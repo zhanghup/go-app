@@ -8,7 +8,7 @@ import (
 )
 
 func (this *Resolver) UserLoader(ctx context.Context, id string) (*app.User, error) {
-	obj, err := this.Loader(ctx).Common(new(app.User)).Load(id)
+	obj, err := this.Loader(ctx).Object(new(app.User)).Load(id)
 	if err != nil {
 		return nil, err
 	}

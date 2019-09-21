@@ -11,7 +11,7 @@ type DictResolver struct {
 }
 
 func (this *Resolver) DictLoader(ctx context.Context, id string) (*app.Dict, error) {
-	obj, err := this.Loader(ctx).Common(new(app.Dict)).Load(id)
+	obj, err := this.Loader(ctx).Object(new(app.Dict)).Load(id)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (this *Resolver) DictLoader(ctx context.Context, id string) (*app.Dict, err
 }
 
 func (this *Resolver) DictItemLoader(ctx context.Context, id string) (*app.DictItem, error) {
-	obj, err := this.Loader(ctx).Common(new(app.DictItem)).Load(id)
+	obj, err := this.Loader(ctx).Object(new(app.DictItem)).Load(id)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,12 @@ func (this *Resolver) Dict() gs.DictResolver {
 }
 
 func (this DictResolver) Values(ctx context.Context, obj *app.Dict) ([]*app.DictItem, error) {
-	panic("implement me")
+	if obj.Code == nil {
+		return nil, nil
+	}
+	var c []*app.DictItem
+	err := this.Loader(ctx).Slice(new(app.DictItem), "code").Load(*obj.Code, &c)
+	return c, err
 }
 
 func (this queryResolver) Dicts(ctx context.Context, query gs.QDict) (*gs.Dicts, error) {
