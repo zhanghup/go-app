@@ -25,7 +25,7 @@ func (this queryResolver) Users(ctx context.Context, query gs.QUser) (*gs.Users,
 		select * from {{ table "user" }} u
 		where 1 = 1
 	`).Page2(query.Index, query.Size, query.Count, &users)
-	tools.Str().JSONStringPrintln(users)
+	tools.Str().JSONStringPrintln(query)
 	return &gs.Users{Data: users, Total: &total}, err
 }
 

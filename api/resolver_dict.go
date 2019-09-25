@@ -73,7 +73,7 @@ func (this mutationResolver) DictUpdate(ctx context.Context, id string, input gs
 }
 
 func (this mutationResolver) DictRemoves(ctx context.Context, ids []string) (bool, error) {
-	return this.Removes(ctx, new(app.DictItem), ids)
+	return this.Removes(ctx, new(app.Dict), ids)
 }
 
 func (this mutationResolver) DictItemCreate(ctx context.Context, input gs.NewDictItem) (*app.DictItem, error) {
