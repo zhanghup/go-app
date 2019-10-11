@@ -176,7 +176,7 @@ func commonGetField(vl reflect.Value, fieldname string) (*reflect.Value, error) 
 			return &v, nil
 		}
 		if t.Type.Kind() == reflect.Struct {
-			commonGetField(v, fieldname)
+			return commonGetField(v, fieldname)
 		}
 	}
 	return nil, errors.New("没有找到对应的属性值")

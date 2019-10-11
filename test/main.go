@@ -61,6 +61,7 @@ func action(t assert.TestingT, prefix, query string, variables interface{}, resu
 		return w, nil
 	}
 	obj := map[string]interface{}{}
+	fmt.Println(w.Body.String())
 	err = json.Unmarshal([]byte(w.Body.String()), &obj)
 	if err != nil {
 		assert.Error(t, err, "json解析异常")
@@ -90,7 +91,7 @@ func action(t assert.TestingT, prefix, query string, variables interface{}, resu
 }
 
 func Query(t assert.TestingT, query string, variables interface{}, result ...interface{}) (*httptest.ResponseRecorder, error) {
-	return action(t, "/query", query, variables, result...)
+	return action(t, "/base", query, variables, result...)
 }
 
 func Tpl() template.FuncMap {
@@ -235,7 +236,6 @@ func (this Mt) MainTest(t *testing.T, obj string, params ...map[string]interface
 	}, Tpl())
 	assert.NoError(t, err, err)
 
-	//fmt.Println(create, query, get, update, remove)
 	// 新增
 	result := map[string]interface{}{}
 	if this.create {
