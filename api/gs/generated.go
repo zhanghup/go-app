@@ -138,7 +138,7 @@ type ComplexityRoot struct {
 }
 
 type DictResolver interface {
-	Values(ctx context.Context, obj *app.Dict) ([]*app.DictItem, error)
+	Values(ctx context.Context, obj *app.Dict) ([]app.DictItem, error)
 }
 type MutationResolver interface {
 	World(ctx context.Context) (*string, error)
@@ -1776,10 +1776,10 @@ func (ec *executionContext) _Dict_values(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*app.DictItem)
+	res := resTmp.([]app.DictItem)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalODictItem2ᚕᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx, field.Selections, res)
+	return ec.marshalODictItem2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DictItem_id(ctx context.Context, field graphql.CollectedField, obj *app.DictItem) (ret graphql.Marshaler) {
@@ -2150,10 +2150,10 @@ func (ec *executionContext) _Dicts_data(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*app.Dict)
+	res := resTmp.([]app.Dict)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalODict2ᚕᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx, field.Selections, res)
+	return ec.marshalODict2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_world(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3361,10 +3361,10 @@ func (ec *executionContext) _Roles_data(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*app.Role)
+	res := resTmp.([]app.Role)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalORole2ᚕᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx, field.Selections, res)
+	return ec.marshalORole2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
@@ -3939,10 +3939,10 @@ func (ec *executionContext) _Users_data(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*app.User)
+	res := resTmp.([]app.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOUser2ᚕᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -6303,28 +6303,8 @@ func (ec *executionContext) marshalNDict2githubᚗcomᚋzhanghupᚋgoᚑappᚐDi
 	return ec._Dict(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNDict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx context.Context, sel ast.SelectionSet, v *app.Dict) graphql.Marshaler {
-	if v == nil {
-		if !ec.HasError(graphql.GetResolverContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Dict(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNDictItem2githubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx context.Context, sel ast.SelectionSet, v app.DictItem) graphql.Marshaler {
 	return ec._DictItem(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNDictItem2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx context.Context, sel ast.SelectionSet, v *app.DictItem) graphql.Marshaler {
-	if v == nil {
-		if !ec.HasError(graphql.GetResolverContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._DictItem(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNNewDict2githubᚗcomᚋzhanghupᚋgoᚑappᚋapiᚋgsᚐNewDict(ctx context.Context, v interface{}) (NewDict, error) {
@@ -6359,16 +6339,6 @@ func (ec *executionContext) marshalNRole2githubᚗcomᚋzhanghupᚋgoᚑappᚐRo
 	return ec._Role(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNRole2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx context.Context, sel ast.SelectionSet, v *app.Role) graphql.Marshaler {
-	if v == nil {
-		if !ec.HasError(graphql.GetResolverContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Role(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	return graphql.UnmarshalString(v)
 }
@@ -6401,16 +6371,6 @@ func (ec *executionContext) unmarshalNUpdUser2githubᚗcomᚋzhanghupᚋgoᚑapp
 
 func (ec *executionContext) marshalNUser2githubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx context.Context, sel ast.SelectionSet, v app.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx context.Context, sel ast.SelectionSet, v *app.User) graphql.Marshaler {
-	if v == nil {
-		if !ec.HasError(graphql.GetResolverContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._User(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -6666,7 +6626,7 @@ func (ec *executionContext) marshalODict2githubᚗcomᚋzhanghupᚋgoᚑappᚐDi
 	return ec._Dict(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalODict2ᚕᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx context.Context, sel ast.SelectionSet, v []*app.Dict) graphql.Marshaler {
+func (ec *executionContext) marshalODict2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx context.Context, sel ast.SelectionSet, v []app.Dict) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6693,7 +6653,7 @@ func (ec *executionContext) marshalODict2ᚕᚖgithubᚗcomᚋzhanghupᚋgoᚑap
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNDict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx, sel, v[i])
+			ret[i] = ec.marshalNDict2githubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6717,7 +6677,7 @@ func (ec *executionContext) marshalODictItem2githubᚗcomᚋzhanghupᚋgoᚑapp�
 	return ec._DictItem(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalODictItem2ᚕᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx context.Context, sel ast.SelectionSet, v []*app.DictItem) graphql.Marshaler {
+func (ec *executionContext) marshalODictItem2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx context.Context, sel ast.SelectionSet, v []app.DictItem) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6744,7 +6704,7 @@ func (ec *executionContext) marshalODictItem2ᚕᚖgithubᚗcomᚋzhanghupᚋgo�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNDictItem2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx, sel, v[i])
+			ret[i] = ec.marshalNDictItem2githubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6825,7 +6785,7 @@ func (ec *executionContext) marshalORole2githubᚗcomᚋzhanghupᚋgoᚑappᚐRo
 	return ec._Role(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalORole2ᚕᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx context.Context, sel ast.SelectionSet, v []*app.Role) graphql.Marshaler {
+func (ec *executionContext) marshalORole2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx context.Context, sel ast.SelectionSet, v []app.Role) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6852,7 +6812,7 @@ func (ec *executionContext) marshalORole2ᚕᚖgithubᚗcomᚋzhanghupᚋgoᚑap
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNRole2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx, sel, v[i])
+			ret[i] = ec.marshalNRole2githubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6942,7 +6902,7 @@ func (ec *executionContext) marshalOUser2githubᚗcomᚋzhanghupᚋgoᚑappᚐUs
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOUser2ᚕᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx context.Context, sel ast.SelectionSet, v []*app.User) graphql.Marshaler {
+func (ec *executionContext) marshalOUser2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx context.Context, sel ast.SelectionSet, v []app.User) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6969,7 +6929,7 @@ func (ec *executionContext) marshalOUser2ᚕᚖgithubᚗcomᚋzhanghupᚋgoᚑap
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNUser2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx, sel, v[i])
+			ret[i] = ec.marshalNUser2githubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)

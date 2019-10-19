@@ -19,7 +19,7 @@ func (this *Resolver) RoleLoader(ctx context.Context, id string) (*app.Role, err
 }
 
 func (this queryResolver) Roles(ctx context.Context, query gs.QRole) (*gs.Roles, error) {
-	roles := make([]*app.Role, 0)
+	roles := make([]app.Role, 0)
 	_, total, err := this.DB.SF(`
 		select * from {{ table "role" }} u
 		where 1 = 1

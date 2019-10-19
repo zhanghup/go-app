@@ -20,7 +20,7 @@ func (this *Resolver) UserLoader(ctx context.Context, id string) (*app.User, err
 }
 
 func (this queryResolver) Users(ctx context.Context, query gs.QUser) (*gs.Users, error) {
-	users := make([]*app.User, 0)
+	users := make([]app.User, 0)
 	_, total, err := this.DB.SF(`
 		select * from {{ table "user" }} u
 		where 1 = 1

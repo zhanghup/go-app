@@ -114,7 +114,7 @@ func (this *dataLoaden) Slice(obj interface{}, key string, params ...map[string]
 		maxBatch: 128,
 		wait:     1 * time.Millisecond,
 		fetch: func(keys []string) (i interface{}, errors []error) {
-			tySlice := reflect.SliceOf(reflect.TypeOf(obj))
+			tySlice := reflect.SliceOf(reflect.TypeOf(obj).Elem())
 			tyMap := reflect.MapOf(reflect.TypeOf(""), tySlice)
 
 			ll := reflect.New(tySlice)
@@ -140,7 +140,7 @@ func (this *dataLoaden) Slice(obj interface{}, key string, params ...map[string]
 
 			for i := 0; i < ll.Len(); i++ {
 				vl := ll.Index(i)
-				id, err := commonGetField(vl.Elem(), UpTitle(key))
+				id, err := commonGetField(vl, UpTitle(key))
 				if err != nil {
 					return nil, []error{err}
 				}
@@ -176,7 +176,10 @@ func commonGetField(vl reflect.Value, fieldname string) (*reflect.Value, error) 
 			return &v, nil
 		}
 		if t.Type.Kind() == reflect.Struct {
-			return commonGetField(v, fieldname)
+			vvv, err := commonGetField(v, fieldname)
+			if err == nil {
+				return vvv, nil
+			}
 		}
 	}
 	return nil, errors.New("没有找到对应的属性值")

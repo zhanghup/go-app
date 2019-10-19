@@ -38,17 +38,17 @@ func (this *Resolver) Dict() gs.DictResolver {
 	return DictResolver{this}
 }
 
-func (this DictResolver) Values(ctx context.Context, obj *app.Dict) ([]*app.DictItem, error) {
+func (this DictResolver) Values(ctx context.Context, obj *app.Dict) ([]app.DictItem, error) {
 	if obj.Code == nil {
 		return nil, nil
 	}
-	var c []*app.DictItem
+	c := make([]app.DictItem,0)
 	err := this.Loader(ctx).Slice(new(app.DictItem), "code").Load(*obj.Code, &c)
 	return c, err
 }
 
 func (this queryResolver) Dicts(ctx context.Context, query gs.QDict) (*gs.Dicts, error) {
-	dicts := make([]*app.Dict, 0)
+	dicts := make([]app.Dict, 0)
 	_, total, err := this.DB.SF(`
 		select * from {{ table "dict" }} u
 		where 1 = 1

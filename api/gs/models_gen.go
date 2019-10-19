@@ -7,8 +7,8 @@ import (
 )
 
 type Dicts struct {
-	Total *int        `json:"total"`
-	Data  []*app.Dict `json:"data"`
+	Total *int       `json:"total"`
+	Data  []app.Dict `json:"data"`
 }
 
 type NewDict struct {
@@ -96,8 +96,8 @@ type QUser struct {
 }
 
 type Roles struct {
-	Total *int        `json:"total"`
-	Data  []*app.Role `json:"data"`
+	Total *int       `json:"total"`
+	Data  []app.Role `json:"data"`
 }
 
 type UpdDict struct {
@@ -163,6 +163,6 @@ type UpdUser struct {
 }
 
 type Users struct {
-	Total *int        `json:"total"`
-	Data  []*app.User `json:"data"`
+	Total *int       `json:"total"`
+	Data  []app.User `json:"data"`
 }
