@@ -61,10 +61,10 @@ type Perm struct {
 type User struct {
 	Bean `xorm:"extends"`
 
-	Type     *string `json:"type"`
+	Type     *string `json:"type"` // D0001 用户类型
 	Account  *string `json:"account" xorm:"unique"`
 	Password *string `json:"password"`
-	Slat     *string `json:"slot"`
+	Slat     *string `json:"-" xorm:"slat"`
 	Name     *string `json:"name"`
 	Avatar   *string `json:"avatar"`
 	ICard    *string `json:"i_card"`

@@ -6,6 +6,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-app"
 	"github.com/zhanghup/go-app/auth"
+	"github.com/zhanghup/go-app/initia"
 
 	//_ "github.com/mattn/go-sqlite3"
 	_ "github.com/go-sql-driver/mysql"
@@ -20,12 +21,13 @@ func Router() *gin.Engine {
 		panic(err)
 	}
 	app.Sync(e)
+	initia.InitDict(e)
 	e.ShowSQL(true)
 
 	g.POST("/base", api.Gin(e))
 	g.POST("/auth", auth.Gin(e))
-	api.Playground(g, "/base/playground1","/base")
-	api.Playground(g, "/auth/playground1","/auth")
+	api.Playground(g, "/base/playground1", "/base")
+	api.Playground(g, "/auth/playground1", "/auth")
 
 	g.GET("/base/playground2", func(c *gin.Context) {
 		handler.Playground("标题", "/base").ServeHTTP(c.Writer, c.Request)

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+
 	"github.com/zhanghup/go-app"
 	"github.com/zhanghup/go-app/api/gs"
 	"github.com/zhanghup/go-tools"
@@ -38,6 +39,18 @@ func (this mutationResolver) UserCreate(ctx context.Context, input gs.NewUser) (
 	if err != nil {
 		return nil, err
 	}
+	if input.Password != "" {
+		pwd := input.Password
+		salt := *tools.ObjectString()
+		_, err := this.DB.Table(new(app.User)).Where("id = ?", id).Update(map[string]interface{}{
+			"password": tools.Password(pwd, salt),
+			"slat":     salt,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return this.UserLoader(ctx, id)
 }
 
