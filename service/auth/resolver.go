@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-app"
-	"github.com/zhanghup/go-app/service/api"
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-tools"
 	"net/http"
@@ -35,10 +34,9 @@ func ggin(e *xorm.Engine) func(c *gin.Context) {
 	}
 }
 
-
 func Gin(e *xorm.Engine, g *gin.Engine) {
 	g.POST("/auth", ggin(e))
-	api.Playground(g, "/auth/playground1", "/auth")
+	gs.Playground(g, "/auth/playground1", "/auth")
 	g.GET("/auth/playground2", func(c *gin.Context) {
 		handler.Playground("标题", "/auth").ServeHTTP(c.Writer, c.Request)
 	})

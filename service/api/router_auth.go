@@ -48,8 +48,14 @@ func userAuth(e *xorm.Engine) gin.HandlerFunc {
 
 		*token.Ops += 1
 		*token.Expire = 7200
+		_, err = e.Table(token).Where("id = ?", token.Id).Update(token)
+		if err != nil {
+			c.Fail(errors.New("【7:未授权】"), nil, 401)
+			c.Abort()
+			return
+		}
 
-		c.Set("token", *token.Id)
+		c.Set("uid", *token.User)
 		c.SetCookie(gs.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
 		c.Next()
 	}
