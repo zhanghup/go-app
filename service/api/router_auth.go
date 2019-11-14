@@ -2,12 +2,13 @@ package api
 
 import (
 	"errors"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-app"
 	"github.com/zhanghup/go-app/service/auth"
 	"github.com/zhanghup/go-app/service/gs"
-	"time"
 )
 
 func userAuth(e *xorm.Engine) gin.HandlerFunc {
@@ -17,6 +18,9 @@ func userAuth(e *xorm.Engine) gin.HandlerFunc {
 			c.Fail(errors.New("【1:未授权】"), nil, 401)
 			c.Abort()
 			return
+		}
+		if len(tok) == 0 {
+			tok = c.GetHeader("Authorization")
 		}
 		token := app.UserToken{}
 		ok, err := e.Table(token).Where("id = ?", tok).Get(&token)
