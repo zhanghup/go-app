@@ -31,7 +31,7 @@
 #    updated: Int
 #    "排序"
 #    weight: Int
-#    "状态[0:隐藏,1:显示]"
+#    "状态[dict:STA0001]"
 #    status: Int
 #
 #}
@@ -41,7 +41,7 @@
 #
 #    "排序"
 #    weight: Int
-#    "状态[0:隐藏,1:显示]"
+#    "状态[dict:STA0001]"
 #    status: Int
 #}
 #
@@ -49,7 +49,7 @@
 #
 #    "排序"
 #    weight: Int
-#    "状态[0:隐藏,1:显示]"
+#    "状态[dict:STA0001]"
 #    status: Int
 #}
 #

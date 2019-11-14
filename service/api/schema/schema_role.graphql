@@ -39,7 +39,7 @@ type Role @goModel(model:"github.com/zhanghup/go-app.Role")  {
     updated: Int
     "排序"
     weight: Int
-    "状态[0:隐藏,1:显示]"
+    "状态[dict:STA0001]"
     status: Int
 
 }
@@ -52,7 +52,7 @@ input NewRole {
 
     "排序"
     weight: Int
-    "状态[0:隐藏,1:显示]"
+    "状态[dict:STA0001]"
     status: Int
 }
 
@@ -64,7 +64,7 @@ input UpdRole {
 
     "排序"
     weight: Int
-    "状态[0:隐藏,1:显示]"
+    "状态[dict:STA0001]"
     status: Int
 }
 

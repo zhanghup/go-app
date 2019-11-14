@@ -42,7 +42,7 @@ type User @goModel(model:"github.com/zhanghup/go-app.User")  {
     i_card: String
     "出生年月"
     birth: Int
-    "性别[0: 未知,1: 女,2: 男]"
+    "性别[dict:STA0002]"
     sex: Int
     "移动电话"
     mobile: String
@@ -54,7 +54,7 @@ type User @goModel(model:"github.com/zhanghup/go-app.User")  {
     updated: Int
     "排序"
     weight: Int
-    "状态[0:隐藏,1:显示]"
+    "状态[dict:STA0001]"
     status: Int
 
 }
@@ -74,7 +74,7 @@ input NewUser {
     i_card: String
     "出生年月"
     birth: Int
-    "性别[0: 未知,1: 女,2: 男]"
+    "性别[dict:STA0002]"
     sex: Int
     "移动电话"
     mobile: String
@@ -82,7 +82,7 @@ input NewUser {
     admin: Int
     "排序"
     weight: Int
-    "状态[0:隐藏,1:显示]"
+    "状态[dict:STA0001]"
     status: Int
 }
 
@@ -101,7 +101,7 @@ input UpdUser {
     i_card: String
     "出生年月"
     birth: Int
-    "性别[0: 未知,1: 女,2: 男]"
+    "性别[dict:STA0002]"
     sex: Int
     "移动电话"
     mobile: String
@@ -109,7 +109,7 @@ input UpdUser {
     admin: Int
     "排序"
     weight: Int
-    "状态[0:隐藏,1:显示]"
+    "状态[dict:STA0001]"
     status: Int
 }
 

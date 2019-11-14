@@ -38,6 +38,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	Perm func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -153,7 +154,10 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var parsedSchema = gqlparser.MustLoadSchema(
-	&ast.Source{Name: "schema.graphql", Input: `directive @goModel(model: String, models: [String!]) on OBJECT
+	&ast.Source{Name: "schema.graphql", Input: `"数据操作权限"
+directive @perm(entity:String!, perm: String!) on FIELD_DEFINITION
+
+directive @goModel(model: String, models: [String!]) on OBJECT
   | INPUT_OBJECT
   | SCALAR
   | ENUM
@@ -178,6 +182,28 @@ type Mutation {
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) dir_perm_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["entity"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["entity"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["perm"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["perm"] = arg1
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error

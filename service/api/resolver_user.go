@@ -2,9 +2,10 @@ package api
 
 import (
 	"context"
+	"github.com/pkg/errors"
+	"github.com/zhanghup/go-app/service/api/lib"
 
 	"github.com/zhanghup/go-app"
-	"github.com/zhanghup/go-app/api/gs"
 	"github.com/zhanghup/go-tools"
 )
 
@@ -20,21 +21,21 @@ func (this *Resolver) UserLoader(ctx context.Context, id string) (*app.User, err
 	return &user, nil
 }
 
-func (this queryResolver) Users(ctx context.Context, query gs.QUser) (*gs.Users, error) {
+func (this queryResolver) Users(ctx context.Context, query lib.QUser) (*lib.Users, error) {
 	users := make([]app.User, 0)
 	_, total, err := this.DB.SF(`
 		select * from {{ table "user" }} u
 		where 1 = 1
 	`).Page2(query.Index, query.Size, query.Count, &users)
 	tools.Str().JSONStringPrintln(query)
-	return &gs.Users{Data: users, Total: &total}, err
+	return &lib.Users{Data: users, Total: &total}, err
 }
 
 func (this queryResolver) User(ctx context.Context, id string) (*app.User, error) {
 	return this.UserLoader(ctx, id)
 }
 
-func (this mutationResolver) UserCreate(ctx context.Context, input gs.NewUser) (*app.User, error) {
+func (this mutationResolver) UserCreate(ctx context.Context, input lib.NewUser) (*app.User, error) {
 	id, err := this.Create(ctx, new(app.User), input)
 	if err != nil {
 		return nil, err
@@ -54,7 +55,17 @@ func (this mutationResolver) UserCreate(ctx context.Context, input gs.NewUser) (
 	return this.UserLoader(ctx, id)
 }
 
-func (this mutationResolver) UserUpdate(ctx context.Context, id string, input gs.UpdUser) (bool, error) {
+func (this mutationResolver) UserUpdate(ctx context.Context, id string, input lib.UpdUser) (bool, error) {
+	user, err := this.UserLoader(ctx, id)
+	if err != nil {
+		return false, err
+	}
+	if input.Password == "" {
+		return false, errors.New("密码不能为空")
+	}
+	if *user.Password != input.Password {
+		input.Password = tools.Password(input.Password, *user.Slat)
+	}
 	return this.Update(ctx, new(app.User), id, input)
 }
 

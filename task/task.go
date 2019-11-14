@@ -61,7 +61,7 @@ func (this *Cron) Add(code, name, expression string, fn func() error) error {
 			}
 		}
 		return nil
-	}, true)
+	})
 
 	err = this.cron.AddFunc(expression, func() {
 		lg := app.CronLog{

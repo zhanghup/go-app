@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	"github.com/zhanghup/go-app"
-	"github.com/zhanghup/go-app/api/gs"
+	"github.com/zhanghup/go-app/service/api/lib"
 )
 
 type DictResolver struct {
@@ -34,7 +34,7 @@ func (this *Resolver) DictItemLoader(ctx context.Context, id string) (*app.DictI
 	return &dict, nil
 }
 
-func (this *Resolver) Dict() gs.DictResolver {
+func (this *Resolver) Dict() lib.DictResolver {
 	return DictResolver{this}
 }
 
@@ -47,20 +47,20 @@ func (this DictResolver) Values(ctx context.Context, obj *app.Dict) ([]app.DictI
 	return c, err
 }
 
-func (this queryResolver) Dicts(ctx context.Context, query gs.QDict) (*gs.Dicts, error) {
+func (this queryResolver) Dicts(ctx context.Context, query lib.QDict) (*lib.Dicts, error) {
 	dicts := make([]app.Dict, 0)
 	_, total, err := this.DB.SF(`
 		select * from {{ table "dict" }} u
 		where 1 = 1
 	`).Page2(query.Index, query.Size, query.Count, &dicts)
-	return &gs.Dicts{Data: dicts, Total: &total}, err
+	return &lib.Dicts{Data: dicts, Total: &total}, err
 }
 
 func (this queryResolver) Dict(ctx context.Context, id string) (*app.Dict, error) {
 	return this.DictLoader(ctx, id)
 }
 
-func (this mutationResolver) DictCreate(ctx context.Context, input gs.NewDict) (*app.Dict, error) {
+func (this mutationResolver) DictCreate(ctx context.Context, input lib.NewDict) (*app.Dict, error) {
 	id, err := this.Create(ctx, new(app.Dict), input)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (this mutationResolver) DictCreate(ctx context.Context, input gs.NewDict) (
 	return this.DictLoader(ctx, id)
 }
 
-func (this mutationResolver) DictUpdate(ctx context.Context, id string, input gs.UpdDict) (bool, error) {
+func (this mutationResolver) DictUpdate(ctx context.Context, id string, input lib.UpdDict) (bool, error) {
 	return this.Update(ctx, new(app.Dict), id, input)
 }
 
@@ -76,7 +76,7 @@ func (this mutationResolver) DictRemoves(ctx context.Context, ids []string) (boo
 	return this.Removes(ctx, new(app.Dict), ids)
 }
 
-func (this mutationResolver) DictItemCreate(ctx context.Context, input gs.NewDictItem) (*app.DictItem, error) {
+func (this mutationResolver) DictItemCreate(ctx context.Context, input lib.NewDictItem) (*app.DictItem, error) {
 	id, err := this.Create(ctx, new(app.DictItem), input)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (this mutationResolver) DictItemCreate(ctx context.Context, input gs.NewDic
 	return this.DictItemLoader(ctx, id)
 }
 
-func (this mutationResolver) DictItemUpdate(ctx context.Context, id string, input gs.UpdDictItem) (bool, error) {
+func (this mutationResolver) DictItemUpdate(ctx context.Context, id string, input lib.UpdDictItem) (bool, error) {
 	return this.Update(ctx, new(app.DictItem), id, input)
 }
 

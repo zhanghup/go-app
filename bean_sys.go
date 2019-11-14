@@ -32,6 +32,7 @@ type DictItem struct {
 	Code      *string `json:"code"`
 	Name      *string `json:"name"`
 	Value     *string `json:"value"`
+	Disable   *int    `json:"disable"`
 	Extension *string `json:"extension"`
 }
 
@@ -61,7 +62,7 @@ type Perm struct {
 type User struct {
 	Bean `xorm:"extends"`
 
-	Type     *string `json:"type"` // D0001 用户类型
+	Type     *string `json:"type"` // 字典SYS0001 用户类型
 	Account  *string `json:"account" xorm:"unique"`
 	Password *string `json:"password"`
 	Slat     *string `json:"-" xorm:"slat"`
@@ -69,7 +70,7 @@ type User struct {
 	Avatar   *string `json:"avatar"`
 	ICard    *string `json:"i_card"`
 	Birth    *int64  `json:"birth"`
-	Sex      *int    `json:"sex"`    // 0：未知，1：男，2：女
+	Sex      *int    `json:"sex"`    // 字典STA0002 人物性别
 	Mobile   *string `json:"mobile"` // 联系电话
 	Admin    *int    `json:"admin"`
 }
