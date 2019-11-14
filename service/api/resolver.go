@@ -13,7 +13,7 @@ import (
 	"net/http"
 )
 
-func Gin(e *xorm.Engine, nexts ...http.HandlerFunc) func(c *gin.Context) {
+func ggin(e *xorm.Engine, nexts ...http.HandlerFunc) func(c *gin.Context) {
 	c := lib.Config{
 		Resolvers: &Resolver{
 			DB:     e,
@@ -44,6 +44,14 @@ func Gin(e *xorm.Engine, nexts ...http.HandlerFunc) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		hu.ServeHTTP(c.Writer, c.Request)
 	}
+}
+
+func Gin(e *xorm.Engine, g *gin.Engine) {
+	g.Group("/", userAuth()).POST("/base", ggin(e))
+	Playground(g, "/base/playground1", "/base")
+	g.GET("/base/playground2", func(c *gin.Context) {
+		handler.Playground("标题", "/base").ServeHTTP(c.Writer, c.Request)
+	})
 }
 
 type Resolver struct {

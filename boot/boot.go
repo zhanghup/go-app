@@ -1,7 +1,6 @@
 package boot
 
 import (
-	"github.com/99designs/gqlgen/handler"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
@@ -37,20 +36,12 @@ func Router(e *xorm.Engine) *gin.Engine {
 
 	// 基础数据路由
 	{
-		g.POST("/base", api.Gin(e))
-		api.Playground(g, "/base/playground1", "/base")
-		g.GET("/base/playground2", func(c *gin.Context) {
-			handler.Playground("标题", "/base").ServeHTTP(c.Writer, c.Request)
-		})
+		api.Gin(e, g)
 	}
 
 	// 授权路由
 	{
-		g.POST("/auth", auth.Gin(e))
-		api.Playground(g, "/auth/playground1", "/auth")
-		g.GET("/auth/playground2", func(c *gin.Context) {
-			handler.Playground("标题", "/auth").ServeHTTP(c.Writer, c.Request)
-		})
+		auth.Gin(e, g)
 	}
 
 	return g

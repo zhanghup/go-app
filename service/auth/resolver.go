@@ -8,12 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-app"
+	"github.com/zhanghup/go-app/service/api"
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-tools"
 	"net/http"
 )
 
-func Gin(e *xorm.Engine) func(c *gin.Context) {
+func ggin(e *xorm.Engine) func(c *gin.Context) {
 	c := Config{Resolvers: &Resolver{
 		DB:     e,
 		Loader: gs.DataLoaden,
@@ -32,6 +33,15 @@ func Gin(e *xorm.Engine) func(c *gin.Context) {
 		ctx := context.WithValue(c.Request.Context(), gs.GIN_CONTEXT, c)
 		hu.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
 	}
+}
+
+
+func Gin(e *xorm.Engine, g *gin.Engine) {
+	g.POST("/auth", ggin(e))
+	api.Playground(g, "/auth/playground1", "/auth")
+	g.GET("/auth/playground2", func(c *gin.Context) {
+		handler.Playground("标题", "/auth").ServeHTTP(c.Writer, c.Request)
+	})
 }
 
 type Resolver struct {
