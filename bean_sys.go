@@ -85,6 +85,23 @@ type UserToken struct {
 	Agent  *string `json:"agent"`  // User-Agent
 }
 
+// 菜单
+type Menu struct {
+	Bean `xorm:"extends"`
+
+	Code      *string `json:"code"`
+	Title     *string `json:"title"`
+	Meta      *string `json:"meta"`
+	Name      *string `json:"name"`
+	Path      *string `json:"path"`
+	Alias     *string `json:"alias"`
+	Icon      *string `json:"icon"`
+	Component *string `json:"component"`
+
+	Parent *string `json:"parent"`
+}
+
+// 资源
 type Resource struct {
 	Bean `xorm:"extends"`
 
@@ -96,6 +113,7 @@ type Resource struct {
 	Datas       []byte `json:"datas" xorm:"longblob"`
 }
 
+// 定时任务
 type Cron struct {
 	Bean `xorm:"extends"`
 
