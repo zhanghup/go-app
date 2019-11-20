@@ -39,11 +39,11 @@ func (this *Resolver) Dict() lib.DictResolver {
 }
 
 func (this DictResolver) Values(ctx context.Context, obj *app.Dict) ([]app.DictItem, error) {
-	if obj.Code == nil {
+	if obj.Id == nil {
 		return nil, nil
 	}
-	c := make([]app.DictItem,0)
-	err := this.Loader(ctx).Slice(new(app.DictItem), "code").Load(*obj.Code, &c)
+	c := make([]app.DictItem, 0)
+	err := this.Loader(ctx).Slice(new(app.DictItem), "code").Load(*obj.Id, &c)
 	return c, err
 }
 
