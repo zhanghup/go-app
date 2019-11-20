@@ -6,7 +6,7 @@ import (
 	"github.com/zhanghup/go-tools"
 )
 
-func InitUser(e *xorm.Engine) {
+func initUser(e *xorm.Engine) {
 	ok, err := e.Table(app.User{}).Where("id = ?", "root").Exist()
 	if err != nil {
 		panic(err)

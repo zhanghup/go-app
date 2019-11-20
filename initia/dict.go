@@ -6,7 +6,7 @@ import (
 	"github.com/zhanghup/go-tools"
 )
 
-func InitDictCode(e *xorm.Engine, code, name, remark string, weight int, dictitems []app.DictItem) {
+func initDictCode(e *xorm.Engine, code, name, remark string, weight int, dictitems []app.DictItem) {
 	dict := app.Dict{}
 	ok, err := e.Table(dict).Where("code = ?", code).Get(&dict)
 	if err != nil {
@@ -45,19 +45,19 @@ func InitDictCode(e *xorm.Engine, code, name, remark string, weight int, dictite
 
 }
 
-func InitDict(e *xorm.Engine) {
-	InitDictCode(e, "SYS0001", "用户类型", "", 1, []app.DictItem{
+func initDict(e *xorm.Engine) {
+	initDictCode(e, "SYS0001", "用户类型", "", 1, []app.DictItem{
 		{Name: tools.Ptr().String("超级管理员"), Value: tools.Ptr().String("0")}, // 就是root用户
 		{Name: tools.Ptr().String("管理员"), Value: tools.Ptr().String("1")},
 		{Name: tools.Ptr().String("普通用户"), Value: tools.Ptr().String("2")},
 	})
 
-	InitDictCode(e, "STA0001", "数据状态", "", 100, []app.DictItem{
+	initDictCode(e, "STA0001", "数据状态", "", 100, []app.DictItem{
 		{Name: tools.Ptr().String("启用"), Value: tools.Ptr().String("1")},
 		{Name: tools.Ptr().String("禁用"), Value: tools.Ptr().String("0")},
 	})
 
-	InitDictCode(e, "STA0002", "人物性别", "", 101, []app.DictItem{
+	initDictCode(e, "STA0002", "人物性别", "", 101, []app.DictItem{
 		{Name: tools.Ptr().String("未知"), Value: tools.Ptr().String("0")},
 		{Name: tools.Ptr().String("男"), Value: tools.Ptr().String("1")},
 		{Name: tools.Ptr().String("女"), Value: tools.Ptr().String("2")},

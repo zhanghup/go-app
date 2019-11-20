@@ -17,8 +17,7 @@ func Boot() {
 		panic(err)
 	}
 	app.Sync(e)
-	initia.InitDict(e)
-	initia.InitUser(e)
+	initia.InitAction(e)
 	e.ShowSQL(true)
 	Router(e).Run(":8899")
 }
