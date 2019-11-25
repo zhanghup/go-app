@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"sync"
 
@@ -847,25 +848,25 @@ type Mutation {
 `},
 	&ast.Source{Name: "schema/schema_dict.graphql", Input: `extend type Query{
     "字典列表（分页）"
-    dicts(query:QDict!):Dicts
+    dicts(query:QDict!):Dicts @perm(entity: "dict",perm: "R")
     "字典单个对象"
-    dict(id: String!):Dict
+    dict(id: String!):Dict @perm(entity: "dict",perm: "R")
 }
 
 extend type Mutation {
     "字典新建"
-    dict_create(input:NewDict!):Dict
+    dict_create(input:NewDict!):Dict  @perm(entity: "dict",perm: "C")
     "字典更新"
-    dict_update(id: String!,input:UpdDict!):Boolean!
+    dict_update(id: String!,input:UpdDict!):Boolean!  @perm(entity: "dict",perm: "U")
     "字典批量删除"
-    dict_removes(ids: [String!]):Boolean!
+    dict_removes(ids: [String!]):Boolean! @perm(entity: "dict",perm: "D")
 
     "字典项新建"
-    dict_item_create(input:NewDictItem!):DictItem
+    dict_item_create(input:NewDictItem!):DictItem  @perm(entity: "dict",perm: "C")
     "字典项更新"
-    dict_item_update(id: String!,input:UpdDictItem!):Boolean!
+    dict_item_update(id: String!,input:UpdDictItem!):Boolean!  @perm(entity: "dict",perm: "U")
     "字典项批量删除"
-    dict_item_removes(ids: [String!]):Boolean!
+    dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict",perm: "D")
 }
 
 input QDict{
@@ -983,22 +984,22 @@ input UpdDictItem{
 }`},
 	&ast.Source{Name: "schema/schema_role.graphql", Input: `extend type Query {
     "角色列表（分页）"
-    roles(query: QRole!): Roles
+    roles(query: QRole!): Roles @perm(entity: "dict",perm: "R")
     "角色获取单个"
-    role(id: String!): Role
+    role(id: String!): Role @perm(entity: "dict",perm: "R")
 }
 
 extend type Mutation {
     "角色新建"
-    role_create(input: NewRole!): Role
+    role_create(input: NewRole!): Role @perm(entity: "dict",perm: "C")
     "角色更新"
-    role_update(id: String!, input: UpdRole!): Boolean!
+    role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "dict",perm: "U")
     "角色批量删除"
-    role_removes(ids: [String!]): Boolean!
+    role_removes(ids: [String!]): Boolean! @perm(entity: "dict",perm: "D")
     "新增权限"
-    role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean!
+    role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean! @perm(entity: "dict",perm: "M")
     "角色分配"
-    role_to_user(uid: String!,roles:[String!]!): Boolean!
+    role_to_user(uid: String!,roles:[String!]!): Boolean! @perm(entity: "dict",perm: "M")
 }
 
 input QRole {
@@ -1056,18 +1057,18 @@ input UpdRole {
 `},
 	&ast.Source{Name: "schema/schema_user.graphql", Input: `extend type Query{
     "用户列表（分页）"
-    users(query:QUser!):Users
+    users(query:QUser!):Users  @perm(entity: "user",perm: "R")
     "用户获取单个"
-    user(id: String!):User
+    user(id: String!):User  @perm(entity: "user",perm: "R")
 }
 
 extend type Mutation {
     "用户新建"
-    user_create(input:NewUser!):User
+    user_create(input:NewUser!):User  @perm(entity: "user",perm: "C")
     "用户更新"
-    user_update(id: String!,input:UpdUser!):Boolean!
+    user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "dict",perm: "U")
     "用户批量删除"
-    user_removes(ids: [String!]):Boolean!
+    user_removes(ids: [String!]):Boolean! @perm(entity: "dict",perm: "D")
 }
 
 input QUser{
@@ -2323,8 +2324,36 @@ func (ec *executionContext) _Mutation_dict_create(ctx context.Context, field gra
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DictCreate(rctx, args["input"].(NewDict))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DictCreate(rctx, args["input"].(NewDict))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "C")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*app.Dict); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.Dict`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2364,8 +2393,36 @@ func (ec *executionContext) _Mutation_dict_update(ctx context.Context, field gra
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DictUpdate(rctx, args["id"].(string), args["input"].(UpdDict))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DictUpdate(rctx, args["id"].(string), args["input"].(UpdDict))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "U")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2408,8 +2465,36 @@ func (ec *executionContext) _Mutation_dict_removes(ctx context.Context, field gr
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DictRemoves(rctx, args["ids"].([]string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DictRemoves(rctx, args["ids"].([]string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "D")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2452,8 +2537,36 @@ func (ec *executionContext) _Mutation_dict_item_create(ctx context.Context, fiel
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DictItemCreate(rctx, args["input"].(NewDictItem))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DictItemCreate(rctx, args["input"].(NewDictItem))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "C")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*app.DictItem); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.DictItem`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2493,8 +2606,36 @@ func (ec *executionContext) _Mutation_dict_item_update(ctx context.Context, fiel
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DictItemUpdate(rctx, args["id"].(string), args["input"].(UpdDictItem))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DictItemUpdate(rctx, args["id"].(string), args["input"].(UpdDictItem))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "U")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2537,8 +2678,36 @@ func (ec *executionContext) _Mutation_dict_item_removes(ctx context.Context, fie
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DictItemRemoves(rctx, args["ids"].([]string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DictItemRemoves(rctx, args["ids"].([]string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "D")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2581,8 +2750,36 @@ func (ec *executionContext) _Mutation_role_create(ctx context.Context, field gra
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RoleCreate(rctx, args["input"].(NewRole))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().RoleCreate(rctx, args["input"].(NewRole))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "C")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*app.Role); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.Role`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2622,8 +2819,36 @@ func (ec *executionContext) _Mutation_role_update(ctx context.Context, field gra
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RoleUpdate(rctx, args["id"].(string), args["input"].(UpdRole))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().RoleUpdate(rctx, args["id"].(string), args["input"].(UpdRole))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "U")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2666,8 +2891,36 @@ func (ec *executionContext) _Mutation_role_removes(ctx context.Context, field gr
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RoleRemoves(rctx, args["ids"].([]string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().RoleRemoves(rctx, args["ids"].([]string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "D")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2710,8 +2963,36 @@ func (ec *executionContext) _Mutation_role_perm_create(ctx context.Context, fiel
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RolePermCreate(rctx, args["id"].(string), args["type"].(string), args["perms"].([]string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().RolePermCreate(rctx, args["id"].(string), args["type"].(string), args["perms"].([]string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "M")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2754,8 +3035,36 @@ func (ec *executionContext) _Mutation_role_to_user(ctx context.Context, field gr
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RoleToUser(rctx, args["uid"].(string), args["roles"].([]string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().RoleToUser(rctx, args["uid"].(string), args["roles"].([]string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "M")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2798,8 +3107,36 @@ func (ec *executionContext) _Mutation_user_create(ctx context.Context, field gra
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UserCreate(rctx, args["input"].(NewUser))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UserCreate(rctx, args["input"].(NewUser))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "user")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "C")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*app.User); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.User`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2839,8 +3176,36 @@ func (ec *executionContext) _Mutation_user_update(ctx context.Context, field gra
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UserUpdate(rctx, args["id"].(string), args["input"].(UpdUser))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UserUpdate(rctx, args["id"].(string), args["input"].(UpdUser))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "U")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2883,8 +3248,36 @@ func (ec *executionContext) _Mutation_user_removes(ctx context.Context, field gr
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UserRemoves(rctx, args["ids"].([]string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UserRemoves(rctx, args["ids"].([]string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "D")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2961,8 +3354,36 @@ func (ec *executionContext) _Query_dicts(ctx context.Context, field graphql.Coll
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Dicts(rctx, args["query"].(QDict))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Dicts(rctx, args["query"].(QDict))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*Dicts); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/lib.Dicts`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3002,8 +3423,36 @@ func (ec *executionContext) _Query_dict(ctx context.Context, field graphql.Colle
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Dict(rctx, args["id"].(string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Dict(rctx, args["id"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*app.Dict); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.Dict`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3043,8 +3492,36 @@ func (ec *executionContext) _Query_roles(ctx context.Context, field graphql.Coll
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Roles(rctx, args["query"].(QRole))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Roles(rctx, args["query"].(QRole))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*Roles); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/lib.Roles`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3084,8 +3561,36 @@ func (ec *executionContext) _Query_role(ctx context.Context, field graphql.Colle
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Role(rctx, args["id"].(string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Role(rctx, args["id"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*app.Role); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.Role`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3125,8 +3630,36 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Users(rctx, args["query"].(QUser))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Users(rctx, args["query"].(QUser))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "user")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*Users); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/lib.Users`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3166,8 +3699,36 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().User(rctx, args["id"].(string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().User(rctx, args["id"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "user")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*app.User); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.User`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)

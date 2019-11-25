@@ -47,9 +47,9 @@ func InitDictCode(e *xorm.Engine, code, name, remark string, weight int, dictite
 
 func initDict(e *xorm.Engine) {
 	InitDictCode(e, "SYS0001", "用户类型", "", 1, []app.DictItem{
-		{Name: tools.Ptr().String("超级管理员"), Value: tools.Ptr().String("0")}, // 就是root用户
-		{Name: tools.Ptr().String("管理员"), Value: tools.Ptr().String("1")},
-		{Name: tools.Ptr().String("普通用户"), Value: tools.Ptr().String("2")},
+		{Name: tools.Ptr().String("微信公众号用户"), Value: tools.Ptr().String("0")},
+		{Name: tools.Ptr().String("微信小程序用户"), Value: tools.Ptr().String("1")},
+		{Name: tools.Ptr().String("平台用户"), Value: tools.Ptr().String("2")},
 	})
 	InitDictCode(e, "SYS0002", "对象权限", "", 1, []app.DictItem{
 		{Name: tools.Ptr().String("新增"), Value: tools.Ptr().String("C")}, // 就是root用户

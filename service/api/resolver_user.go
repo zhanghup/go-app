@@ -27,7 +27,6 @@ func (this queryResolver) Users(ctx context.Context, query lib.QUser) (*lib.User
 		select * from {{ table "user" }} u
 		where 1 = 1
 	`).Page2(query.Index, query.Size, query.Count, &users)
-	tools.Str().JSONStringPrintln(query)
 	return &lib.Users{Data: users, Total: &total}, err
 }
 

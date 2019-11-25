@@ -47,7 +47,7 @@ type RoleUser struct {
 	Bean `xorm:"extends"`
 
 	Role *string `json:"role"`
-	Uid *string `json:"uid"`
+	Uid  *string `json:"uid"`
 }
 
 // 数据权限
@@ -88,7 +88,7 @@ type User struct {
 // 授权
 type UserToken struct {
 	Bean   `xorm:"extends"`
-	Uid   *string `json:"uid"`
+	Uid    *string `json:"uid"`
 	Ops    *int64  `json:"ops"`    // 接口调用次数
 	Type   *string `json:"type"`   // 授权类型 [pc,wx:微信小程序，we:微信公众号]
 	Expire *int64  `json:"expire"` // 到期时间
@@ -136,5 +136,5 @@ type Cron struct {
 }
 
 func sys_tables() []interface{} {
-	return []interface{}{new(Dict), new(DictItem), new(Menu), new(Role), new(RoleUser), new(Perm), new(User), new(UserToken), new(Resource), new(Cron)}
+	return []interface{}{new(Dict), new(DictItem), new(Menu), new(Role), new(RoleUser), new(Perm), new(PermObject), new(User), new(UserToken), new(Resource), new(Cron)}
 }

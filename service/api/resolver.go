@@ -42,7 +42,8 @@ func ggin(e *xorm.Engine, nexts ...http.HandlerFunc) func(c *gin.Context) {
 	}
 
 	return func(c *gin.Context) {
-		hu.ServeHTTP(c.Writer, c.Request)
+		ctx := context.WithValue(c.Request.Context(), gs.GIN_CONTEXT, c)
+		hu.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
 	}
 }
 
@@ -67,7 +68,6 @@ func (r *Resolver) Query() lib.QueryResolver {
 }
 
 type mutationResolver struct{ *Resolver }
-
 
 func (this mutationResolver) World(ctx context.Context) (*string, error) {
 	return tools.Ptr().String("hello"), nil

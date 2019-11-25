@@ -1,21 +1,21 @@
 extend type Query {
     "角色列表（分页）"
-    roles(query: QRole!): Roles
+    roles(query: QRole!): Roles @perm(entity: "dict",perm: "R")
     "角色获取单个"
-    role(id: String!): Role
+    role(id: String!): Role @perm(entity: "dict",perm: "R")
 }
 
 extend type Mutation {
     "角色新建"
-    role_create(input: NewRole!): Role
+    role_create(input: NewRole!): Role @perm(entity: "dict",perm: "C")
     "角色更新"
-    role_update(id: String!, input: UpdRole!): Boolean!
+    role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "dict",perm: "U")
     "角色批量删除"
-    role_removes(ids: [String!]): Boolean!
+    role_removes(ids: [String!]): Boolean! @perm(entity: "dict",perm: "D")
     "新增权限"
-    role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean!
+    role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean! @perm(entity: "dict",perm: "M")
     "角色分配"
-    role_to_user(uid: String!,roles:[String!]!): Boolean!
+    role_to_user(uid: String!,roles:[String!]!): Boolean! @perm(entity: "dict",perm: "M")
 }
 
 input QRole {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-tools"
 	"net/http"
@@ -18,12 +19,17 @@ const DATA_LOADEN = "go-app-dataloaden"
 type Loader interface {
 	Object(obj interface{}) *CommonLoader
 	Slice(obj interface{}, key string, param ...map[string]interface{}) *CommonSliceLoader
+
+	GinContext() *gin.Context
+	Uid() string
+	Admin() bool
 }
 
 type dataLoaden struct {
 	sync  sync.Mutex
 	store tools.IMap
 	db    *xorm.Session
+	gin   *gin.Context
 }
 
 func DataLoaden(ctx context.Context) Loader {
@@ -31,13 +37,34 @@ func DataLoaden(ctx context.Context) Loader {
 }
 func DataLoadenMiddleware(db *xorm.Engine, next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cc := r.Context().Value(GIN_CONTEXT)
 		ctx := context.WithValue(r.Context(), DATA_LOADEN, &dataLoaden{
 			sync:  sync.Mutex{},
 			store: tools.NewCache(),
 			db:    db.Context(r.Context()),
+			gin:   cc.(*gin.Context),
 		})
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+func (this *dataLoaden) GinContext() *gin.Context {
+	return this.gin
+}
+
+func (this *dataLoaden) Uid() string {
+	uido, ok := this.gin.Get("uid")
+	if !ok {
+		return ""
+	}
+	return uido.(string)
+}
+
+func (this *dataLoaden) Admin() bool {
+	uido, ok := this.gin.Get("admin")
+	if !ok {
+		return false
+	}
+	return uido.(bool)
 }
 
 func (this *dataLoaden) Object(obj interface{}) *CommonLoader {

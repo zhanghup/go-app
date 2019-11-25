@@ -85,8 +85,8 @@ func (this mutationResolver) Login(ctx context.Context, account string, password
 func (this mutationResolver) Token(ctx context.Context, uid string, ty TokenType) (string, error) {
 	token := new(app.UserToken)
 	ctx, err := this.DB.Ts(ctx, func(s *xorm.Session) error {
-		_, e := s.SF(`update {{ table "user_token" }} set status = 0 where user = :user and type = :type`, map[string]interface{}{
-			"user": uid,
+		_, e := s.SF(`update {{ table "user_token" }} set status = 0 where uid = :uid and type = :type`, map[string]interface{}{
+			"uid":  uid,
 			"type": ty,
 		}).Execute()
 		if e != nil {
@@ -96,14 +96,14 @@ func (this mutationResolver) Token(ctx context.Context, uid string, ty TokenType
 		token.Status = tools.Ptr().Int(1)
 		token.Uid = &uid
 		token.Type = tools.Ptr().String(string(ty))
-		token.Agent = tools.Ptr().String(gs.GinContext(ctx).Request.UserAgent())
+		token.Agent = tools.Ptr().String(this.Loader(ctx).GinContext().Request.UserAgent())
 		token.Expire = tools.Ptr().Int64(2 * 60 * 60)
 		token.Ops = tools.Ptr().Int64(0)
 		_, e = s.Insert(token)
 		if e != nil {
 			return e
 		}
-		gs.GinContext(ctx).SetCookie(gs.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
+		this.Loader(ctx).GinContext().SetCookie(gs.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
 		return nil
 	})
 
