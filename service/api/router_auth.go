@@ -40,7 +40,7 @@ func userAuth(e *xorm.Engine) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if time.Now().Unix() > *token.Created+*token.Expire {
+		if time.Now().Unix() > *token.Updated+*token.Expire {
 			c.Fail(errors.New("【5:未授权】"), nil, 401)
 			c.Abort()
 			return
@@ -154,6 +154,7 @@ func userAuth(e *xorm.Engine) gin.HandlerFunc {
 		}
 
 		c.Set("uid", *token.Uid)
+		c.Set("user", u)
 		c.Set("perms", myPerms)
 		c.Set("permobjs", myPermObj)
 		c.Set("admin", admin)

@@ -18,6 +18,7 @@ func ggin(e *xorm.Engine) func(c *gin.Context) {
 		Resolvers: &Resolver{
 			DB:     e,
 			Loader: gs.DataLoaden,
+			middle: gs.NewMiddleware,
 		},
 		Directives: lib.DirectiveRoot{
 			Perm: gs.Perm(),
@@ -50,6 +51,7 @@ func Gin(e *xorm.Engine, g *gin.Engine) {
 type Resolver struct {
 	DB     *xorm.Engine
 	Loader func(ctx context.Context) gs.Loader
+	middle func(ctx context.Context) gs.Middleware
 }
 
 func (r *Resolver) Mutation() lib.MutationResolver {

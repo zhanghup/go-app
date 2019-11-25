@@ -14,6 +14,7 @@ require (
 	github.com/vektah/dataloaden v0.3.0 // indirect
 	github.com/vektah/gqlparser v1.1.2
 	github.com/zhanghup/go-tools v1.0.15
+	golang.org/x/tools v0.0.0-20190820205717-547ecf7b1ef1
 )
 
 replace github.com/gin-gonic/gin => github.com/zhanghup/go-gin v0.0.0-20190818132815-0b17e4c65c1e

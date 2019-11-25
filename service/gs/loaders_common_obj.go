@@ -31,11 +31,11 @@ func (l *CommonLoader) Load(key string, result interface{}) (interface{}, error)
 		panic("传入参数result类型异常，应为*struct{}")
 	}
 
-	result, err := l.LoadThunk(key)()
+	r, err := l.LoadThunk(key)()
 	if err != nil {
 		return nil, err
 	}
-	reflect.ValueOf(result).Elem().Set(reflect.ValueOf(result))
+	reflect.ValueOf(result).Elem().Set(reflect.ValueOf(r))
 	return nil, nil
 }
 

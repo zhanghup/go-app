@@ -17,6 +17,7 @@ func ggin(e *xorm.Engine) func(c *gin.Context) {
 	c := Config{Resolvers: &Resolver{
 		DB:     e,
 		Loader: gs.DataLoaden,
+		middle: gs.NewMiddleware,
 	}}
 
 	hu := handler.GraphQL(NewExecutableSchema(c))
@@ -45,6 +46,7 @@ func Gin(e *xorm.Engine, g *gin.Engine) {
 type Resolver struct {
 	DB     *xorm.Engine
 	Loader func(ctx context.Context) gs.Loader
+	middle func(ctx context.Context) gs.Middleware
 }
 
 func (r *Resolver) Mutation() MutationResolver {
@@ -96,14 +98,14 @@ func (this mutationResolver) Token(ctx context.Context, uid string, ty TokenType
 		token.Status = tools.Ptr().Int(1)
 		token.Uid = &uid
 		token.Type = tools.Ptr().String(string(ty))
-		token.Agent = tools.Ptr().String(this.Loader(ctx).GinContext().Request.UserAgent())
+		token.Agent = tools.Ptr().String(this.middle(ctx).GinContext().Request.UserAgent())
 		token.Expire = tools.Ptr().Int64(2 * 60 * 60)
 		token.Ops = tools.Ptr().Int64(0)
 		_, e = s.Insert(token)
 		if e != nil {
 			return e
 		}
-		this.Loader(ctx).GinContext().SetCookie(gs.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
+		this.middle(ctx).GinContext().SetCookie(gs.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
 		return nil
 	})
 
