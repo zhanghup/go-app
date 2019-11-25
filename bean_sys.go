@@ -49,13 +49,23 @@ type RoleUser struct {
 	Role *string `json:"role"`
 	User *string `json:"user"`
 }
+
+// 数据权限
 type Perm struct {
 	Bean `xorm:"extends"`
 
-	Type *string `json:"type"` // 类型（menu等）
 	Role *string `json:"role"` // 角色ID
+	Type *string `json:"type"` // 类型（menu等）
 	Oid  *string `json:"oid"`  // 对象ID
-	Mask *string `json:"mask"` // 权限
+}
+
+// 对象权限
+type PermObject struct {
+	Bean `xorm:"extends"`
+
+	Role   *string `json:"role"`   // 角色ID
+	Object *string `json:"object"` // 表类型（user/dict等）SYS0003
+	Mask   *string `json:"mask"`   // 权限（C/R/U/D）等组成的字符串 SYS0002
 }
 
 // 用户

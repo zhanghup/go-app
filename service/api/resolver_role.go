@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/zhanghup/go-app"
 	"github.com/zhanghup/go-app/service/api/lib"
+	"github.com/zhanghup/go-tools"
 )
 
 func (this *Resolver) RoleLoader(ctx context.Context, id string) (*app.Role, error) {
@@ -45,4 +46,30 @@ func (this mutationResolver) RoleUpdate(ctx context.Context, id string, input li
 
 func (this mutationResolver) RoleRemoves(ctx context.Context, id []string) (bool, error) {
 	return this.Removes(ctx, new(app.Role), id)
+}
+
+func (this mutationResolver) RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error) {
+	_, err := this.DB.SF(`delete * from {{ table "perm" }} where role = :id and type = :type`, map[string]interface{}{
+		"type": typeArg,
+	}).Execute()
+	if err != nil {
+		return false, err
+	}
+	for i, o := range perms {
+		p := app.Perm{
+			Bean: app.Bean{
+				Id:     tools.ObjectString(),
+				Status: tools.Ptr().Int(1),
+				Weight: &i,
+			},
+			Type: &typeArg,
+			Role: &id,
+			Oid:  &o,
+		}
+		_, err := this.DB.Insert(p)
+		if err != nil {
+			return false, err
+		}
+	}
+	return true, nil
 }

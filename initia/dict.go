@@ -51,6 +51,17 @@ func initDict(e *xorm.Engine) {
 		{Name: tools.Ptr().String("管理员"), Value: tools.Ptr().String("1")},
 		{Name: tools.Ptr().String("普通用户"), Value: tools.Ptr().String("2")},
 	})
+	initDictCode(e, "SYS0002", "对象权限类型", "", 1, []app.DictItem{
+		{Name: tools.Ptr().String("新增"), Value: tools.Ptr().String("C")}, // 就是root用户
+		{Name: tools.Ptr().String("编辑"), Value: tools.Ptr().String("U")},
+		{Name: tools.Ptr().String("删除"), Value: tools.Ptr().String("D")},
+		{Name: tools.Ptr().String("查询"), Value: tools.Ptr().String("R")},
+		{Name: tools.Ptr().String("管理"), Value: tools.Ptr().String("M")},
+	})
+	initDictCode(e, "SYS0003", "对象列表", "", 1, []app.DictItem{
+		{Name: tools.Ptr().String("用户"), Value: tools.Ptr().String("user")},
+		{Name: tools.Ptr().String("数据字典"), Value: tools.Ptr().String("dict")},
+	})
 
 	initDictCode(e, "STA0001", "数据状态", "", 100, []app.DictItem{
 		{Name: tools.Ptr().String("启用"), Value: tools.Ptr().String("1")},

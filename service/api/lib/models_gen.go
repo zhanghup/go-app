@@ -20,7 +20,7 @@ type NewDict struct {
 	Remark *string `json:"remark"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[0:隐藏,1:显示]
+	// 状态[dict:STA0001]
 	Status *int `json:"status"`
 }
 
@@ -35,7 +35,7 @@ type NewDictItem struct {
 	Extension *string `json:"extension"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[0:隐藏,1:显示]
+	// 状态[dict:STA0001]
 	Status *int `json:"status"`
 }
 
@@ -46,7 +46,7 @@ type NewRole struct {
 	Desc *string `json:"desc"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[0:隐藏,1:显示]
+	// 状态[dict:STA0001]
 	Status *int `json:"status"`
 }
 
@@ -65,7 +65,7 @@ type NewUser struct {
 	ICard *string `json:"i_card"`
 	// 出生年月
 	Birth *int `json:"birth"`
-	// 性别[0: 未知,1: 女,2: 男]
+	// 性别[dict:STA0002]
 	Sex *int `json:"sex"`
 	// 移动电话
 	Mobile *string `json:"mobile"`
@@ -73,7 +73,7 @@ type NewUser struct {
 	Admin *int `json:"admin"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[0:隐藏,1:显示]
+	// 状态[dict:STA0001]
 	Status *int `json:"status"`
 }
 
@@ -107,7 +107,7 @@ type UpdDict struct {
 	Remark *string `json:"remark"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[0:隐藏,1:显示]
+	// 状态[dict:STA0001]
 	Status *int `json:"status"`
 }
 
@@ -120,7 +120,7 @@ type UpdDictItem struct {
 	Extension *string `json:"extension"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[0:隐藏,1:显示]
+	// 状态[dict:STA0001]
 	Status *int `json:"status"`
 }
 
@@ -131,7 +131,7 @@ type UpdRole struct {
 	Desc *string `json:"desc"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[0:隐藏,1:显示]
+	// 状态[dict:STA0001]
 	Status *int `json:"status"`
 }
 
@@ -150,7 +150,7 @@ type UpdUser struct {
 	ICard *string `json:"i_card"`
 	// 出生年月
 	Birth *int `json:"birth"`
-	// 性别[0: 未知,1: 女,2: 男]
+	// 性别[dict:STA0002]
 	Sex *int `json:"sex"`
 	// 移动电话
 	Mobile *string `json:"mobile"`
@@ -158,7 +158,7 @@ type UpdUser struct {
 	Admin *int `json:"admin"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[0:隐藏,1:显示]
+	// 状态[dict:STA0001]
 	Status *int `json:"status"`
 }
 
