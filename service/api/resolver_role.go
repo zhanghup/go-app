@@ -42,9 +42,22 @@ func (this mutationResolver) RoleRemoves(ctx context.Context, id []string) (bool
 	return this.Removes(ctx, new(app.Role), id)
 }
 
+func (this queryResolver) RolePerms(ctx context.Context, id string, typeArg *string) ([]string, error) {
+	result := make([]string,0)
+	err := this.DB.SF(`
+		select oid from {{ table "perm" }} where role = :role 
+		{{ if .type }} and type = :type {{ end }}
+	`,map[string]interface{}{
+		"role":id,
+		"type":typeArg,
+	}).Find(&result)
+	return result,err
+}
+
 func (this mutationResolver) RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error) {
-	_, err := this.DB.SF(`delete * from {{ table "perm" }} where role = :id and type = :type`, map[string]interface{}{
+	_, err := this.DB.SF(`delete from {{ table "perm" }} where role = :id and type = :type`, map[string]interface{}{
 		"type": typeArg,
+		"id":id,
 	}).Execute()
 	if err != nil {
 		return false, err
@@ -69,7 +82,7 @@ func (this mutationResolver) RolePermCreate(ctx context.Context, id string, type
 }
 
 func (this mutationResolver) RoleToUser(ctx context.Context, uid string, roles []string) (bool, error) {
-	_, err := this.DB.SF(`delete * from {{ table "role_user" }} where uid = :uid`, map[string]interface{}{
+	_, err := this.DB.SF(`delete from {{ table "role_user" }} where uid = :uid`, map[string]interface{}{
 		"uid": uid,
 	}).Execute()
 	if err != nil {

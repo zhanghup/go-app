@@ -3,6 +3,8 @@ extend type Query {
     roles(query: QRole!): Roles @perm(entity: "dict",perm: "R")
     "角色获取单个"
     role(id: String!): Role @perm(entity: "dict",perm: "R")
+    "权限列表"
+    role_perms(id: String!,type: String): [String!] @perm(entity: "dict",perm: "R")
 }
 
 extend type Mutation {

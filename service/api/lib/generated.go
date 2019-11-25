@@ -93,13 +93,14 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Dict  func(childComplexity int, id string) int
-		Dicts func(childComplexity int, query QDict) int
-		Hello func(childComplexity int) int
-		Role  func(childComplexity int, id string) int
-		Roles func(childComplexity int, query QRole) int
-		User  func(childComplexity int, id string) int
-		Users func(childComplexity int, query QUser) int
+		Dict      func(childComplexity int, id string) int
+		Dicts     func(childComplexity int, query QDict) int
+		Hello     func(childComplexity int) int
+		Role      func(childComplexity int, id string) int
+		RolePerms func(childComplexity int, id string, typeArg *string) int
+		Roles     func(childComplexity int, query QRole) int
+		User      func(childComplexity int, id string) int
+		Users     func(childComplexity int, query QUser) int
 	}
 
 	Role struct {
@@ -167,6 +168,7 @@ type QueryResolver interface {
 	Dict(ctx context.Context, id string) (*app.Dict, error)
 	Roles(ctx context.Context, query QRole) (*Roles, error)
 	Role(ctx context.Context, id string) (*app.Role, error)
+	RolePerms(ctx context.Context, id string, typeArg *string) ([]string, error)
 	Users(ctx context.Context, query QUser) (*Users, error)
 	User(ctx context.Context, id string) (*app.User, error)
 }
@@ -543,6 +545,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Role(childComplexity, args["id"].(string)), true
+
+	case "Query.role_perms":
+		if e.complexity.Query.RolePerms == nil {
+			break
+		}
+
+		args, err := ec.field_Query_role_perms_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.RolePerms(childComplexity, args["id"].(string), args["type"].(*string)), true
 
 	case "Query.roles":
 		if e.complexity.Query.Roles == nil {
@@ -987,6 +1001,8 @@ input UpdDictItem{
     roles(query: QRole!): Roles @perm(entity: "dict",perm: "R")
     "角色获取单个"
     role(id: String!): Role @perm(entity: "dict",perm: "R")
+    "权限列表"
+    role_perms(id: String!,type: String): [String!] @perm(entity: "dict",perm: "R")
 }
 
 extend type Mutation {
@@ -1504,6 +1520,28 @@ func (ec *executionContext) field_Query_role_args(ctx context.Context, rawArgs m
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_role_perms_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["type"]; ok {
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["type"] = arg1
 	return args, nil
 }
 
@@ -3603,6 +3641,75 @@ func (ec *executionContext) _Query_role(ctx context.Context, field graphql.Colle
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalORole2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_role_perms(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_role_perms_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().RolePerms(rctx, args["id"].(string), args["type"].(*string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6628,6 +6735,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_role(ctx, field)
+				return res
+			})
+		case "role_perms":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_role_perms(ctx, field)
 				return res
 			})
 		case "users":

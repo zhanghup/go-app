@@ -40,6 +40,7 @@ func (this queryResolver) Dicts(ctx context.Context, query lib.QDict) (*lib.Dict
 	_, total, err := this.DB.SF(`
 		select * from {{ table "dict" }} u
 		where 1 = 1
+		order by u.code
 	`).Page2(query.Index, query.Size, query.Count, &dicts)
 	return &lib.Dicts{Data: dicts, Total: &total}, err
 }
