@@ -83,6 +83,7 @@ type ComplexityRoot struct {
 		RoleCreate      func(childComplexity int, input NewRole) int
 		RolePermCreate  func(childComplexity int, id string, typeArg string, perms []string) int
 		RoleRemoves     func(childComplexity int, ids []string) int
+		RoleToUser      func(childComplexity int, uid string, roles []string) int
 		RoleUpdate      func(childComplexity int, id string, input UpdRole) int
 		UserCreate      func(childComplexity int, input NewUser) int
 		UserRemoves     func(childComplexity int, ids []string) int
@@ -154,6 +155,7 @@ type MutationResolver interface {
 	RoleUpdate(ctx context.Context, id string, input UpdRole) (bool, error)
 	RoleRemoves(ctx context.Context, ids []string) (bool, error)
 	RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error)
+	RoleToUser(ctx context.Context, uid string, roles []string) (bool, error)
 	UserCreate(ctx context.Context, input NewUser) (*app.User, error)
 	UserUpdate(ctx context.Context, id string, input UpdUser) (bool, error)
 	UserRemoves(ctx context.Context, ids []string) (bool, error)
@@ -430,6 +432,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.RoleRemoves(childComplexity, args["ids"].([]string)), true
+
+	case "Mutation.role_to_user":
+		if e.complexity.Mutation.RoleToUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_role_to_user_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RoleToUser(childComplexity, args["uid"].(string), args["roles"].([]string)), true
 
 	case "Mutation.role_update":
 		if e.complexity.Mutation.RoleUpdate == nil {
@@ -968,74 +982,76 @@ input UpdDictItem{
     status: Int
 }`},
 	&ast.Source{Name: "schema/schema_role.graphql", Input: `extend type Query {
-  "角色列表（分页）"
-  roles(query: QRole!): Roles
-  "角色获取单个"
-  role(id: String!): Role
+    "角色列表（分页）"
+    roles(query: QRole!): Roles
+    "角色获取单个"
+    role(id: String!): Role
 }
 
 extend type Mutation {
-  "角色新建"
-  role_create(input: NewRole!): Role
-  "角色更新"
-  role_update(id: String!, input: UpdRole!): Boolean!
-  "角色批量删除"
-  role_removes(ids: [String!]): Boolean!
-  "新增权限"
-  role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean!
+    "角色新建"
+    role_create(input: NewRole!): Role
+    "角色更新"
+    role_update(id: String!, input: UpdRole!): Boolean!
+    "角色批量删除"
+    role_removes(ids: [String!]): Boolean!
+    "新增权限"
+    role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean!
+    "角色分配"
+    role_to_user(uid: String!,roles:[String!]!): Boolean!
 }
 
 input QRole {
-  index: Int
-  size: Int
-  count: Boolean
+    index: Int
+    size: Int
+    count: Boolean
 }
 
 type Roles {
-  total: Int
-  data: [Role!]
+    total: Int
+    data: [Role!]
 }
 
 type Role @goModel(model: "github.com/zhanghup/go-app.Role") {
-  id: String
+    id: String
 
-  "角色描述"
-  name: String
-  "角色名称"
-  desc: String
+    "角色描述"
+    name: String
+    "角色名称"
+    desc: String
 
-  "创建时间"
-  created: Int
-  "更新时间"
-  updated: Int
-  "排序"
-  weight: Int
-  "状态[dict:STA0001]"
-  status: Int
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
 }
 
 input NewRole {
-  "角色描述"
-  name: String
-  "角色名称"
-  desc: String
+    "角色描述"
+    name: String
+    "角色名称"
+    desc: String
 
-  "排序"
-  weight: Int
-  "状态[dict:STA0001]"
-  status: Int
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
 }
 
 input UpdRole {
-  "角色描述"
-  name: String
-  "角色名称"
-  desc: String
+    "角色描述"
+    name: String
+    "角色名称"
+    desc: String
 
-  "排序"
-  weight: Int
-  "状态[dict:STA0001]"
-  status: Int
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
 }
 `},
 	&ast.Source{Name: "schema/schema_user.graphql", Input: `extend type Query{
@@ -1337,6 +1353,28 @@ func (ec *executionContext) field_Mutation_role_removes_args(ctx context.Context
 		}
 	}
 	args["ids"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_role_to_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["uid"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["uid"] = arg0
+	var arg1 []string
+	if tmp, ok := rawArgs["roles"]; ok {
+		arg1, err = ec.unmarshalNString2ᚕstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["roles"] = arg1
 	return args, nil
 }
 
@@ -2674,6 +2712,50 @@ func (ec *executionContext) _Mutation_role_perm_create(ctx context.Context, fiel
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().RolePermCreate(rctx, args["id"].(string), args["type"].(string), args["perms"].([]string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_role_to_user(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_role_to_user_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RoleToUser(rctx, args["uid"].(string), args["roles"].([]string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5886,6 +5968,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "role_perm_create":
 			out.Values[i] = ec._Mutation_role_perm_create(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "role_to_user":
+			out.Values[i] = ec._Mutation_role_to_user(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

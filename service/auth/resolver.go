@@ -94,7 +94,7 @@ func (this mutationResolver) Token(ctx context.Context, uid string, ty TokenType
 		}
 		token.Id = tools.ObjectString()
 		token.Status = tools.Ptr().Int(1)
-		token.User = &uid
+		token.Uid = &uid
 		token.Type = tools.Ptr().String(string(ty))
 		token.Agent = tools.Ptr().String(gs.GinContext(ctx).Request.UserAgent())
 		token.Expire = tools.Ptr().Int64(2 * 60 * 60)

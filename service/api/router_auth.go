@@ -59,7 +59,7 @@ func userAuth(e *xorm.Engine) gin.HandlerFunc {
 			return
 		}
 
-		c.Set("uid", *token.User)
+		c.Set("uid", *token.Uid)
 		c.SetCookie(gs.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
 		c.Next()
 	}

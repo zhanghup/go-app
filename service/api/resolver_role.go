@@ -73,3 +73,28 @@ func (this mutationResolver) RolePermCreate(ctx context.Context, id string, type
 	}
 	return true, nil
 }
+
+func (this mutationResolver) RoleToUser(ctx context.Context, uid string, roles []string) (bool, error) {
+	_, err := this.DB.SF(`delete * from {{ table "role_user" }} where uid = :uid`, map[string]interface{}{
+		"uid": uid,
+	}).Execute()
+	if err != nil {
+		return false, err
+	}
+	for i, o := range roles {
+		p := app.RoleUser{
+			Bean: app.Bean{
+				Id:     tools.ObjectString(),
+				Status: tools.Ptr().Int(1),
+				Weight: &i,
+			},
+			Role: &o,
+			Uid:  &uid,
+		}
+		_, err := this.DB.Insert(p)
+		if err != nil {
+			return false, err
+		}
+	}
+	return true, nil
+}

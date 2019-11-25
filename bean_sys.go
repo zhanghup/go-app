@@ -47,7 +47,7 @@ type RoleUser struct {
 	Bean `xorm:"extends"`
 
 	Role *string `json:"role"`
-	User *string `json:"user"`
+	Uid *string `json:"uid"`
 }
 
 // 数据权限
@@ -88,7 +88,7 @@ type User struct {
 // 授权
 type UserToken struct {
 	Bean   `xorm:"extends"`
-	User   *string `json:"user"`
+	Uid   *string `json:"uid"`
 	Ops    *int64  `json:"ops"`    // 接口调用次数
 	Type   *string `json:"type"`   // 授权类型 [pc,wx:微信小程序，we:微信公众号]
 	Expire *int64  `json:"expire"` // 到期时间

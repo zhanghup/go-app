@@ -1,70 +1,72 @@
 extend type Query {
-  "角色列表（分页）"
-  roles(query: QRole!): Roles
-  "角色获取单个"
-  role(id: String!): Role
+    "角色列表（分页）"
+    roles(query: QRole!): Roles
+    "角色获取单个"
+    role(id: String!): Role
 }
 
 extend type Mutation {
-  "角色新建"
-  role_create(input: NewRole!): Role
-  "角色更新"
-  role_update(id: String!, input: UpdRole!): Boolean!
-  "角色批量删除"
-  role_removes(ids: [String!]): Boolean!
-  "新增权限"
-  role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean!
+    "角色新建"
+    role_create(input: NewRole!): Role
+    "角色更新"
+    role_update(id: String!, input: UpdRole!): Boolean!
+    "角色批量删除"
+    role_removes(ids: [String!]): Boolean!
+    "新增权限"
+    role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean!
+    "角色分配"
+    role_to_user(uid: String!,roles:[String!]!): Boolean!
 }
 
 input QRole {
-  index: Int
-  size: Int
-  count: Boolean
+    index: Int
+    size: Int
+    count: Boolean
 }
 
 type Roles {
-  total: Int
-  data: [Role!]
+    total: Int
+    data: [Role!]
 }
 
 type Role @goModel(model: "github.com/zhanghup/go-app.Role") {
-  id: String
+    id: String
 
-  "角色描述"
-  name: String
-  "角色名称"
-  desc: String
+    "角色描述"
+    name: String
+    "角色名称"
+    desc: String
 
-  "创建时间"
-  created: Int
-  "更新时间"
-  updated: Int
-  "排序"
-  weight: Int
-  "状态[dict:STA0001]"
-  status: Int
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
 }
 
 input NewRole {
-  "角色描述"
-  name: String
-  "角色名称"
-  desc: String
+    "角色描述"
+    name: String
+    "角色名称"
+    desc: String
 
-  "排序"
-  weight: Int
-  "状态[dict:STA0001]"
-  status: Int
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
 }
 
 input UpdRole {
-  "角色描述"
-  name: String
-  "角色名称"
-  desc: String
+    "角色描述"
+    name: String
+    "角色名称"
+    desc: String
 
-  "排序"
-  weight: Int
-  "状态[dict:STA0001]"
-  status: Int
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
 }
