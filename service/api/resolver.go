@@ -13,7 +13,7 @@ import (
 	"net/http"
 )
 
-func ggin(e *xorm.Engine, nexts ...http.HandlerFunc) func(c *gin.Context) {
+func ggin(e *xorm.Engine) func(c *gin.Context) {
 	c := lib.Config{
 		Resolvers: &Resolver{
 			DB:     e,
@@ -32,14 +32,6 @@ func ggin(e *xorm.Engine, nexts ...http.HandlerFunc) func(c *gin.Context) {
 			next.ServeHTTP(w, r)
 		})
 	}(hu)
-
-	for _, obj := range nexts {
-		hu = func(next http.HandlerFunc) http.HandlerFunc {
-			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				next.ServeHTTP(w, r)
-			})
-		}(obj)
-	}
 
 	return func(c *gin.Context) {
 		ctx := context.WithValue(c.Request.Context(), gs.GIN_CONTEXT, c)

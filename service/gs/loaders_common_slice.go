@@ -40,7 +40,7 @@ func (l *CommonSliceLoader) Load(key string, result interface{}) error {
 
 	rtype := reflect.TypeOf(result)
 	if rtype.Kind() != reflect.Ptr || rtype.Elem().Kind() != reflect.Slice {
-		panic("传入参数result类型异常，应为*[]*interface{}")
+		panic("传入参数result类型异常，应为*[]interface{}")
 	}
 
 	rval := reflect.New(rtype.Elem()).Elem()

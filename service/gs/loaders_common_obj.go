@@ -1,13 +1,10 @@
 package gs
 
 import (
+	"reflect"
 	"sync"
 	"time"
 )
-
-
-
-
 
 type CommonLoader struct {
 	fetch    func(keys []string) ([]interface{}, []error)
@@ -28,8 +25,18 @@ type commonBatch struct {
 	table interface{} // 保存数据库model对象
 }
 
-func (l *CommonLoader) Load(key string) (interface{}, error) {
-	return l.LoadThunk(key)()
+func (l *CommonLoader) Load(key string, result interface{}) (interface{}, error) {
+	rtype := reflect.TypeOf(result)
+	if rtype.Kind() != reflect.Ptr || rtype.Elem().Kind() != reflect.Struct {
+		panic("传入参数result类型异常，应为*struct{}")
+	}
+
+	result, err := l.LoadThunk(key)()
+	if err != nil {
+		return nil, err
+	}
+	reflect.ValueOf(result).Elem().Set(reflect.ValueOf(result))
+	return nil, nil
 }
 
 func (l *CommonLoader) LoadThunk(key string) func() (interface{}, error) {

@@ -10,15 +10,9 @@ import (
 )
 
 func (this *Resolver) UserLoader(ctx context.Context, id string) (*app.User, error) {
-	obj, err := this.Loader(ctx).Object(new(app.User)).Load(id)
-	if err != nil {
-		return nil, err
-	}
-	user, ok := obj.(app.User)
-	if !ok {
-		return nil, nil
-	}
-	return &user, nil
+	result := new(app.User)
+	_, err := this.Loader(ctx).Object(new(app.User)).Load(id, result)
+	return result, err
 }
 
 func (this queryResolver) Users(ctx context.Context, query lib.QUser) (*lib.Users, error) {

@@ -8,15 +8,9 @@ import (
 )
 
 func (this *Resolver) RoleLoader(ctx context.Context, id string) (*app.Role, error) {
-	obj, err := this.Loader(ctx).Object(new(app.Role)).Load(id)
-	if err != nil {
-		return nil, err
-	}
-	role, ok := obj.(app.Role)
-	if !ok {
-		return nil, nil
-	}
-	return &role, nil
+	result := new(app.Role)
+	_, err := this.Loader(ctx).Object(new(app.Role)).Load(id, result)
+	return result, err
 }
 
 func (this queryResolver) Roles(ctx context.Context, query lib.QRole) (*lib.Roles, error) {

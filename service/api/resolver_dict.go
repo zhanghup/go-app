@@ -11,27 +11,15 @@ type DictResolver struct {
 }
 
 func (this *Resolver) DictLoader(ctx context.Context, id string) (*app.Dict, error) {
-	obj, err := this.Loader(ctx).Object(new(app.Dict)).Load(id)
-	if err != nil {
-		return nil, err
-	}
-	dict, ok := obj.(app.Dict)
-	if !ok {
-		return nil, nil
-	}
-	return &dict, nil
+	result := new(app.Dict)
+	_, err := this.Loader(ctx).Object(new(app.Dict)).Load(id, result)
+	return result, err
 }
 
 func (this *Resolver) DictItemLoader(ctx context.Context, id string) (*app.DictItem, error) {
-	obj, err := this.Loader(ctx).Object(new(app.DictItem)).Load(id)
-	if err != nil {
-		return nil, err
-	}
-	dict, ok := obj.(app.DictItem)
-	if !ok {
-		return nil, nil
-	}
-	return &dict, nil
+	result := new(app.DictItem)
+	_, err := this.Loader(ctx).Object(new(app.DictItem)).Load(id, result)
+	return result, err
 }
 
 func (this *Resolver) Dict() lib.DictResolver {
