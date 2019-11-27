@@ -118,9 +118,8 @@ type Resource struct {
 	MD5         string `json:"md5" xorm:"'md5'"`
 	ContentType string `json:"content_type"`
 	Name        string `json:"name"`
-	Type        string `json:"type"`
 	Size        int64  `json:"size"`
-	Datas       []byte `json:"datas" xorm:"longblob"`
+	FileEnd     string `json:"file_end"`
 }
 
 // 定时任务
