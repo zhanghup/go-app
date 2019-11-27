@@ -81,10 +81,10 @@ func (this mutationResolver) Login(ctx context.Context, account string, password
 	if !flag {
 		return "", gin.NewErr("登录失败")
 	}
-	return this.Token(ctx, *user.Id, TokenPc)
+	return this.Token(ctx, *user.Id, gs.TokenPc)
 }
 
-func (this mutationResolver) Token(ctx context.Context, uid string, ty TokenType) (string, error) {
+func (this mutationResolver) Token(ctx context.Context, uid string, ty gs.TokenType) (string, error) {
 	token := new(app.UserToken)
 	ctx, err := this.DB.Ts(ctx, func(s *xorm.Session) error {
 		_, e := s.SF(`update {{ table "user_token" }} set status = 0 where uid = :uid and type = :type`, map[string]interface{}{

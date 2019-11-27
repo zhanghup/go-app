@@ -1,22 +1,22 @@
 module github.com/zhanghup/go-app
 
-go 1.12
+go 1.13
 
 require (
 	github.com/99designs/gqlgen v0.10.1
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/go-xorm/xorm v0.7.6
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect 图片压缩
 	github.com/pkg/errors v0.8.1
-	github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563
+	github.com/rcrowley/go-metrics v0.0.0-20190706150252-9beb055b7962 // gin接口请求统计
 	github.com/robfig/cron v1.2.0
 	github.com/stretchr/testify v1.4.0
 	github.com/vektah/dataloaden v0.3.0 // indirect
 	github.com/vektah/gqlparser v1.1.2
 	github.com/zhanghup/go-tools v1.0.15
-	golang.org/x/tools v0.0.0-20190820205717-547ecf7b1ef1
 )
 
-replace github.com/gin-gonic/gin => github.com/zhanghup/go-gin v0.0.0-20190818132815-0b17e4c65c1e
+replace github.com/gin-gonic/gin => github.com/zhanghup/go-gin v1.50.3
 
 replace github.com/go-xorm/xorm => github.com/zhanghup/go-xorm v1.0.22

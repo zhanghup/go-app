@@ -41,7 +41,7 @@ func ggin(e *xorm.Engine) func(c *gin.Context) {
 }
 
 func Gin(e *xorm.Engine, g *gin.Engine) {
-	g.Group("/", userAuth(e)).POST("/base", ggin(e))
+	g.Group("/", gs.UserAuth(e)).POST("/base", ggin(e))
 	gs.Playground(g, "/base/playground1", "/base")
 	g.GET("/base/playground2", func(c *gin.Context) {
 		handler.Playground("标题", "/base").ServeHTTP(c.Writer, c.Request)

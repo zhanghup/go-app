@@ -1,23 +1,19 @@
-package api
+package gs
 
 import (
-	"errors"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-app"
-	"github.com/zhanghup/go-app/service/auth"
-	"github.com/zhanghup/go-app/service/gs"
 )
 
-func userAuth(e *xorm.Engine) gin.HandlerFunc {
+func UserAuth(e *xorm.Engine) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tok, err := c.Cookie(gs.GIN_TOKEN)
+		tok, err := c.Cookie(GIN_TOKEN)
 		if err != nil {
-			c.Fail(errors.New("【1:未授权】"), nil, 401)
-			c.Abort()
+			c.Fail401("【1:未授权】", err)
 			return
 		}
 		if len(tok) == 0 {
@@ -26,28 +22,23 @@ func userAuth(e *xorm.Engine) gin.HandlerFunc {
 		token := app.UserToken{}
 		ok, err := e.Table(token).Where("id = ?", tok).Get(&token)
 		if err != nil {
-			c.Fail(errors.New("【2:未授权】"), nil, 401)
-			c.Abort()
+			c.Fail401("【2:未授权】", err)
 			return
 		}
 		if !ok {
-			c.Fail(errors.New("【3:未授权】"), nil, 401)
-			c.Abort()
+			c.Fail401("【3:未授权】")
 			return
 		}
 		if token.Status == nil || *token.Status != 1 {
-			c.Fail(errors.New("【4:未授权】"), nil, 401)
-			c.Abort()
+			c.Fail401("【4:未授权】")
 			return
 		}
 		if time.Now().Unix() > *token.Updated+*token.Expire {
-			c.Fail(errors.New("【5:未授权】"), nil, 401)
-			c.Abort()
+			c.Fail401("【5:未授权】")
 			return
 		}
-		if token.Type == nil || auth.TokenType(*token.Type) != auth.TokenPc {
-			c.Fail(errors.New("【6:未授权】"), nil, 401)
-			c.Abort()
+		if token.Type == nil || TokenType(*token.Type) != TokenPc {
+			c.Fail401("【6:未授权】")
 			return
 		}
 
@@ -55,13 +46,12 @@ func userAuth(e *xorm.Engine) gin.HandlerFunc {
 		*token.Expire = 7200
 		_, err = e.Table(token).Where("id = ?", token.Id).Update(token)
 		if err != nil {
-			c.Fail(errors.New("【7:未授权】"), nil, 401)
-			c.Abort()
+			c.Fail401("【7:未授权】", err)
 			return
 		}
 
 		// 读取权限列表
-		myPerms := gs.Perms{}
+		myPerms := Perms{}
 		{
 			perms := make([]struct {
 				Type string `json:"type"`
@@ -73,8 +63,7 @@ func userAuth(e *xorm.Engine) gin.HandlerFunc {
 			join {{ table "perm" }} p on p.role = ru.id
 		`).Find(&perms)
 			if err != nil {
-				c.Fail(errors.New("【8:未授权】"), nil, 401)
-				c.Abort()
+				c.Fail401("【8:未授权】", err)
 				return
 			}
 			// 去重
@@ -100,7 +89,7 @@ func userAuth(e *xorm.Engine) gin.HandlerFunc {
 		}
 
 		// 读取对象权限
-		myPermObj := gs.PermObjects{}
+		myPermObj := PermObjects{}
 		{
 			permObjects := make([]struct {
 				Object string `json:"object"`
@@ -112,8 +101,7 @@ func userAuth(e *xorm.Engine) gin.HandlerFunc {
 			join {{ table "perm_object" }} p on p.role = ru.id
 		`).Find(&permObjects)
 			if err != nil {
-				c.Fail(errors.New("【9:未授权】"), nil, 401)
-				c.Abort()
+				c.Fail401("【9:未授权】", err)
 				return
 			}
 
@@ -142,8 +130,7 @@ func userAuth(e *xorm.Engine) gin.HandlerFunc {
 		u := app.User{}
 		ok, err = e.Table(u).Where("id = ? and status = 1", *token.Uid).Get(&u)
 		if err != nil {
-			c.Fail(errors.New("【10:未授权】"), nil, 401)
-			c.Abort()
+			c.Fail401("【10:未授权】", err)
 			return
 		}
 
@@ -158,7 +145,7 @@ func userAuth(e *xorm.Engine) gin.HandlerFunc {
 		c.Set("perms", myPerms)
 		c.Set("permobjs", myPermObj)
 		c.Set("admin", admin)
-		c.SetCookie(gs.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
+		c.SetCookie(GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
 		c.Next()
 	}
 }

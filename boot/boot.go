@@ -8,6 +8,7 @@ import (
 	"github.com/zhanghup/go-app/initia"
 	"github.com/zhanghup/go-app/service/api"
 	"github.com/zhanghup/go-app/service/auth"
+	"github.com/zhanghup/go-app/service/file"
 	"net/http"
 )
 
@@ -24,6 +25,10 @@ func Boot() {
 
 func Router(e *xorm.Engine) *gin.Engine {
 	g := gin.Default()
+	// 文件操作
+	{
+		file.Gin(e, g)
+	}
 
 	// http服务状态监听
 	{
@@ -32,6 +37,8 @@ func Router(e *xorm.Engine) *gin.Engine {
 			c.JSON(http.StatusOK, StatsReport())
 		})
 	}
+
+
 
 	// 基础数据路由
 	{
