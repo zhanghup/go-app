@@ -2,12 +2,12 @@ package initia
 
 import (
 	"github.com/go-xorm/xorm"
-	"github.com/zhanghup/go-app"
+	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-tools"
 )
 
 func initUser(e *xorm.Engine) {
-	ok, err := e.Table(app.User{}).Where("id = ?", "root").Exist()
+	ok, err := e.Table(beans.User{}).Where("id = ?", "root").Exist()
 	if err != nil {
 		panic(err)
 	}
@@ -17,8 +17,8 @@ func initUser(e *xorm.Engine) {
 
 	slat := *tools.ObjectString()
 	password := tools.Password("bwg7xj98b3", slat)
-	user := app.User{
-		Bean: app.Bean{
+	user := beans.User{
+		Bean: beans.Bean{
 			Id:     tools.Ptr().String("root"),
 			Status: tools.Ptr().Int(1),
 			Weight: tools.Ptr().Int(0),

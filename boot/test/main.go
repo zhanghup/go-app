@@ -1,7 +1,7 @@
 package main
 
 import (
-	rice "github.com/giter/go.rice"
+	"github.com/giter/go.rice"
 	"github.com/zhanghup/go-app/boot"
 )
 
@@ -11,5 +11,5 @@ func main() {
 		panic(err)
 	}
 	boot.Boot(box)
-	//boot.Run()
+	boot.Run()
 }

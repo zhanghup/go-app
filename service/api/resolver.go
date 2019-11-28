@@ -7,6 +7,7 @@ import (
 	"github.com/99designs/gqlgen/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
+	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-app/service/api/lib"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
@@ -15,10 +16,10 @@ import (
 	"net/http"
 )
 
-func ggin(e *xorm.Engine) func(c *gin.Context) {
+func ggin() func(c *gin.Context) {
 	c := lib.Config{
 		Resolvers: &Resolver{
-			DB:     e,
+			DB:     cfg.DB().Engine(),
 			Loader: loaders.DataLoaden,
 			middle: directive.NewMiddleware,
 		},
@@ -28,7 +29,7 @@ func ggin(e *xorm.Engine) func(c *gin.Context) {
 	}
 
 	hu := handler.GraphQL(lib.NewExecutableSchema(c))
-	hu = loaders.DataLoadenMiddleware(e, hu)
+	hu = loaders.DataLoadenMiddleware(cfg.DB().Engine(), hu)
 	hu = func(next http.HandlerFunc) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			r.Header.Set("Content-Type", "application/json")
@@ -42,10 +43,10 @@ func ggin(e *xorm.Engine) func(c *gin.Context) {
 	}
 }
 
-func Gin(e *xorm.Engine, g *gin.Engine) {
-	g.Group("/", directive.UserAuth(e)).POST("/base", ggin(e))
-	gs.Playground(g, "/base/playground1", "/base")
-	g.GET("/base/playground2", func(c *gin.Context) {
+func Gin() {
+	cfg.Web().Engine().Group("/", directive.UserAuth()).POST("/base", ggin())
+	gs.Playground("/base/playground1", "/base")
+	cfg.Web().Engine().GET("/base/playground2", func(c *gin.Context) {
 		handler.Playground("标题", "/base").ServeHTTP(c.Writer, c.Request)
 	})
 }

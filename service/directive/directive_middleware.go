@@ -3,7 +3,7 @@ package directive
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/zhanghup/go-app"
+	"github.com/zhanghup/go-app/beans"
 )
 
 const (
@@ -32,12 +32,12 @@ func (this Middleware) Uid() string {
 	return uido.(string)
 }
 
-func (this Middleware) User() app.User {
+func (this Middleware) User() beans.User {
 	uido, ok := this.gin.Get("user")
 	if !ok {
-		return app.User{}
+		return beans.User{}
 	}
-	return uido.(app.User)
+	return uido.(beans.User)
 }
 
 func (this Middleware) Admin() bool {

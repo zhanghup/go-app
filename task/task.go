@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/go-xorm/xorm"
 	"github.com/robfig/cron"
-	"github.com/zhanghup/go-app"
+	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-tools"
 	"os"
 	"runtime"
@@ -30,7 +30,7 @@ func NewCron(db *xorm.Engine) ICron {
 }
 
 func (this *Cron) Add(code, name, expression string, fn func() error) error {
-	cr := new(app.Cron)
+	cr := new(beans.Cron)
 	ok, err := this.db.SF(`select * from {{ table "cron" }} where code = :code`, map[string]interface{}{
 		"code": code,
 	}).Get(cr)
@@ -41,7 +41,7 @@ func (this *Cron) Add(code, name, expression string, fn func() error) error {
 	ctx := context.Background()
 	ctx, err = this.db.Ts(ctx, func(s *xorm.Session) error {
 		if !ok {
-			cr.Bean = app.Bean{
+			cr.Bean = beans.Bean{
 				Id:     tools.ObjectString(),
 				Status: tools.Ptr().Int(1),
 			}
@@ -64,8 +64,8 @@ func (this *Cron) Add(code, name, expression string, fn func() error) error {
 	})
 
 	err = this.cron.AddFunc(expression, func() {
-		lg := app.CronLog{
-			Bean: app.Bean{
+		lg := beans.CronLog{
+			Bean: beans.Bean{
 				Id:     tools.ObjectString(),
 				Status: tools.Ptr().Int(1),
 			},

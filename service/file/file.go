@@ -7,7 +7,8 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/nfnt/resize"
 	"github.com/pkg/errors"
-	"github.com/zhanghup/go-app"
+	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-tools"
 	"image"
 	"image/gif"
@@ -20,8 +21,8 @@ import (
 	"strings"
 )
 
-func NewUploader(e *xorm.Engine) *Uploader {
-	return &Uploader{e}
+func NewUploader() *Uploader {
+	return &Uploader{db: cfg.DB().Engine()}
 }
 
 type Uploader struct {
@@ -56,7 +57,7 @@ func (this *Uploader) Upload() func(c *gin.Context) {
 			endStr = hd.Filename[idx+1:]
 		}
 
-		old := app.Resource{}
+		old := beans.Resource{}
 		_, err = this.db.Table(old).Where("md5 = ?", md5).Get(&old)
 		if err != nil {
 			c.Fail400("读取文件失败【4】", err)
@@ -66,8 +67,8 @@ func (this *Uploader) Upload() func(c *gin.Context) {
 		ct := hd.Header.Get("Content-Type")
 
 		if old.Id == nil {
-			res := app.Resource{
-				Bean: app.Bean{
+			res := beans.Resource{
+				Bean: beans.Bean{
 					Id:     tools.ObjectString(),
 					Status: tools.Ptr().Int(1),
 				},
@@ -104,8 +105,8 @@ func (this *Uploader) Upload() func(c *gin.Context) {
 	}
 
 }
-func (this *Uploader) GetFile(id string) (*app.Resource, *os.File, error) {
-	res := new(app.Resource)
+func (this *Uploader) GetFile(id string) (*beans.Resource, *os.File, error) {
+	res := new(beans.Resource)
 	ok, err := this.db.Where("id = ?", id).Get(res)
 	if err != nil {
 		return nil, nil, err
@@ -216,10 +217,10 @@ func (this *Uploader) Resize() func(c *gin.Context) {
 	}
 }
 
-func Gin(e *xorm.Engine, g *gin.Engine) {
-	up := NewUploader(e)
-	g.Group("/").POST("/upload", up.Upload())
-	g.Group("/").GET("/upload/:id", up.Get())
-	g.Group("/").GET("/upload/:id/:width/:height", up.Resize())
-	g.Group("/").GET("/upload/:id/:width", up.Resize())
+func Gin() {
+	up := NewUploader()
+	cfg.Web().Engine().Group("/").POST("/upload", up.Upload())
+	cfg.Web().Engine().Group("/").GET("/upload/:id", up.Get())
+	cfg.Web().Engine().Group("/").GET("/upload/:id/:width/:height", up.Resize())
+	cfg.Web().Engine().Group("/").GET("/upload/:id/:width", up.Resize())
 }

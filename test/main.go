@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"github.com/zhanghup/go-app/api/server/engine"
 	"github.com/zhanghup/go-tools"
 	"net/http"
 	"net/http/httptest"
@@ -300,6 +299,6 @@ func (this Mt) MainTest(t *testing.T, obj string, params ...map[string]interface
 var e *gin.Engine
 
 func init() {
-	e = engine.Router()
+	
 	//login(e)
 }

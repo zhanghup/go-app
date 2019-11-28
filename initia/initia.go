@@ -1,11 +1,7 @@
 package initia
 
-import "github.com/go-xorm/xorm"
 
-
-
-
-func InitAction(e *xorm.Engine) {
-	initDict(e)
-	initUser(e)
+func InitAction() {
+	initDict()
+	initUser()
 }

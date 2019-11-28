@@ -1,4 +1,4 @@
-package app
+package beans
 
 type PageResult struct {
 	Total int64       `json:"total"`

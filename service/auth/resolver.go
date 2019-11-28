@@ -7,7 +7,8 @@ import (
 	"github.com/99designs/gqlgen/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
-	"github.com/zhanghup/go-app"
+	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-app/service/loaders"
@@ -15,15 +16,15 @@ import (
 	"net/http"
 )
 
-func ggin(e *xorm.Engine) func(c *gin.Context) {
+func ggin() func(c *gin.Context) {
 	c := Config{Resolvers: &Resolver{
-		DB:     e,
+		DB:     cfg.DB().Engine(),
 		Loader: loaders.DataLoaden,
 		middle: directive.NewMiddleware,
 	}}
 
 	hu := handler.GraphQL(NewExecutableSchema(c))
-	hu = loaders.DataLoadenMiddleware(e, hu)
+	hu = loaders.DataLoadenMiddleware(cfg.DB().Engine(), hu)
 	hu = func(next http.HandlerFunc) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			r.Header.Set("Content-Type", "application/json")
@@ -37,10 +38,10 @@ func ggin(e *xorm.Engine) func(c *gin.Context) {
 	}
 }
 
-func Gin(e *xorm.Engine, g *gin.Engine) {
-	g.POST("/auth", ggin(e))
-	gs.Playground(g, "/auth/playground1", "/auth")
-	g.GET("/auth/playground2", func(c *gin.Context) {
+func Gin() {
+	cfg.Web().Engine().POST("/auth", ggin())
+	gs.Playground("/auth/playground1", "/auth")
+	cfg.Web().Engine().GET("/auth/playground2", func(c *gin.Context) {
 		handler.Playground("标题", "/auth").ServeHTTP(c.Writer, c.Request)
 	})
 }
@@ -61,7 +62,7 @@ func (r *Resolver) Query() QueryResolver {
 type mutationResolver struct{ *Resolver }
 
 func (this mutationResolver) Login(ctx context.Context, account string, password string) (string, error) {
-	user := app.User{}
+	user := beans.User{}
 	ok, err := this.DB.Where("account = ? and status = 1", account).Get(&user)
 	if err != nil {
 		return "", err
@@ -87,7 +88,7 @@ func (this mutationResolver) Login(ctx context.Context, account string, password
 }
 
 func (this mutationResolver) Token(ctx context.Context, uid string, ty gs.TokenType) (string, error) {
-	token := new(app.UserToken)
+	token := new(beans.UserToken)
 	ctx, err := this.DB.Ts(ctx, func(s *xorm.Session) error {
 		_, e := s.SF(`update {{ table "user_token" }} set status = 0 where uid = :uid and type = :type`, map[string]interface{}{
 			"uid":  uid,

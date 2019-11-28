@@ -1,16 +1,17 @@
 package directive
 
 import (
+	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-app/service/gs"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-xorm/xorm"
-	"github.com/zhanghup/go-app"
 )
 
-func UserAuth(e *xorm.Engine) gin.HandlerFunc {
+func UserAuth() gin.HandlerFunc {
+	e := cfg.DB().Engine()
 	return func(c *gin.Context) {
 		tok, err := c.Cookie(GIN_TOKEN)
 		if err != nil {
@@ -20,7 +21,7 @@ func UserAuth(e *xorm.Engine) gin.HandlerFunc {
 		if len(tok) == 0 {
 			tok = c.GetHeader("Authorization")
 		}
-		token := app.UserToken{}
+		token := beans.UserToken{}
 		ok, err := e.Table(token).Where("id = ?", tok).Get(&token)
 		if err != nil {
 			c.Fail401("【2:未授权】", err)
@@ -128,7 +129,7 @@ func UserAuth(e *xorm.Engine) gin.HandlerFunc {
 			}
 		}
 
-		u := app.User{}
+		u := beans.User{}
 		ok, err = e.Table(u).Where("id = ? and status = 1", *token.Uid).Get(&u)
 		if err != nil {
 			c.Fail401("【10:未授权】", err)
