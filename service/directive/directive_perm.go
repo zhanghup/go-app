@@ -15,7 +15,7 @@ func Perm() func(ctx context.Context, obj interface{}, next graphql.Resolver, en
 		md := MewMe(ctx)
 		user := md.User()
 
-		// root 无线操作权限
+		// root 无限操作权限
 		if user.Id != nil && *user.Id == "root" {
 			return next(ctx)
 		}
