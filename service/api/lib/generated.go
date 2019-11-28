@@ -14,7 +14,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
-	"github.com/zhanghup/go-app"
+	"github.com/zhanghup/go-app/beans"
 )
 
 // region    ************************** generated!.gotpl **************************
@@ -143,34 +143,34 @@ type ComplexityRoot struct {
 }
 
 type DictResolver interface {
-	Values(ctx context.Context, obj *app.Dict) ([]app.DictItem, error)
+	Values(ctx context.Context, obj *beans.Dict) ([]beans.DictItem, error)
 }
 type MutationResolver interface {
 	World(ctx context.Context) (*string, error)
-	DictCreate(ctx context.Context, input NewDict) (*app.Dict, error)
+	DictCreate(ctx context.Context, input NewDict) (*beans.Dict, error)
 	DictUpdate(ctx context.Context, id string, input UpdDict) (bool, error)
 	DictRemoves(ctx context.Context, ids []string) (bool, error)
-	DictItemCreate(ctx context.Context, input NewDictItem) (*app.DictItem, error)
+	DictItemCreate(ctx context.Context, input NewDictItem) (*beans.DictItem, error)
 	DictItemUpdate(ctx context.Context, id string, input UpdDictItem) (bool, error)
 	DictItemRemoves(ctx context.Context, ids []string) (bool, error)
-	RoleCreate(ctx context.Context, input NewRole) (*app.Role, error)
+	RoleCreate(ctx context.Context, input NewRole) (*beans.Role, error)
 	RoleUpdate(ctx context.Context, id string, input UpdRole) (bool, error)
 	RoleRemoves(ctx context.Context, ids []string) (bool, error)
 	RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error)
 	RoleToUser(ctx context.Context, uid string, roles []string) (bool, error)
-	UserCreate(ctx context.Context, input NewUser) (*app.User, error)
+	UserCreate(ctx context.Context, input NewUser) (*beans.User, error)
 	UserUpdate(ctx context.Context, id string, input UpdUser) (bool, error)
 	UserRemoves(ctx context.Context, ids []string) (bool, error)
 }
 type QueryResolver interface {
 	Hello(ctx context.Context) (*string, error)
 	Dicts(ctx context.Context, query QDict) (*Dicts, error)
-	Dict(ctx context.Context, id string) (*app.Dict, error)
+	Dict(ctx context.Context, id string) (*beans.Dict, error)
 	Roles(ctx context.Context, query QRole) (*Roles, error)
-	Role(ctx context.Context, id string) (*app.Role, error)
+	Role(ctx context.Context, id string) (*beans.Role, error)
 	RolePerms(ctx context.Context, id string, typeArg *string) ([]string, error)
 	Users(ctx context.Context, query QUser) (*Users, error)
-	User(ctx context.Context, id string) (*app.User, error)
+	User(ctx context.Context, id string) (*beans.User, error)
 }
 
 type executableSchema struct {
@@ -894,7 +894,7 @@ type Dicts{
     data:[Dict!]
 }
 
-type Dict @goModel(model:"github.com/zhanghup/go-app.Dict")  {
+type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     id: String
 
     "字典编码"
@@ -944,7 +944,7 @@ input UpdDict {
     status: Int
 }
 
-type DictItem @goModel(model:"github.com/zhanghup/go-app.DictItem")  {
+type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
     id: String
 
     "字典id"
@@ -1029,7 +1029,7 @@ type Roles {
     data: [Role!]
 }
 
-type Role @goModel(model: "github.com/zhanghup/go-app.Role") {
+type Role @goModel(model: "github.com/zhanghup/go-app/beans.Role") {
     id: String
 
     "角色描述"
@@ -1098,7 +1098,7 @@ type Users{
     data:[User!]
 }
 
-type User @goModel(model:"github.com/zhanghup/go-app.User")  {
+type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     id: String
 
     "用户类型"
@@ -1623,7 +1623,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Dict_id(ctx context.Context, field graphql.CollectedField, obj *app.Dict) (ret graphql.Marshaler) {
+func (ec *executionContext) _Dict_id(ctx context.Context, field graphql.CollectedField, obj *beans.Dict) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1657,7 +1657,7 @@ func (ec *executionContext) _Dict_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Dict_code(ctx context.Context, field graphql.CollectedField, obj *app.Dict) (ret graphql.Marshaler) {
+func (ec *executionContext) _Dict_code(ctx context.Context, field graphql.CollectedField, obj *beans.Dict) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1691,7 +1691,7 @@ func (ec *executionContext) _Dict_code(ctx context.Context, field graphql.Collec
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Dict_name(ctx context.Context, field graphql.CollectedField, obj *app.Dict) (ret graphql.Marshaler) {
+func (ec *executionContext) _Dict_name(ctx context.Context, field graphql.CollectedField, obj *beans.Dict) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1725,7 +1725,7 @@ func (ec *executionContext) _Dict_name(ctx context.Context, field graphql.Collec
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Dict_remark(ctx context.Context, field graphql.CollectedField, obj *app.Dict) (ret graphql.Marshaler) {
+func (ec *executionContext) _Dict_remark(ctx context.Context, field graphql.CollectedField, obj *beans.Dict) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1759,7 +1759,7 @@ func (ec *executionContext) _Dict_remark(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Dict_created(ctx context.Context, field graphql.CollectedField, obj *app.Dict) (ret graphql.Marshaler) {
+func (ec *executionContext) _Dict_created(ctx context.Context, field graphql.CollectedField, obj *beans.Dict) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1793,7 +1793,7 @@ func (ec *executionContext) _Dict_created(ctx context.Context, field graphql.Col
 	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Dict_updated(ctx context.Context, field graphql.CollectedField, obj *app.Dict) (ret graphql.Marshaler) {
+func (ec *executionContext) _Dict_updated(ctx context.Context, field graphql.CollectedField, obj *beans.Dict) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1827,7 +1827,7 @@ func (ec *executionContext) _Dict_updated(ctx context.Context, field graphql.Col
 	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Dict_weight(ctx context.Context, field graphql.CollectedField, obj *app.Dict) (ret graphql.Marshaler) {
+func (ec *executionContext) _Dict_weight(ctx context.Context, field graphql.CollectedField, obj *beans.Dict) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1861,7 +1861,7 @@ func (ec *executionContext) _Dict_weight(ctx context.Context, field graphql.Coll
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Dict_status(ctx context.Context, field graphql.CollectedField, obj *app.Dict) (ret graphql.Marshaler) {
+func (ec *executionContext) _Dict_status(ctx context.Context, field graphql.CollectedField, obj *beans.Dict) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1895,7 +1895,7 @@ func (ec *executionContext) _Dict_status(ctx context.Context, field graphql.Coll
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Dict_values(ctx context.Context, field graphql.CollectedField, obj *app.Dict) (ret graphql.Marshaler) {
+func (ec *executionContext) _Dict_values(ctx context.Context, field graphql.CollectedField, obj *beans.Dict) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1923,13 +1923,13 @@ func (ec *executionContext) _Dict_values(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]app.DictItem)
+	res := resTmp.([]beans.DictItem)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalODictItem2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx, field.Selections, res)
+	return ec.marshalODictItem2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDictItem(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DictItem_id(ctx context.Context, field graphql.CollectedField, obj *app.DictItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _DictItem_id(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1963,7 +1963,7 @@ func (ec *executionContext) _DictItem_id(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DictItem_code(ctx context.Context, field graphql.CollectedField, obj *app.DictItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _DictItem_code(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1997,7 +1997,7 @@ func (ec *executionContext) _DictItem_code(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DictItem_name(ctx context.Context, field graphql.CollectedField, obj *app.DictItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _DictItem_name(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -2031,7 +2031,7 @@ func (ec *executionContext) _DictItem_name(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DictItem_value(ctx context.Context, field graphql.CollectedField, obj *app.DictItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _DictItem_value(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -2065,7 +2065,7 @@ func (ec *executionContext) _DictItem_value(ctx context.Context, field graphql.C
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DictItem_extension(ctx context.Context, field graphql.CollectedField, obj *app.DictItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _DictItem_extension(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -2099,7 +2099,7 @@ func (ec *executionContext) _DictItem_extension(ctx context.Context, field graph
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DictItem_created(ctx context.Context, field graphql.CollectedField, obj *app.DictItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _DictItem_created(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -2133,7 +2133,7 @@ func (ec *executionContext) _DictItem_created(ctx context.Context, field graphql
 	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DictItem_updated(ctx context.Context, field graphql.CollectedField, obj *app.DictItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _DictItem_updated(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -2167,7 +2167,7 @@ func (ec *executionContext) _DictItem_updated(ctx context.Context, field graphql
 	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DictItem_weight(ctx context.Context, field graphql.CollectedField, obj *app.DictItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _DictItem_weight(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -2201,7 +2201,7 @@ func (ec *executionContext) _DictItem_weight(ctx context.Context, field graphql.
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DictItem_status(ctx context.Context, field graphql.CollectedField, obj *app.DictItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _DictItem_status(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -2297,10 +2297,10 @@ func (ec *executionContext) _Dicts_data(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]app.Dict)
+	res := resTmp.([]beans.Dict)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalODict2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx, field.Selections, res)
+	return ec.marshalODict2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDict(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_world(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2388,10 +2388,10 @@ func (ec *executionContext) _Mutation_dict_create(ctx context.Context, field gra
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*app.Dict); ok {
+		if data, ok := tmp.(*beans.Dict); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.Dict`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Dict`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2400,10 +2400,10 @@ func (ec *executionContext) _Mutation_dict_create(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*app.Dict)
+	res := resTmp.(*beans.Dict)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalODict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx, field.Selections, res)
+	return ec.marshalODict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDict(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_dict_update(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2601,10 +2601,10 @@ func (ec *executionContext) _Mutation_dict_item_create(ctx context.Context, fiel
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*app.DictItem); ok {
+		if data, ok := tmp.(*beans.DictItem); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.DictItem`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.DictItem`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2613,10 +2613,10 @@ func (ec *executionContext) _Mutation_dict_item_create(ctx context.Context, fiel
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*app.DictItem)
+	res := resTmp.(*beans.DictItem)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalODictItem2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx, field.Selections, res)
+	return ec.marshalODictItem2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDictItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_dict_item_update(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2814,10 +2814,10 @@ func (ec *executionContext) _Mutation_role_create(ctx context.Context, field gra
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*app.Role); ok {
+		if data, ok := tmp.(*beans.Role); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.Role`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Role`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2826,10 +2826,10 @@ func (ec *executionContext) _Mutation_role_create(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*app.Role)
+	res := resTmp.(*beans.Role)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalORole2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx, field.Selections, res)
+	return ec.marshalORole2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐRole(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_role_update(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3171,10 +3171,10 @@ func (ec *executionContext) _Mutation_user_create(ctx context.Context, field gra
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*app.User); ok {
+		if data, ok := tmp.(*beans.User); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.User`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.User`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3183,10 +3183,10 @@ func (ec *executionContext) _Mutation_user_create(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*app.User)
+	res := resTmp.(*beans.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOUser2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_user_update(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3487,10 +3487,10 @@ func (ec *executionContext) _Query_dict(ctx context.Context, field graphql.Colle
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*app.Dict); ok {
+		if data, ok := tmp.(*beans.Dict); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.Dict`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Dict`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3499,10 +3499,10 @@ func (ec *executionContext) _Query_dict(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*app.Dict)
+	res := resTmp.(*beans.Dict)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalODict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx, field.Selections, res)
+	return ec.marshalODict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDict(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_roles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3625,10 +3625,10 @@ func (ec *executionContext) _Query_role(ctx context.Context, field graphql.Colle
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*app.Role); ok {
+		if data, ok := tmp.(*beans.Role); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.Role`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Role`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3637,10 +3637,10 @@ func (ec *executionContext) _Query_role(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*app.Role)
+	res := resTmp.(*beans.Role)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalORole2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx, field.Selections, res)
+	return ec.marshalORole2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐRole(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_role_perms(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3832,10 +3832,10 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*app.User); ok {
+		if data, ok := tmp.(*beans.User); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app.User`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.User`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3844,10 +3844,10 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*app.User)
+	res := resTmp.(*beans.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOUser2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3925,7 +3925,7 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Role_id(ctx context.Context, field graphql.CollectedField, obj *app.Role) (ret graphql.Marshaler) {
+func (ec *executionContext) _Role_id(ctx context.Context, field graphql.CollectedField, obj *beans.Role) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -3959,7 +3959,7 @@ func (ec *executionContext) _Role_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Role_name(ctx context.Context, field graphql.CollectedField, obj *app.Role) (ret graphql.Marshaler) {
+func (ec *executionContext) _Role_name(ctx context.Context, field graphql.CollectedField, obj *beans.Role) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -3993,7 +3993,7 @@ func (ec *executionContext) _Role_name(ctx context.Context, field graphql.Collec
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Role_desc(ctx context.Context, field graphql.CollectedField, obj *app.Role) (ret graphql.Marshaler) {
+func (ec *executionContext) _Role_desc(ctx context.Context, field graphql.CollectedField, obj *beans.Role) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4027,7 +4027,7 @@ func (ec *executionContext) _Role_desc(ctx context.Context, field graphql.Collec
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Role_created(ctx context.Context, field graphql.CollectedField, obj *app.Role) (ret graphql.Marshaler) {
+func (ec *executionContext) _Role_created(ctx context.Context, field graphql.CollectedField, obj *beans.Role) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4061,7 +4061,7 @@ func (ec *executionContext) _Role_created(ctx context.Context, field graphql.Col
 	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Role_updated(ctx context.Context, field graphql.CollectedField, obj *app.Role) (ret graphql.Marshaler) {
+func (ec *executionContext) _Role_updated(ctx context.Context, field graphql.CollectedField, obj *beans.Role) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4095,7 +4095,7 @@ func (ec *executionContext) _Role_updated(ctx context.Context, field graphql.Col
 	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Role_weight(ctx context.Context, field graphql.CollectedField, obj *app.Role) (ret graphql.Marshaler) {
+func (ec *executionContext) _Role_weight(ctx context.Context, field graphql.CollectedField, obj *beans.Role) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4129,7 +4129,7 @@ func (ec *executionContext) _Role_weight(ctx context.Context, field graphql.Coll
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Role_status(ctx context.Context, field graphql.CollectedField, obj *app.Role) (ret graphql.Marshaler) {
+func (ec *executionContext) _Role_status(ctx context.Context, field graphql.CollectedField, obj *beans.Role) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4225,13 +4225,13 @@ func (ec *executionContext) _Roles_data(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]app.Role)
+	res := resTmp.([]beans.Role)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalORole2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx, field.Selections, res)
+	return ec.marshalORole2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐRole(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4265,7 +4265,7 @@ func (ec *executionContext) _User_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_type(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_type(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4299,7 +4299,7 @@ func (ec *executionContext) _User_type(ctx context.Context, field graphql.Collec
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_account(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_account(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4333,7 +4333,7 @@ func (ec *executionContext) _User_account(ctx context.Context, field graphql.Col
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_password(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_password(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4367,7 +4367,7 @@ func (ec *executionContext) _User_password(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4401,7 +4401,7 @@ func (ec *executionContext) _User_name(ctx context.Context, field graphql.Collec
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_avatar(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_avatar(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4435,7 +4435,7 @@ func (ec *executionContext) _User_avatar(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_i_card(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_i_card(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4469,7 +4469,7 @@ func (ec *executionContext) _User_i_card(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_birth(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_birth(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4503,7 +4503,7 @@ func (ec *executionContext) _User_birth(ctx context.Context, field graphql.Colle
 	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_sex(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_sex(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4537,7 +4537,7 @@ func (ec *executionContext) _User_sex(ctx context.Context, field graphql.Collect
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_mobile(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_mobile(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4571,7 +4571,7 @@ func (ec *executionContext) _User_mobile(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_admin(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_admin(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4605,7 +4605,7 @@ func (ec *executionContext) _User_admin(ctx context.Context, field graphql.Colle
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_created(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_created(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4639,7 +4639,7 @@ func (ec *executionContext) _User_created(ctx context.Context, field graphql.Col
 	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_updated(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_updated(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4673,7 +4673,7 @@ func (ec *executionContext) _User_updated(ctx context.Context, field graphql.Col
 	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_weight(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_weight(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4707,7 +4707,7 @@ func (ec *executionContext) _User_weight(ctx context.Context, field graphql.Coll
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_status(ctx context.Context, field graphql.CollectedField, obj *app.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_status(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -4803,10 +4803,10 @@ func (ec *executionContext) _Users_data(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]app.User)
+	res := resTmp.([]beans.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOUser2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -6468,7 +6468,7 @@ func (ec *executionContext) unmarshalInputUpdUser(ctx context.Context, obj inter
 
 var dictImplementors = []string{"Dict"}
 
-func (ec *executionContext) _Dict(ctx context.Context, sel ast.SelectionSet, obj *app.Dict) graphql.Marshaler {
+func (ec *executionContext) _Dict(ctx context.Context, sel ast.SelectionSet, obj *beans.Dict) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.RequestContext, sel, dictImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -6517,7 +6517,7 @@ func (ec *executionContext) _Dict(ctx context.Context, sel ast.SelectionSet, obj
 
 var dictItemImplementors = []string{"DictItem"}
 
-func (ec *executionContext) _DictItem(ctx context.Context, sel ast.SelectionSet, obj *app.DictItem) graphql.Marshaler {
+func (ec *executionContext) _DictItem(ctx context.Context, sel ast.SelectionSet, obj *beans.DictItem) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.RequestContext, sel, dictItemImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -6787,7 +6787,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 
 var roleImplementors = []string{"Role"}
 
-func (ec *executionContext) _Role(ctx context.Context, sel ast.SelectionSet, obj *app.Role) graphql.Marshaler {
+func (ec *executionContext) _Role(ctx context.Context, sel ast.SelectionSet, obj *beans.Role) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.RequestContext, sel, roleImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -6849,7 +6849,7 @@ func (ec *executionContext) _Roles(ctx context.Context, sel ast.SelectionSet, ob
 
 var userImplementors = []string{"User"}
 
-func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *app.User) graphql.Marshaler {
+func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *beans.User) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.RequestContext, sel, userImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -7184,11 +7184,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNDict2githubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx context.Context, sel ast.SelectionSet, v app.Dict) graphql.Marshaler {
+func (ec *executionContext) marshalNDict2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDict(ctx context.Context, sel ast.SelectionSet, v beans.Dict) graphql.Marshaler {
 	return ec._Dict(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNDictItem2githubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx context.Context, sel ast.SelectionSet, v app.DictItem) graphql.Marshaler {
+func (ec *executionContext) marshalNDictItem2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDictItem(ctx context.Context, sel ast.SelectionSet, v beans.DictItem) graphql.Marshaler {
 	return ec._DictItem(ctx, sel, &v)
 }
 
@@ -7220,7 +7220,7 @@ func (ec *executionContext) unmarshalNQUser2githubᚗcomᚋzhanghupᚋgoᚑapp�
 	return ec.unmarshalInputQUser(ctx, v)
 }
 
-func (ec *executionContext) marshalNRole2githubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx context.Context, sel ast.SelectionSet, v app.Role) graphql.Marshaler {
+func (ec *executionContext) marshalNRole2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐRole(ctx context.Context, sel ast.SelectionSet, v beans.Role) graphql.Marshaler {
 	return ec._Role(ctx, sel, &v)
 }
 
@@ -7283,7 +7283,7 @@ func (ec *executionContext) unmarshalNUpdUser2githubᚗcomᚋzhanghupᚋgoᚑapp
 	return ec.unmarshalInputUpdUser(ctx, v)
 }
 
-func (ec *executionContext) marshalNUser2githubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx context.Context, sel ast.SelectionSet, v app.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐUser(ctx context.Context, sel ast.SelectionSet, v beans.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
@@ -7536,11 +7536,11 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
 }
 
-func (ec *executionContext) marshalODict2githubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx context.Context, sel ast.SelectionSet, v app.Dict) graphql.Marshaler {
+func (ec *executionContext) marshalODict2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDict(ctx context.Context, sel ast.SelectionSet, v beans.Dict) graphql.Marshaler {
 	return ec._Dict(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalODict2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx context.Context, sel ast.SelectionSet, v []app.Dict) graphql.Marshaler {
+func (ec *executionContext) marshalODict2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDict(ctx context.Context, sel ast.SelectionSet, v []beans.Dict) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -7567,7 +7567,7 @@ func (ec *executionContext) marshalODict2ᚕgithubᚗcomᚋzhanghupᚋgoᚑapp�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNDict2githubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx, sel, v[i])
+			ret[i] = ec.marshalNDict2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDict(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -7580,18 +7580,18 @@ func (ec *executionContext) marshalODict2ᚕgithubᚗcomᚋzhanghupᚋgoᚑapp�
 	return ret
 }
 
-func (ec *executionContext) marshalODict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDict(ctx context.Context, sel ast.SelectionSet, v *app.Dict) graphql.Marshaler {
+func (ec *executionContext) marshalODict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDict(ctx context.Context, sel ast.SelectionSet, v *beans.Dict) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Dict(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalODictItem2githubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx context.Context, sel ast.SelectionSet, v app.DictItem) graphql.Marshaler {
+func (ec *executionContext) marshalODictItem2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDictItem(ctx context.Context, sel ast.SelectionSet, v beans.DictItem) graphql.Marshaler {
 	return ec._DictItem(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalODictItem2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx context.Context, sel ast.SelectionSet, v []app.DictItem) graphql.Marshaler {
+func (ec *executionContext) marshalODictItem2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDictItem(ctx context.Context, sel ast.SelectionSet, v []beans.DictItem) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -7618,7 +7618,7 @@ func (ec *executionContext) marshalODictItem2ᚕgithubᚗcomᚋzhanghupᚋgoᚑa
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNDictItem2githubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx, sel, v[i])
+			ret[i] = ec.marshalNDictItem2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDictItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -7631,7 +7631,7 @@ func (ec *executionContext) marshalODictItem2ᚕgithubᚗcomᚋzhanghupᚋgoᚑa
 	return ret
 }
 
-func (ec *executionContext) marshalODictItem2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐDictItem(ctx context.Context, sel ast.SelectionSet, v *app.DictItem) graphql.Marshaler {
+func (ec *executionContext) marshalODictItem2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDictItem(ctx context.Context, sel ast.SelectionSet, v *beans.DictItem) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -7695,11 +7695,11 @@ func (ec *executionContext) marshalOInt2ᚖint64(ctx context.Context, sel ast.Se
 	return ec.marshalOInt2int64(ctx, sel, *v)
 }
 
-func (ec *executionContext) marshalORole2githubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx context.Context, sel ast.SelectionSet, v app.Role) graphql.Marshaler {
+func (ec *executionContext) marshalORole2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐRole(ctx context.Context, sel ast.SelectionSet, v beans.Role) graphql.Marshaler {
 	return ec._Role(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalORole2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx context.Context, sel ast.SelectionSet, v []app.Role) graphql.Marshaler {
+func (ec *executionContext) marshalORole2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐRole(ctx context.Context, sel ast.SelectionSet, v []beans.Role) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -7726,7 +7726,7 @@ func (ec *executionContext) marshalORole2ᚕgithubᚗcomᚋzhanghupᚋgoᚑapp�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNRole2githubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx, sel, v[i])
+			ret[i] = ec.marshalNRole2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐRole(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -7739,7 +7739,7 @@ func (ec *executionContext) marshalORole2ᚕgithubᚗcomᚋzhanghupᚋgoᚑapp�
 	return ret
 }
 
-func (ec *executionContext) marshalORole2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐRole(ctx context.Context, sel ast.SelectionSet, v *app.Role) graphql.Marshaler {
+func (ec *executionContext) marshalORole2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐRole(ctx context.Context, sel ast.SelectionSet, v *beans.Role) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -7812,11 +7812,11 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return ec.marshalOString2string(ctx, sel, *v)
 }
 
-func (ec *executionContext) marshalOUser2githubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx context.Context, sel ast.SelectionSet, v app.User) graphql.Marshaler {
+func (ec *executionContext) marshalOUser2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐUser(ctx context.Context, sel ast.SelectionSet, v beans.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOUser2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx context.Context, sel ast.SelectionSet, v []app.User) graphql.Marshaler {
+func (ec *executionContext) marshalOUser2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐUser(ctx context.Context, sel ast.SelectionSet, v []beans.User) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -7843,7 +7843,7 @@ func (ec *executionContext) marshalOUser2ᚕgithubᚗcomᚋzhanghupᚋgoᚑapp�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNUser2githubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx, sel, v[i])
+			ret[i] = ec.marshalNUser2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -7856,7 +7856,7 @@ func (ec *executionContext) marshalOUser2ᚕgithubᚗcomᚋzhanghupᚋgoᚑapp�
 	return ret
 }
 
-func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚐUser(ctx context.Context, sel ast.SelectionSet, v *app.User) graphql.Marshaler {
+func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐUser(ctx context.Context, sel ast.SelectionSet, v *beans.User) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

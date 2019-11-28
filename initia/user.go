@@ -1,13 +1,13 @@
 package initia
 
 import (
-	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-tools"
 )
 
-func initUser(e *xorm.Engine) {
-	ok, err := e.Table(beans.User{}).Where("id = ?", "root").Exist()
+func initUser() {
+	ok, err := cfg.DB().Engine().Table(beans.User{}).Where("id = ?", "root").Exist()
 	if err != nil {
 		panic(err)
 	}
@@ -28,7 +28,7 @@ func initUser(e *xorm.Engine) {
 		Password: &password,
 		Slat:     &slat,
 	}
-	_, err = e.Table(user).Insert(user)
+	_, err = cfg.DB().Engine().Table(user).Insert(user)
 	if err != nil {
 		panic(err)
 	}

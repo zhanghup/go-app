@@ -12,7 +12,7 @@ type Perms map[string][]string
 
 func Perm() func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string) (res interface{}, err error) {
 	return func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string) (res interface{}, err error) {
-		md := NewMiddleware(ctx)
+		md := MewMe(ctx)
 		user := md.User()
 
 		// root 无线操作权限

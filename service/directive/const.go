@@ -1,4 +1,4 @@
-package gs
+package directive
 
 type TokenType string
 

@@ -11,20 +11,20 @@ const (
 	GIN_TOKEN   = "gin-token"
 )
 
-type Middleware struct {
+type Me struct {
 	gin *gin.Context
 }
 
-func NewMiddleware(g context.Context) Middleware {
+func MewMe(g context.Context) Me {
 	gg := g.Value(GIN_CONTEXT)
-	return Middleware{gg.(*gin.Context)}
+	return Me{gg.(*gin.Context)}
 }
 
-func (this Middleware) GinContext() *gin.Context {
+func (this Me) GinContext() *gin.Context {
 	return this.gin
 }
 
-func (this Middleware) Uid() string {
+func (this Me) Uid() string {
 	uido, ok := this.gin.Get("uid")
 	if !ok {
 		return ""
@@ -32,7 +32,7 @@ func (this Middleware) Uid() string {
 	return uido.(string)
 }
 
-func (this Middleware) User() beans.User {
+func (this Me) User() beans.User {
 	uido, ok := this.gin.Get("user")
 	if !ok {
 		return beans.User{}
@@ -40,7 +40,7 @@ func (this Middleware) User() beans.User {
 	return uido.(beans.User)
 }
 
-func (this Middleware) Admin() bool {
+func (this Me) Admin() bool {
 	uido, ok := this.gin.Get("admin")
 	if !ok {
 		return false
@@ -48,7 +48,7 @@ func (this Middleware) Admin() bool {
 	return uido.(bool)
 }
 
-func (this Middleware) Perms() Perms {
+func (this Me) Perms() Perms {
 	uido, ok := this.gin.Get("perms")
 	if !ok {
 		return nil
@@ -56,7 +56,7 @@ func (this Middleware) Perms() Perms {
 	return uido.(Perms)
 }
 
-func (this Middleware) PermObjs() PermObjects {
+func (this Me) PermObjs() PermObjects {
 	uido, ok := this.gin.Get("permobjs")
 	if !ok {
 		return nil

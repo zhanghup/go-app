@@ -31,7 +31,7 @@ type Roles {
     data: [Role!]
 }
 
-type Role @goModel(model: "github.com/zhanghup/go-app.Role") {
+type Role @goModel(model: "github.com/zhanghup/go-app/beans.Role") {
     id: String
 
     "角色描述"

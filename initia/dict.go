@@ -8,7 +8,7 @@ import (
 
 func InitDictCode(dict beans.Dict, dictitems []beans.DictItem) {
 	hisDict := beans.Dict{}
-	ok, err := cfg.DB().Engine().Table(hisDict).Where("code = ?", hisDict.Code).Get(&hisDict)
+	ok, err := cfg.DB().Engine().Table(hisDict).Where("code = ?", dict.Code).Get(&hisDict)
 	if err != nil {
 		panic(err)
 	}

@@ -25,7 +25,7 @@ type Users{
     data:[User!]
 }
 
-type User @goModel(model:"github.com/zhanghup/go-app.User")  {
+type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     id: String
 
     "用户类型"

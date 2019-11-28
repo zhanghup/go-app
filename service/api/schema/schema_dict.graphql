@@ -32,7 +32,7 @@ type Dicts{
     data:[Dict!]
 }
 
-type Dict @goModel(model:"github.com/zhanghup/go-app.Dict")  {
+type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     id: String
 
     "字典编码"
@@ -82,7 +82,7 @@ input UpdDict {
     status: Int
 }
 
-type DictItem @goModel(model:"github.com/zhanghup/go-app.DictItem")  {
+type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
     id: String
 
     "字典id"

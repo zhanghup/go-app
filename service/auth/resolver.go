@@ -20,7 +20,7 @@ func ggin() func(c *gin.Context) {
 	c := Config{Resolvers: &Resolver{
 		DB:     cfg.DB().Engine(),
 		Loader: loaders.DataLoaden,
-		middle: directive.NewMiddleware,
+		me:     directive.MewMe,
 	}}
 
 	hu := handler.GraphQL(NewExecutableSchema(c))
@@ -49,7 +49,7 @@ func Gin() {
 type Resolver struct {
 	DB     *xorm.Engine
 	Loader func(ctx context.Context) loaders.Loader
-	middle func(ctx context.Context) directive.Middleware
+	me     func(ctx context.Context) directive.Me
 }
 
 func (r *Resolver) Mutation() MutationResolver {
@@ -84,10 +84,10 @@ func (this mutationResolver) Login(ctx context.Context, account string, password
 	if !flag {
 		return "", gin.NewErr("登录失败")
 	}
-	return this.Token(ctx, *user.Id, gs.TokenPc)
+	return this.Token(ctx, *user.Id, directive.TokenPc)
 }
 
-func (this mutationResolver) Token(ctx context.Context, uid string, ty gs.TokenType) (string, error) {
+func (this mutationResolver) Token(ctx context.Context, uid string, ty directive.TokenType) (string, error) {
 	token := new(beans.UserToken)
 	ctx, err := this.DB.Ts(ctx, func(s *xorm.Session) error {
 		_, e := s.SF(`update {{ table "user_token" }} set status = 0 where uid = :uid and type = :type`, map[string]interface{}{
@@ -101,14 +101,14 @@ func (this mutationResolver) Token(ctx context.Context, uid string, ty gs.TokenT
 		token.Status = tools.Ptr().Int(1)
 		token.Uid = &uid
 		token.Type = tools.Ptr().String(string(ty))
-		token.Agent = tools.Ptr().String(this.middle(ctx).GinContext().Request.UserAgent())
+		token.Agent = tools.Ptr().String(this.me(ctx).GinContext().Request.UserAgent())
 		token.Expire = tools.Ptr().Int64(2 * 60 * 60)
 		token.Ops = tools.Ptr().Int64(0)
 		_, e = s.Insert(token)
 		if e != nil {
 			return e
 		}
-		this.middle(ctx).GinContext().SetCookie(directive.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
+		this.me(ctx).GinContext().SetCookie(directive.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
 		return nil
 	})
 
