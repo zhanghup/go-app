@@ -12,15 +12,31 @@ import (
 	"net/http"
 )
 
-func Boot() {
-	e, err := xorm.NewEngine("mysql", "root:123@/test?charset=utf8")
+type BODB struct {
+	Type    string `json:"type"`
+	Uri     string `json:"uri"`
+	ShowSql bool   `json:"show_sql"`
+}
+
+type BOWeb struct {
+	Port string `json:"port"`
+}
+
+type BootOption struct {
+	Version string `json:"version"`
+	DB      BODB   `json:"db"`
+	Web     BOWeb  `json:"web"`
+}
+
+func Boot(opt BootOption) {
+	e, err := xorm.NewEngine(opt.DB.Type, opt.DB.Uri)
 	if err != nil {
 		panic(err)
 	}
 	app.Sync(e)
 	initia.InitAction(e)
-	e.ShowSQL(true)
-	Router(e).Run(":8899")
+	e.ShowSQL(opt.DB.ShowSql)
+	Router(e).Run(":" + opt.Web.Port)
 }
 
 func Router(e *xorm.Engine) *gin.Engine {
@@ -37,8 +53,6 @@ func Router(e *xorm.Engine) *gin.Engine {
 			c.JSON(http.StatusOK, StatsReport())
 		})
 	}
-
-
 
 	// 基础数据路由
 	{

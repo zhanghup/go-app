@@ -1,6 +1,7 @@
-package gs
+package directive
 
 import (
+	"github.com/zhanghup/go-app/service/gs"
 	"strings"
 	"time"
 
@@ -37,7 +38,7 @@ func UserAuth(e *xorm.Engine) gin.HandlerFunc {
 			c.Fail401("【5:未授权】")
 			return
 		}
-		if token.Type == nil || TokenType(*token.Type) != TokenPc {
+		if token.Type == nil || gs.TokenType(*token.Type) != gs.TokenPc {
 			c.Fail401("【6:未授权】")
 			return
 		}

@@ -8,7 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-app/service/api/lib"
+	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
+	"github.com/zhanghup/go-app/service/loaders"
 	"github.com/zhanghup/go-tools"
 	"net/http"
 )
@@ -17,16 +19,16 @@ func ggin(e *xorm.Engine) func(c *gin.Context) {
 	c := lib.Config{
 		Resolvers: &Resolver{
 			DB:     e,
-			Loader: gs.DataLoaden,
-			middle: gs.NewMiddleware,
+			Loader: loaders.DataLoaden,
+			middle: directive.NewMiddleware,
 		},
 		Directives: lib.DirectiveRoot{
-			Perm: gs.Perm(),
+			Perm: directive.Perm(),
 		},
 	}
 
 	hu := handler.GraphQL(lib.NewExecutableSchema(c))
-	hu = gs.DataLoadenMiddleware(e, hu)
+	hu = loaders.DataLoadenMiddleware(e, hu)
 	hu = func(next http.HandlerFunc) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			r.Header.Set("Content-Type", "application/json")
@@ -35,13 +37,13 @@ func ggin(e *xorm.Engine) func(c *gin.Context) {
 	}(hu)
 
 	return func(c *gin.Context) {
-		ctx := context.WithValue(c.Request.Context(), gs.GIN_CONTEXT, c)
+		ctx := context.WithValue(c.Request.Context(), directive.GIN_CONTEXT, c)
 		hu.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
 	}
 }
 
 func Gin(e *xorm.Engine, g *gin.Engine) {
-	g.Group("/", gs.UserAuth(e)).POST("/base", ggin(e))
+	g.Group("/", directive.UserAuth(e)).POST("/base", ggin(e))
 	gs.Playground(g, "/base/playground1", "/base")
 	g.GET("/base/playground2", func(c *gin.Context) {
 		handler.Playground("标题", "/base").ServeHTTP(c.Writer, c.Request)
@@ -50,8 +52,8 @@ func Gin(e *xorm.Engine, g *gin.Engine) {
 
 type Resolver struct {
 	DB     *xorm.Engine
-	Loader func(ctx context.Context) gs.Loader
-	middle func(ctx context.Context) gs.Middleware
+	Loader func(ctx context.Context) loaders.Loader
+	middle func(ctx context.Context) directive.Middleware
 }
 
 func (r *Resolver) Mutation() lib.MutationResolver {

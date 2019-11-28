@@ -8,7 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-app"
+	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
+	"github.com/zhanghup/go-app/service/loaders"
 	"github.com/zhanghup/go-tools"
 	"net/http"
 )
@@ -16,12 +18,12 @@ import (
 func ggin(e *xorm.Engine) func(c *gin.Context) {
 	c := Config{Resolvers: &Resolver{
 		DB:     e,
-		Loader: gs.DataLoaden,
-		middle: gs.NewMiddleware,
+		Loader: loaders.DataLoaden,
+		middle: directive.NewMiddleware,
 	}}
 
 	hu := handler.GraphQL(NewExecutableSchema(c))
-	hu = gs.DataLoadenMiddleware(e, hu)
+	hu = loaders.DataLoadenMiddleware(e, hu)
 	hu = func(next http.HandlerFunc) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			r.Header.Set("Content-Type", "application/json")
@@ -30,7 +32,7 @@ func ggin(e *xorm.Engine) func(c *gin.Context) {
 	}(hu)
 
 	return func(c *gin.Context) {
-		ctx := context.WithValue(c.Request.Context(), gs.GIN_CONTEXT, c)
+		ctx := context.WithValue(c.Request.Context(), directive.GIN_CONTEXT, c)
 		hu.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
 	}
 }
@@ -45,8 +47,8 @@ func Gin(e *xorm.Engine, g *gin.Engine) {
 
 type Resolver struct {
 	DB     *xorm.Engine
-	Loader func(ctx context.Context) gs.Loader
-	middle func(ctx context.Context) gs.Middleware
+	Loader func(ctx context.Context) loaders.Loader
+	middle func(ctx context.Context) directive.Middleware
 }
 
 func (r *Resolver) Mutation() MutationResolver {
@@ -105,7 +107,7 @@ func (this mutationResolver) Token(ctx context.Context, uid string, ty gs.TokenT
 		if e != nil {
 			return e
 		}
-		this.middle(ctx).GinContext().SetCookie(gs.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
+		this.middle(ctx).GinContext().SetCookie(directive.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
 		return nil
 	})
 
