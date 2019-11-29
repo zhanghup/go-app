@@ -21,32 +21,32 @@ var my = &config{
 
 func DB() *configDB {
 	if my.DB == nil {
-		panic("【config.ini - [database]】 配置文件数据库信息尚未初始化完成")
+		panic("config.ini - [database] - 配置文件数据库信息尚未初始化完成")
 	}
 	return my.DB
 }
 
 func Web() *configWeb {
 	if my.DB == nil {
-		panic("【config.ini - [web]】 配置文件web信息尚未初始化完成")
+		panic("config.ini - [web] - 配置文件web信息尚未初始化完成")
 	}
 	return my.Web
 }
 
 func WxQy() *configWxQy {
 	if my.WxQy == nil {
-		panic("【config.ini - [wxqy]】 配置文件微信企业号信息尚未初始化完成")
+		panic("config.ini - [wxqy] - 配置文件微信企业号信息尚未初始化完成")
 	}
 	return my.WxQy
 }
 
-func WxQyApplication(agentid string) *configWxQyApp {
+func WxQyApp(agentid string) *configWxQyApp {
 	if my.WxQy == nil {
-		panic("【config.ini - [wxqy-app]】 配置文件微信企业号应用信息尚未初始化完成")
+		panic("config.ini - [wxqy-app] - 配置文件微信企业号应用信息尚未初始化完成")
 	}
 	obj, ok := my.WxQyApp[agentid]
 	if !ok {
-		panic(fmt.Sprintf(`【config.ini - [wxqy-app "%s"]】没有找到该应用的agentid`, agentid))
+		panic(fmt.Sprintf(`config.ini - [wxqy-app "%s"] - 没有找到该应用的agentid`, agentid))
 	}
 	return &obj
 }
@@ -54,16 +54,16 @@ func WxQyApplication(agentid string) *configWxQyApp {
 func InitConfig(box *rice.Box) {
 	f, err := box.Open("config.ini")
 	if err != nil {
-		panic("【config.ini】 配置文件文件打开失败")
+		panic("config.ini - 配置文件文件打开失败")
 	}
 	sess, err := ini.Load(f)
 	if err != nil {
-		panic("【config.ini】 初始化配置文件异常")
+		panic("config.ini - 初始化配置文件异常")
 	}
 
 	r, err := regexp.Compile(`(.*?)\s"(.*?)"`)
 	if err != nil {
-		panic("【config.ini】 初始化配置文件异常")
+		panic("config.ini - 初始化配置文件异常")
 	}
 	{
 		vl := reflect.ValueOf(my).Elem()
@@ -81,7 +81,7 @@ func InitConfig(box *rice.Box) {
 				sec := sess.Section(f.Tag.Get("ini"))
 				err := sec.MapTo(obj.Interface())
 				if err != nil {
-					panic("【config.ini】 配置文件数据注入异常")
+					panic("config.ini - 配置文件数据注入异常")
 				}
 				v.Set(obj)
 			} else if len(f.Tag.Get("ini-map")) != 0 {
@@ -101,7 +101,7 @@ func InitConfig(box *rice.Box) {
 							oo := reflect.New(rg.Value().Type())
 							err := o.MapTo(oo.Interface())
 							if err != nil {
-								panic("【config.ini】 配置文件数据注入异常")
+								panic("config.ini - 配置文件数据注入异常")
 							}
 							obj.SetMapIndex(reflect.ValueOf(value), oo.Elem())
 						}

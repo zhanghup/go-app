@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"github.com/zhanghup/go-app/libs/wx/qiye"
 	"os"
 	"testing"
 	"text/template"

@@ -3,6 +3,7 @@ package cfg
 import "github.com/go-xorm/xorm"
 
 type configDB struct {
+	Enable    bool        `ini:"enable"`
 	Type    string       `ini:"type"`
 	Uri     string       `ini:"uri"`
 	ShowSql bool         `ini:"show_sql"`

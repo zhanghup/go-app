@@ -3,6 +3,7 @@ package cfg
 import "github.com/gin-gonic/gin"
 
 type configWeb struct {
+	Enable    bool        `ini:"enable"`
 	Port      string      `ini:"port"`
 	engine    *gin.Engine `ini:"-"`
 	engineRun bool        `ini:"-"`

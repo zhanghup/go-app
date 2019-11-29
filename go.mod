@@ -17,7 +17,7 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/vektah/dataloaden v0.3.0 // indirect
 	github.com/vektah/gqlparser v1.1.2
-	github.com/zhanghup/go-tools v1.0.16
+	github.com/zhanghup/go-tools v1.0.18
 	gopkg.in/ini.v1 v1.51.0
 )
 

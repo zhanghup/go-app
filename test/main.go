@@ -299,6 +299,6 @@ func (this Mt) MainTest(t *testing.T, obj string, params ...map[string]interface
 var e *gin.Engine
 
 func init() {
-	
+
 	//login(e)
 }
