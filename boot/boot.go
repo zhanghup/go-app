@@ -12,8 +12,13 @@ import (
 	"github.com/zhanghup/go-app/service/gin_stat"
 )
 
-func Boot(box *rice.Box) {
+func Boot(fn func() (*rice.Box, error)) {
 	// 初始化配置文件
+	cfg.InitConfFile()
+	box, err := fn()
+	if err != nil {
+		panic(err)
+	}
 	cfg.InitConfig(box)
 
 	if cfg.DBEnable() {

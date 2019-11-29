@@ -14,3 +14,7 @@ func TestIni(t *testing.T) {
 	cfg.InitConfig(box)
 
 }
+
+func TestInitConf(t *testing.T) {
+	cfg.InitConfFile()
+}

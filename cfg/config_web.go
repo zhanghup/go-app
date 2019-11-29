@@ -1,6 +1,10 @@
 package cfg
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"log"
+	"runtime/debug"
+)
 
 type configWeb struct {
 	Enable    bool        `ini:"enable"`
@@ -14,6 +18,14 @@ func (this *configWeb) Engine() *gin.Engine {
 		return this.engine
 	}
 	this.engine = gin.Default()
+	this.engine.Use(func(c *gin.Context) {
+		defer func() {
+			if p := recover(); p != nil {
+				log.Println(string(debug.Stack()))
+			}
+		}()
+		c.Next()
+	})
 	return this.engine
 }
 
