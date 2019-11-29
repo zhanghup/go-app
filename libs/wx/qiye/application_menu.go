@@ -13,7 +13,7 @@ type Button struct {
 	SubButton []Button `json:"sub_button"`
 }
 
-func (this *application) Menus() ([]Button, error) {
+func (this *application_api) Menus() ([]Button, error) {
 	token, err := this.access_token()
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (this *application) Menus() ([]Button, error) {
 	return data.Button, err
 }
 
-func (this *application) MenuCreate(btn []Button) error {
+func (this *application_api) MenuCreate(btn []Button) error {
 	token, err := this.access_token()
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func (this *application) MenuCreate(btn []Button) error {
 	return result.Error()
 }
 
-func (this *application) MenuRemove() error {
+func (this *application_api) MenuRemove() error {
 	token, err := this.access_token()
 	if err != nil {
 		return err

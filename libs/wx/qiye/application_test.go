@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-var ap *application
+var ap *application_api
 
 func TestAccessToken(t *testing.T) {
 	fmt.Println(ap.access_token())
@@ -48,5 +48,5 @@ func init() {
 		panic(err)
 	}
 	cfg.InitConfig(box)
-	ap = newApplication("1000002")
+	ap = newApplicationApi("1000002")
 }

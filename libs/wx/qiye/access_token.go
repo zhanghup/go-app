@@ -3,33 +3,48 @@ package qiye
 import (
 	"fmt"
 	"github.com/zhanghup/go-tools"
+	"time"
 )
 
+type access_token_api struct {
+	token tools.IMap
+}
+
+var token *access_token_api
+
+func newAccessToken() *access_token_api {
+	if token != nil {
+		return token
+	}
+	token = &access_token_api{token: tools.NewCache()}
+	return token
+}
+
 type accessToken struct {
-	Errorcode   int    `json:"errorcode"`
-	Errmsg      string `json:"errmsg"`
+	Error
 	AccessToken string `json:"access_token"`
 	ExpiresIn   int    `json:"expires_in"`
 }
 
-func getAccessToken(corpid, corpsecret string) (*accessToken, error) {
+func (this *access_token_api) getToken(corpid, corpsecret string) (string, error) {
+	key := fmt.Sprintf("%s -- %s", corpid, corpsecret)
+	ak := this.token.Get(key)
+	if ak != nil {
+		return ak.(string), nil
+	}
+
 	res := new(accessToken)
 	err := tools.Http().GetI("https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={{.corpid}}&corpsecret={{.corpsecret}}", map[string]interface{}{
 		"corpid":     corpid,
 		"corpsecret": corpsecret,
 	}, res)
-	return res, err
-}
 
-type Error struct {
-	Errcode int    `json:"errcode"`
-	Errmsg  string `json:"errmsg"`
-}
-
-func (this Error) Error() error {
-	if this.Errcode == 0 {
-		return nil
+	if err != nil {
+		return "", err
 	}
-	return fmt.Errorf("Error: %d, ErrorMessage: %s ", this.Errcode, this.Errmsg)
+	if res.Error.Error() != nil {
+		return "", res.Error.Error()
+	}
+	this.token.Set2(key, res.AccessToken, time.Now().Unix()+int64(res.ExpiresIn))
+	return res.AccessToken, err
 }
-
