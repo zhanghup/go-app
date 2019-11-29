@@ -44,7 +44,7 @@ func InitDictCode(dict beans.Dict, dictitems []beans.DictItem) {
 func initDict() {
 	initDictSys()
 	initDictSta()
-	if cfg.WxQy().Enable {
+	if cfg.WxqyEnable() {
 		initWxqy()
 	}
 }

@@ -1,7 +1,6 @@
 package cfg
 
 import (
-	"fmt"
 	"github.com/giter/go.rice"
 	"gopkg.in/ini.v1"
 	"reflect"
@@ -11,44 +10,12 @@ import (
 type config struct {
 	Web     *configWeb               `ini:"web"`
 	DB      *configDB                `ini:"database"`
-	WxQy    *configWxQy              `ini:"wxqy"`
-	WxQyApp map[string]configWxQyApp `ini-map:"wxqy-app"`
+	Wxqy    *configWxQy              `ini:"wxqy"`
+	WxqyApp map[string]configWxQyApp `ini-map:"wxqy-app"`
 }
 
 var my = &config{
-	WxQyApp: map[string]configWxQyApp{"": {}}, // 若是map类型的配置项数据，必须先初始化一条数据，不然反射不到
-}
-
-func DB() *configDB {
-	if my.DB == nil {
-		panic("config.ini - [database] - 配置文件数据库信息尚未初始化完成")
-	}
-	return my.DB
-}
-
-func Web() *configWeb {
-	if my.DB == nil {
-		panic("config.ini - [web] - 配置文件web信息尚未初始化完成")
-	}
-	return my.Web
-}
-
-func WxQy() *configWxQy {
-	if my.WxQy == nil {
-		panic("config.ini - [wxqy] - 配置文件微信企业号信息尚未初始化完成")
-	}
-	return my.WxQy
-}
-
-func WxQyApp(agentid string) *configWxQyApp {
-	if my.WxQy == nil {
-		panic("config.ini - [wxqy-app] - 配置文件微信企业号应用信息尚未初始化完成")
-	}
-	obj, ok := my.WxQyApp[agentid]
-	if !ok {
-		panic(fmt.Sprintf(`config.ini - [wxqy-app "%s"] - 没有找到该应用的agentid`, agentid))
-	}
-	return &obj
+	WxqyApp: map[string]configWxQyApp{"": {}}, // 若是map类型的配置项数据，必须先初始化一条数据，不然反射不到
 }
 
 func InitConfig(box *rice.Box) {
@@ -68,6 +35,7 @@ func InitConfig(box *rice.Box) {
 	{
 		vl := reflect.ValueOf(my).Elem()
 		ty := reflect.TypeOf(my).Elem()
+
 		for i := 0; i < vl.NumField(); i++ {
 			v := vl.Field(i)
 			f := ty.Field(i)
@@ -81,9 +49,12 @@ func InitConfig(box *rice.Box) {
 				sec := sess.Section(f.Tag.Get("ini"))
 				err := sec.MapTo(obj.Interface())
 				if err != nil {
-					panic("config.ini - 配置文件数据注入异常")
+					panic("config.ini - 配置文件数据注入异常【1】")
 				}
+
+				// 配置文件对象
 				v.Set(obj)
+
 			} else if len(f.Tag.Get("ini-map")) != 0 {
 				obj := reflect.MakeMap(t)
 				secs := sess.Sections()
@@ -96,15 +67,18 @@ func InitConfig(box *rice.Box) {
 					value := cfs[2]
 
 					if f.Tag.Get("ini-map") == key {
+						// 配置文件对象
 						rg := v.MapRange()
 						if rg.Next() {
 							oo := reflect.New(rg.Value().Type())
 							err := o.MapTo(oo.Interface())
 							if err != nil {
-								panic("config.ini - 配置文件数据注入异常")
+								panic("config.ini - 配置文件数据注入异常【3】")
 							}
+
 							obj.SetMapIndex(reflect.ValueOf(value), oo.Elem())
 						}
+
 					}
 				}
 				v.Set(obj)

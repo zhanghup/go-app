@@ -16,14 +16,16 @@ func Boot(box *rice.Box) {
 	// 初始化配置文件
 	cfg.InitConfig(box)
 
-	// 同步表结构
-	beans.Sync()
+	if cfg.DBEnable() {
+		// 同步表结构
+		beans.Sync()
 
-	// 初始化表数据
-	initia.InitAction()
+		// 初始化表数据
+		initia.InitAction()
+	}
 
 	// 初始化基础路由
-	{
+	if cfg.WebEnable() {
 		// http服务状态监听
 		{
 			gin_stat.Gin()
@@ -47,5 +49,8 @@ func Boot(box *rice.Box) {
 }
 
 func Run() error {
+	if !cfg.WebEnable() {
+		return nil
+	}
 	return cfg.Web().Run()
 }

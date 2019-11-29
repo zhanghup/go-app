@@ -29,10 +29,8 @@ func NewContext() *Context {
 	if cc != nil {
 		return cc
 	}
-	if !cfg.WxQy().Enable {
-		panic("config.ini - wxqy.enable 未启用")
-	}
-	return &Context{CorpId: cfg.WxQy().Corpid, application: map[string]*application_api{}}
+
+	return &Context{CorpId: cfg.Wxqy().Corpid, application: map[string]*application_api{}}
 }
 
 func (this *Context) Application(agentid string) *application_api {

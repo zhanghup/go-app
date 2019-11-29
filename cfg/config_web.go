@@ -24,3 +24,21 @@ func (this *configWeb) Run() error {
 	this.engineRun = true
 	return this.engine.Run(":" + this.Port)
 }
+
+// api服务配置
+func web(flag ...bool) *configWeb {
+	if my.DB == nil {
+		panic("config.ini - [web] - 配置文件web信息尚未初始化完成")
+	}
+	if (len(flag) == 0 || flag[0]) && !my.Web.Enable {
+		panic("config.ini - [web].enable 未启用")
+	}
+	return my.Web
+}
+func Web() *configWeb {
+	return web()
+}
+
+func WebEnable() bool {
+	return web(false).Enable
+}

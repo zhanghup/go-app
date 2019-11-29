@@ -13,10 +13,8 @@ type application_api struct {
 
 func newApplicationApi(agentid string) *application_api {
 
-	if !cfg.WxQyApp(agentid).Enable {
-		panic(fmt.Sprintf("config.ini - wxqy-app[%s].enable 未启用", agentid))
-	}
-	app := application_api{corpId: cfg.WxQy().Corpid, secret: cfg.WxQyApp(agentid).Secret, agentid: agentid}
+
+	app := application_api{corpId: cfg.Wxqy().Corpid, secret: cfg.WxqyApp(agentid).Secret, agentid: agentid}
 	return &app
 }
 
