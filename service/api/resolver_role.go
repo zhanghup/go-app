@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/lib"
 	"github.com/zhanghup/go-tools"
@@ -42,7 +43,17 @@ func (this mutationResolver) RoleRemoves(ctx context.Context, id []string) (bool
 	return this.Removes(ctx, new(beans.Role), id)
 }
 
-func (this queryResolver) RolePerms(ctx context.Context, id string, typeArg *string) ([]string, error) {
+func (this queryResolver) RolePermObjects(ctx context.Context, id string) ([]lib.PermObj, error) {
+	result := make([]lib.PermObj, 0)
+	err := this.DB.SF(`
+		select object,mask from {{ table "perm_object" }} where role = :role 
+	`, map[string]interface{}{
+		"role": id,
+	}).Find(&result)
+	return result, err
+}
+
+func (this queryResolver) RolePerms(ctx context.Context, id string,typeArg *string) ([]string, error) {
 	result := make([]string, 0)
 	err := this.DB.SF(`
 		select oid from {{ table "perm" }} where role = :role 
@@ -76,6 +87,35 @@ func (this mutationResolver) RolePermCreate(ctx context.Context, id string, type
 		_, err := this.DB.Insert(p)
 		if err != nil {
 			return false, err
+		}
+	}
+	return true, nil
+}
+
+func (this mutationResolver) RolePermObjCreate(ctx context.Context, id string, perms []lib.IPermObj) (result bool, err error) {
+	_, err = this.DB.SF(`delete from {{ table "perm_object" }} where role = :id`, map[string]interface{}{
+		"id":   id,
+	}).Execute()
+	if err != nil {
+		return
+	}
+	for i, o := range perms {
+		p := beans.PermObject{
+			Bean: beans.Bean{
+				Id:     tools.ObjectString(),
+				Status: tools.Ptr().Int(1),
+				Weight: &i,
+			},
+			Role: &id,
+			Object: &o.Object,
+			Mask:&o.Mask,
+		}
+		ctx,err = this.DB.Ts(ctx, func(s *xorm.Session) error {
+			_, e := s.Insert(p)
+			return e
+		})
+		if err != nil {
+			return
 		}
 	}
 	return true, nil

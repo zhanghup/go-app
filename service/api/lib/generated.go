@@ -75,32 +75,40 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		DictCreate      func(childComplexity int, input NewDict) int
-		DictItemCreate  func(childComplexity int, input NewDictItem) int
-		DictItemRemoves func(childComplexity int, ids []string) int
-		DictItemUpdate  func(childComplexity int, id string, input UpdDictItem) int
-		DictRemoves     func(childComplexity int, ids []string) int
-		DictUpdate      func(childComplexity int, id string, input UpdDict) int
-		RoleCreate      func(childComplexity int, input NewRole) int
-		RolePermCreate  func(childComplexity int, id string, typeArg string, perms []string) int
-		RoleRemoves     func(childComplexity int, ids []string) int
-		RoleToUser      func(childComplexity int, uid string, roles []string) int
-		RoleUpdate      func(childComplexity int, id string, input UpdRole) int
-		UserCreate      func(childComplexity int, input NewUser) int
-		UserRemoves     func(childComplexity int, ids []string) int
-		UserUpdate      func(childComplexity int, id string, input UpdUser) int
-		World           func(childComplexity int) int
+		DictCreate        func(childComplexity int, input NewDict) int
+		DictItemCreate    func(childComplexity int, input NewDictItem) int
+		DictItemRemoves   func(childComplexity int, ids []string) int
+		DictItemUpdate    func(childComplexity int, id string, input UpdDictItem) int
+		DictRemoves       func(childComplexity int, ids []string) int
+		DictUpdate        func(childComplexity int, id string, input UpdDict) int
+		RoleCreate        func(childComplexity int, input NewRole) int
+		RolePermCreate    func(childComplexity int, id string, typeArg string, perms []string) int
+		RolePermObjCreate func(childComplexity int, id string, perms []IPermObj) int
+		RoleRemoves       func(childComplexity int, ids []string) int
+		RoleToUser        func(childComplexity int, uid string, roles []string) int
+		RoleUpdate        func(childComplexity int, id string, input UpdRole) int
+		UserCreate        func(childComplexity int, input NewUser) int
+		UserRemoves       func(childComplexity int, ids []string) int
+		UserUpdate        func(childComplexity int, id string, input UpdUser) int
+		World             func(childComplexity int) int
+	}
+
+	PermObj struct {
+		Mask   func(childComplexity int) int
+		Object func(childComplexity int) int
 	}
 
 	Query struct {
-		Dict      func(childComplexity int, id string) int
-		Dicts     func(childComplexity int, query QDict) int
-		Hello     func(childComplexity int) int
-		Role      func(childComplexity int, id string) int
-		RolePerms func(childComplexity int, id string, typeArg *string) int
-		Roles     func(childComplexity int, query QRole) int
-		User      func(childComplexity int, id string) int
-		Users     func(childComplexity int, query QUser) int
+		Dict            func(childComplexity int, id string) int
+		Dicts           func(childComplexity int, query QDict) int
+		Hello           func(childComplexity int) int
+		Role            func(childComplexity int, id string) int
+		RolePermObjects func(childComplexity int, id string) int
+		RolePerms       func(childComplexity int, id string, typeArg *string) int
+		Roles           func(childComplexity int, query QRole) int
+		Stat            func(childComplexity int) int
+		User            func(childComplexity int, id string) int
+		Users           func(childComplexity int, query QUser) int
 	}
 
 	Role struct {
@@ -157,18 +165,21 @@ type MutationResolver interface {
 	RoleUpdate(ctx context.Context, id string, input UpdRole) (bool, error)
 	RoleRemoves(ctx context.Context, ids []string) (bool, error)
 	RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error)
+	RolePermObjCreate(ctx context.Context, id string, perms []IPermObj) (bool, error)
 	RoleToUser(ctx context.Context, uid string, roles []string) (bool, error)
 	UserCreate(ctx context.Context, input NewUser) (*beans.User, error)
 	UserUpdate(ctx context.Context, id string, input UpdUser) (bool, error)
 	UserRemoves(ctx context.Context, ids []string) (bool, error)
 }
 type QueryResolver interface {
+	Stat(ctx context.Context) (interface{}, error)
 	Hello(ctx context.Context) (*string, error)
 	Dicts(ctx context.Context, query QDict) (*Dicts, error)
 	Dict(ctx context.Context, id string) (*beans.Dict, error)
 	Roles(ctx context.Context, query QRole) (*Roles, error)
 	Role(ctx context.Context, id string) (*beans.Role, error)
 	RolePerms(ctx context.Context, id string, typeArg *string) ([]string, error)
+	RolePermObjects(ctx context.Context, id string) ([]PermObj, error)
 	Users(ctx context.Context, query QUser) (*Users, error)
 	User(ctx context.Context, id string) (*beans.User, error)
 }
@@ -424,6 +435,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RolePermCreate(childComplexity, args["id"].(string), args["type"].(string), args["perms"].([]string)), true
 
+	case "Mutation.role_perm_obj_create":
+		if e.complexity.Mutation.RolePermObjCreate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_role_perm_obj_create_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RolePermObjCreate(childComplexity, args["id"].(string), args["perms"].([]IPermObj)), true
+
 	case "Mutation.role_removes":
 		if e.complexity.Mutation.RoleRemoves == nil {
 			break
@@ -503,6 +526,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.World(childComplexity), true
 
+	case "PermObj.mask":
+		if e.complexity.PermObj.Mask == nil {
+			break
+		}
+
+		return e.complexity.PermObj.Mask(childComplexity), true
+
+	case "PermObj.object":
+		if e.complexity.PermObj.Object == nil {
+			break
+		}
+
+		return e.complexity.PermObj.Object(childComplexity), true
+
 	case "Query.dict":
 		if e.complexity.Query.Dict == nil {
 			break
@@ -546,6 +583,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Role(childComplexity, args["id"].(string)), true
 
+	case "Query.role_perm_objects":
+		if e.complexity.Query.RolePermObjects == nil {
+			break
+		}
+
+		args, err := ec.field_Query_role_perm_objects_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.RolePermObjects(childComplexity, args["id"].(string)), true
+
 	case "Query.role_perms":
 		if e.complexity.Query.RolePerms == nil {
 			break
@@ -569,6 +618,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Roles(childComplexity, args["query"].(QRole)), true
+
+	case "Query.stat":
+		if e.complexity.Query.Stat == nil {
+			break
+		}
+
+		return e.complexity.Query.Stat(childComplexity), true
 
 	case "Query.user":
 		if e.complexity.Query.User == nil {
@@ -838,7 +894,9 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var parsedSchema = gqlparser.MustLoadSchema(
-	&ast.Source{Name: "schema/schema.graphql", Input: `"数据操作权限"
+	&ast.Source{Name: "schema/schema.graphql", Input: `scalar Any
+
+"数据操作权限"
 directive @perm(entity:String!, perm: String!) on FIELD_DEFINITION
 
 directive @goModel(model: String, models: [String!]) on OBJECT
@@ -853,6 +911,7 @@ directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITI
 
 
 type Query {
+    stat: Any
     hello: String
 }
 
@@ -998,24 +1057,42 @@ input UpdDictItem{
 }`},
 	&ast.Source{Name: "schema/schema_role.graphql", Input: `extend type Query {
     "角色列表（分页）"
-    roles(query: QRole!): Roles @perm(entity: "dict",perm: "R")
+    roles(query: QRole!): Roles @perm(entity: "role",perm: "R")
     "角色获取单个"
-    role(id: String!): Role @perm(entity: "dict",perm: "R")
+    role(id: String!): Role @perm(entity: "role",perm: "R")
     "权限列表"
-    role_perms(id: String!,type: String): [String!] @perm(entity: "dict",perm: "R")
+    role_perms(id: String!,type: String): [String!] @perm(entity: "role",perm: "R")
+    "对象权限列表"
+    role_perm_objects(id: String!): [PermObj!] @perm(entity: "role",perm: "R")
 }
 
 extend type Mutation {
     "角色新建"
-    role_create(input: NewRole!): Role @perm(entity: "dict",perm: "C")
+    role_create(input: NewRole!): Role @perm(entity: "role",perm: "C")
     "角色更新"
-    role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "dict",perm: "U")
+    role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "role",perm: "U")
     "角色批量删除"
-    role_removes(ids: [String!]): Boolean! @perm(entity: "dict",perm: "D")
+    role_removes(ids: [String!]): Boolean! @perm(entity: "role",perm: "D")
     "新增权限"
-    role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean! @perm(entity: "dict",perm: "M")
+    role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean! @perm(entity: "role",perm: "M")
+    "新增对象权限"
+    role_perm_obj_create(id: String!, perms:[IPermObj!]!): Boolean! @perm(entity: "role",perm: "M")
     "角色分配"
-    role_to_user(uid: String!,roles:[String!]!): Boolean! @perm(entity: "dict",perm: "M")
+    role_to_user(uid: String!,roles:[String!]!): Boolean! @perm(entity: "role",perm: "M")
+}
+
+input IPermObj{
+    "对象"
+    object: String!
+    "操作权限"
+    mask: String!
+}
+
+type PermObj{
+    "对象"
+    object: String!
+    "操作权限"
+    mask: String!
 }
 
 input QRole {
@@ -1359,6 +1436,28 @@ func (ec *executionContext) field_Mutation_role_perm_create_args(ctx context.Con
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_role_perm_obj_create_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 []IPermObj
+	if tmp, ok := rawArgs["perms"]; ok {
+		arg1, err = ec.unmarshalNIPermObj2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐIPermObj(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["perms"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_role_removes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1510,6 +1609,20 @@ func (ec *executionContext) field_Query_dicts_args(ctx context.Context, rawArgs 
 }
 
 func (ec *executionContext) field_Query_role_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_role_perm_objects_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -2793,7 +2906,7 @@ func (ec *executionContext) _Mutation_role_create(ctx context.Context, field gra
 			return ec.resolvers.Mutation().RoleCreate(rctx, args["input"].(NewRole))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "role")
 			if err != nil {
 				return nil, err
 			}
@@ -2862,7 +2975,7 @@ func (ec *executionContext) _Mutation_role_update(ctx context.Context, field gra
 			return ec.resolvers.Mutation().RoleUpdate(rctx, args["id"].(string), args["input"].(UpdRole))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "role")
 			if err != nil {
 				return nil, err
 			}
@@ -2934,7 +3047,7 @@ func (ec *executionContext) _Mutation_role_removes(ctx context.Context, field gr
 			return ec.resolvers.Mutation().RoleRemoves(rctx, args["ids"].([]string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "role")
 			if err != nil {
 				return nil, err
 			}
@@ -3006,7 +3119,79 @@ func (ec *executionContext) _Mutation_role_perm_create(ctx context.Context, fiel
 			return ec.resolvers.Mutation().RolePermCreate(rctx, args["id"].(string), args["type"].(string), args["perms"].([]string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "role")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "M")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_role_perm_obj_create(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_role_perm_obj_create_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().RolePermObjCreate(rctx, args["id"].(string), args["perms"].([]IPermObj))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "role")
 			if err != nil {
 				return nil, err
 			}
@@ -3078,7 +3263,7 @@ func (ec *executionContext) _Mutation_role_to_user(ctx context.Context, field gr
 			return ec.resolvers.Mutation().RoleToUser(rctx, args["uid"].(string), args["roles"].([]string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "role")
 			if err != nil {
 				return nil, err
 			}
@@ -3333,6 +3518,114 @@ func (ec *executionContext) _Mutation_user_removes(ctx context.Context, field gr
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _PermObj_object(ctx context.Context, field graphql.CollectedField, obj *PermObj) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "PermObj",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Object, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PermObj_mask(ctx context.Context, field graphql.CollectedField, obj *PermObj) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "PermObj",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mask, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_stat(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Stat(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(interface{})
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOAny2interface(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -3535,7 +3828,7 @@ func (ec *executionContext) _Query_roles(ctx context.Context, field graphql.Coll
 			return ec.resolvers.Query().Roles(rctx, args["query"].(QRole))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "role")
 			if err != nil {
 				return nil, err
 			}
@@ -3604,7 +3897,7 @@ func (ec *executionContext) _Query_role(ctx context.Context, field graphql.Colle
 			return ec.resolvers.Query().Role(rctx, args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "role")
 			if err != nil {
 				return nil, err
 			}
@@ -3673,7 +3966,7 @@ func (ec *executionContext) _Query_role_perms(ctx context.Context, field graphql
 			return ec.resolvers.Query().RolePerms(rctx, args["id"].(string), args["type"].(*string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "role")
 			if err != nil {
 				return nil, err
 			}
@@ -3710,6 +4003,75 @@ func (ec *executionContext) _Query_role_perms(ctx context.Context, field graphql
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_role_perm_objects(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_role_perm_objects_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().RolePermObjects(rctx, args["id"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "role")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]PermObj); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []github.com/zhanghup/go-app/service/api/lib.PermObj`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]PermObj)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOPermObj2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐPermObj(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -5960,6 +6322,30 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputIPermObj(ctx context.Context, obj interface{}) (IPermObj, error) {
+	var it IPermObj
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "object":
+			var err error
+			it.Object, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "mask":
+			var err error
+			it.Mask, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewDict(ctx context.Context, obj interface{}) (NewDict, error) {
 	var it NewDict
 	var asMap = obj.(map[string]interface{})
@@ -6639,6 +7025,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "role_perm_obj_create":
+			out.Values[i] = ec._Mutation_role_perm_obj_create(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "role_to_user":
 			out.Values[i] = ec._Mutation_role_to_user(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -6653,6 +7044,38 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "user_removes":
 			out.Values[i] = ec._Mutation_user_removes(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var permObjImplementors = []string{"PermObj"}
+
+func (ec *executionContext) _PermObj(ctx context.Context, sel ast.SelectionSet, obj *PermObj) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, permObjImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PermObj")
+		case "object":
+			out.Values[i] = ec._PermObj_object(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "mask":
+			out.Values[i] = ec._PermObj_mask(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -6682,6 +7105,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "stat":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_stat(ctx, field)
+				return res
+			})
 		case "hello":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -6746,6 +7180,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_role_perms(ctx, field)
+				return res
+			})
+		case "role_perm_objects":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_role_perm_objects(ctx, field)
 				return res
 			})
 		case "users":
@@ -7192,6 +7637,30 @@ func (ec *executionContext) marshalNDictItem2githubᚗcomᚋzhanghupᚋgoᚑapp�
 	return ec._DictItem(ctx, sel, &v)
 }
 
+func (ec *executionContext) unmarshalNIPermObj2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐIPermObj(ctx context.Context, v interface{}) (IPermObj, error) {
+	return ec.unmarshalInputIPermObj(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNIPermObj2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐIPermObj(ctx context.Context, v interface{}) ([]IPermObj, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]IPermObj, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNIPermObj2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐIPermObj(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) unmarshalNNewDict2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐNewDict(ctx context.Context, v interface{}) (NewDict, error) {
 	return ec.unmarshalInputNewDict(ctx, v)
 }
@@ -7206,6 +7675,10 @@ func (ec *executionContext) unmarshalNNewRole2githubᚗcomᚋzhanghupᚋgoᚑapp
 
 func (ec *executionContext) unmarshalNNewUser2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐNewUser(ctx context.Context, v interface{}) (NewUser, error) {
 	return ec.unmarshalInputNewUser(ctx, v)
+}
+
+func (ec *executionContext) marshalNPermObj2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐPermObj(ctx context.Context, sel ast.SelectionSet, v PermObj) graphql.Marshaler {
+	return ec._PermObj(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalNQDict2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐQDict(ctx context.Context, v interface{}) (QDict, error) {
@@ -7513,6 +7986,20 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
+func (ec *executionContext) unmarshalOAny2interface(ctx context.Context, v interface{}) (interface{}, error) {
+	if v == nil {
+		return nil, nil
+	}
+	return graphql.UnmarshalAny(v)
+}
+
+func (ec *executionContext) marshalOAny2interface(ctx context.Context, sel ast.SelectionSet, v interface{}) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalAny(v)
+}
+
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	return graphql.UnmarshalBoolean(v)
 }
@@ -7693,6 +8180,46 @@ func (ec *executionContext) marshalOInt2ᚖint64(ctx context.Context, sel ast.Se
 		return graphql.Null
 	}
 	return ec.marshalOInt2int64(ctx, sel, *v)
+}
+
+func (ec *executionContext) marshalOPermObj2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐPermObj(ctx context.Context, sel ast.SelectionSet, v []PermObj) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPermObj2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐPermObj(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalORole2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐRole(ctx context.Context, sel ast.SelectionSet, v beans.Role) graphql.Marshaler {

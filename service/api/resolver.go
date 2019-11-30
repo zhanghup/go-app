@@ -44,10 +44,10 @@ func ggin() func(c *gin.Context) {
 }
 
 func Gin() {
-	cfg.Web().Engine().Group("/", directive.UserAuth()).POST("/base", ggin())
-	gs.Playground("/base/playground1", "/base")
-	cfg.Web().Engine().GET("/base/playground2", func(c *gin.Context) {
-		handler.Playground("标题", "/base").ServeHTTP(c.Writer, c.Request)
+	cfg.Web().Engine().Group("/", directive.UserAuth()).POST("/api", ggin())
+	gs.Playground("/api/playground1", "/api")
+	cfg.Web().Engine().GET("/api/playground2", func(c *gin.Context) {
+		handler.Playground("标题", "/api").ServeHTTP(c.Writer, c.Request)
 	})
 }
 

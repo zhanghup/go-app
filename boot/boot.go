@@ -9,7 +9,6 @@ import (
 	"github.com/zhanghup/go-app/service/api"
 	"github.com/zhanghup/go-app/service/auth"
 	"github.com/zhanghup/go-app/service/file"
-	"github.com/zhanghup/go-app/service/gin_stat"
 )
 
 func Boot(fn func() (*rice.Box, error)) {
@@ -33,7 +32,7 @@ func Boot(fn func() (*rice.Box, error)) {
 	if cfg.WebEnable() {
 		// http服务状态监听
 		{
-			gin_stat.Gin()
+			cfg.Web().Engine().Use(api.StatsRequest())
 		}
 
 		// 文件操作

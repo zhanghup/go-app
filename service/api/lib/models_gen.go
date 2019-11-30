@@ -11,6 +11,13 @@ type Dicts struct {
 	Data  []beans.Dict `json:"data"`
 }
 
+type IPermObj struct {
+	// 对象
+	Object string `json:"object"`
+	// 操作权限
+	Mask string `json:"mask"`
+}
+
 type NewDict struct {
 	// 字典编码
 	Code *string `json:"code"`
@@ -75,6 +82,13 @@ type NewUser struct {
 	Weight *int `json:"weight"`
 	// 状态[dict:STA0001]
 	Status *int `json:"status"`
+}
+
+type PermObj struct {
+	// 对象
+	Object string `json:"object"`
+	// 操作权限
+	Mask string `json:"mask"`
 }
 
 type QDict struct {

@@ -1,3 +1,5 @@
+scalar Any
+
 "数据操作权限"
 directive @perm(entity:String!, perm: String!) on FIELD_DEFINITION
 
@@ -13,6 +15,7 @@ directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITI
 
 
 type Query {
+    stat: Any
     hello: String
 }
 

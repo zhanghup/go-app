@@ -1,12 +1,10 @@
-package gin_stat
+package api
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/rcrowley/go-metrics"
-	"github.com/zhanghup/go-app/cfg"
-	"github.com/zhanghup/go-app/service/directive"
-	"net/http"
 	"time"
 )
 
@@ -16,7 +14,7 @@ func statsReport() metrics.Registry {
 }
 
 //RequestStats middleware
-func statsRequest() gin.HandlerFunc {
+func StatsRequest() gin.HandlerFunc {
 	const (
 		ginLatencyMetric = "gin.latency"
 		ginStatusMetric  = "gin.status"
@@ -39,9 +37,6 @@ func statsRequest() gin.HandlerFunc {
 	}
 }
 
-func Gin() {
-	cfg.Web().Engine().Use(statsRequest())
-	cfg.Web().Engine().Group("/", directive.UserAuth()).GET("/stats", func(c *gin.Context) {
-		c.JSON(http.StatusOK, statsReport())
-	})
+func (this queryResolver) Stat(ctx context.Context) (interface{}, error) {
+	return statsReport(),nil
 }
