@@ -8,11 +8,11 @@ import (
 
 var FileConfigString = `
 [web]
-enable = false
+enable = true
 port = 8899
 
 [database]
-enable = false
+enable = true
 type = mysql
 uri = root:123@/test?charset=utf8
 
