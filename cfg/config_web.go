@@ -39,7 +39,7 @@ func (this *configWeb) Run() error {
 
 // api服务配置
 func web(flag ...bool) *configWeb {
-	if my.DB == nil {
+	if my.Web == nil {
 		panic("config.ini - [web] - 配置文件web信息尚未初始化完成")
 	}
 	if (len(flag) == 0 || flag[0]) && !my.Web.Enable {
