@@ -39,10 +39,11 @@ func (this *menu) error(err interface{}, fn string, i ...int) error {
 }
 
 type Button struct {
-	Type string `json:"type"`
-	Name string `json:"name"`
-	Key  string `json:"key"`
-	Url  string `json:"url"`
+	Type  string `json:"type"`
+	Name  string `json:"name"`
+	Key   string `json:"key"`
+	Url   string `json:"url"`
+	Value string `json:"value"`
 
 	SubButton []Button `json:"sub_button"`
 }
@@ -65,3 +66,48 @@ func (this *menu) Delete() error {
 	return this.error(result, "Delete", 2)
 }
 
+func (this *menu) Get() ([]Button, error) {
+	data := struct {
+		Error
+		IsMenuOPen   int `json:"is_menu_o_pen"`
+		SelfmenuInfo struct {
+			Button []struct {
+				Name      string `json:"name"`
+				Type      string `json:"type"`
+				Value     string `json:"value"`
+				Key       string `json:"key"`
+				Url       string `json:"url"`
+				SubButton struct {
+					List []struct {
+						Name  string `json:"name"`
+						Type  string `json:"type"`
+						Key   string `json:"key"`
+						Value string `json:"value"`
+						Url   string `json:"url"`
+					} `json:"list"`
+				} `json:"sub_button"`
+			} `json:"button"`
+		} `json:"selfmenu_info"`
+	}{}
+	err := this.context.get("https://api.weixin.qq.com/cgi-bin/get_current_selfmenu_info?access_token=ACCESS_TOKEN", nil, &data)
+	if err != nil {
+		return nil, this.error(err, "Get", 1)
+	}
+
+	err = this.error(data.Error, "Get", 2)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]Button, 0)
+	for _, o := range data.SelfmenuInfo.Button {
+		btn := Button{
+			Name: o.Name,
+			Type: o.Type,
+			Value:o.Value,
+
+		}
+
+	}
+
+}
