@@ -69,6 +69,19 @@ func initDictSys() {
 		{Name: tools.Ptr().String("用户"), Value: tools.Ptr().String("user")},
 		{Name: tools.Ptr().String("数据字典"), Value: tools.Ptr().String("dict")},
 	})
+
+	InitDictCode(beans.Dict{Code: tools.Ptr().String("SYS0004"), Name: tools.Ptr().String("表单字段类型")}, []beans.DictItem{
+		{Name: tools.Ptr().String("隐藏域"), Value: tools.Ptr().String("hide")},
+		{Name: tools.Ptr().String("字符串"), Value: tools.Ptr().String("string")},
+		{Name: tools.Ptr().String("数字"), Value: tools.Ptr().String("number")},
+		{Name: tools.Ptr().String("时间"), Value: tools.Ptr().String("date")},
+		{Name: tools.Ptr().String("时间范围"), Value: tools.Ptr().String("date-range")},
+		{Name: tools.Ptr().String("经纬度"), Value: tools.Ptr().String("position")},
+		{Name: tools.Ptr().String("当前时间"), Value: tools.Ptr().String("current-time")},
+		{Name: tools.Ptr().String("当前人员"), Value: tools.Ptr().String("current-user")},
+	})
+
+
 }
 
 func initDictSta() {

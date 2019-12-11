@@ -50,9 +50,9 @@ func (this *jssdk) error(err interface{},fn string,i ... int) error{
 	}
 
 	if len(i) > 0{
-		return fmt.Errorf("[微信网页开发_%d] - [%s] - %s",i[0],fn,s)
+		return fmt.Errorf("微信公众号 - 网页开发_%d - %s - %s",i[0],fn,s)
 	}
-	return fmt.Errorf("[微信网页开发] - [%s] - %s",fn,s)
+	return fmt.Errorf("微信公众号 - 网页开发 - %s - %s",fn,s)
 }
 
 func (this *jssdk) Auth(code string) (string,string,error) {
