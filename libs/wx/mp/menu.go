@@ -102,12 +102,25 @@ func (this *menu) Get() ([]Button, error) {
 	result := make([]Button, 0)
 	for _, o := range data.SelfmenuInfo.Button {
 		btn := Button{
-			Name: o.Name,
-			Type: o.Type,
-			Value:o.Value,
-
+			Name:      o.Name,
+			Type:      o.Type,
+			Value:     o.Value,
+			Key:       o.Key,
+			Url:       o.Url,
+			SubButton: make([]Button, 0),
 		}
-
+		if o.SubButton.List != nil && len(o.SubButton.List) > 0 {
+			for _, oo := range o.SubButton.List {
+				btn.SubButton = append(btn.SubButton, Button{
+					Name:  o.Name,
+					Type:  o.Type,
+					Value: o.Value,
+					Key:   o.Key,
+					Url:   o.Url,
+				})
+			}
+		}
 	}
+	return result, nil
 
 }
