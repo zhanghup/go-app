@@ -37,6 +37,23 @@ func NewContext() IContext {
 	return c
 }
 
+func (this *context) error(err interface{}) string {
+	var s = ""
+	switch err.(type) {
+	case string:
+		s = err.(string)
+	case error:
+		s = err.(error).Error()
+	case Error:
+		e := err.(Error)
+		if e.Errcode == 0 {
+			return ""
+		}
+		s = fmt.Sprintf("%d: %s", e.Errcode, e.Errmsg)
+	}
+	return s
+}
+
 func (this *context) token() error {
 	if this.cache.Contain("access_token") {
 		return nil
