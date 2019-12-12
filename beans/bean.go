@@ -13,4 +13,11 @@ func Sync() {
 	if err != nil {
 		panic(err)
 	}
+
+	if cfg.WxmiEnable() {
+		err = cfg.DB().Engine().Sync2(wxmi_tables()...)
+		if err != nil {
+			panic(err)
+		}
+	}
 }

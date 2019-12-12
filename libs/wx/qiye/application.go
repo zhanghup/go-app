@@ -1,7 +1,6 @@
 package qiye
 
 import (
-	"fmt"
 	"github.com/zhanghup/go-app/cfg"
 )
 
@@ -12,7 +11,6 @@ type application_api struct {
 }
 
 func newApplicationApi(agentid string) *application_api {
-
 
 	app := application_api{corpId: cfg.Wxqy().Corpid, secret: cfg.WxqyApp(agentid).Secret, agentid: agentid}
 	return &app

@@ -11,6 +11,7 @@ func (this *context) Menu() Imenu {
 type Imenu interface {
 	Create(btns []Button) error
 	Delete() error
+	Get() ([]Button, error)
 }
 
 type menu struct {
@@ -112,11 +113,11 @@ func (this *menu) Get() ([]Button, error) {
 		if o.SubButton.List != nil && len(o.SubButton.List) > 0 {
 			for _, oo := range o.SubButton.List {
 				btn.SubButton = append(btn.SubButton, Button{
-					Name:  o.Name,
-					Type:  o.Type,
-					Value: o.Value,
-					Key:   o.Key,
-					Url:   o.Url,
+					Name:  oo.Name,
+					Type:  oo.Type,
+					Value: oo.Value,
+					Key:   oo.Key,
+					Url:   oo.Url,
 				})
 			}
 		}

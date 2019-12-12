@@ -90,7 +90,7 @@ type UserToken struct {
 	Bean   `xorm:"extends"`
 	Uid    *string `json:"uid"`
 	Ops    *int64  `json:"ops"`    // 接口调用次数
-	Type   *string `json:"type"`   // 授权类型 [pc,wx:微信小程序，we:微信公众号]
+	Type   *string `json:"type"`   // 授权类型 [pc,wxmi:微信小程序，wxmp:微信公众号]
 	Expire *int64  `json:"expire"` // 到期时间
 	Agent  *string `json:"agent"`  // User-Agent
 }

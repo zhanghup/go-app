@@ -12,7 +12,8 @@ type config struct {
 	DB      *configDB                `ini:"database"`
 	Wxqy    *configWxQy              `ini:"wxqy"`
 	WxqyApp map[string]configWxQyApp `ini-map:"wxqy-app"`
-	Wxmp *configWxmp                 `ini:"wxmp"`
+	Wxmp    *configWxmp              `ini:"wxmp"`
+	Wxmi    *configWxmi              `ini:"wxmi"`
 }
 
 var my = &config{
