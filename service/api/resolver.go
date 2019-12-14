@@ -13,16 +13,23 @@ import (
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-app/service/loaders"
 	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-wxmp"
 	"net/http"
 )
 
 func ggin() func(c *gin.Context) {
+	resolver := &Resolver{
+		DB:     cfg.DB().Engine(),
+		Loader: loaders.DataLoaden,
+		my:     directive.MewMe,
+	}
+
+	if cfg.WxmpEnable() {
+		resolver.wxmp = wxmp.NewContext(cfg.Wxmp().Appid, cfg.Wxmp().AppSecret, cfg.Wxmp().Token)
+	}
+
 	c := lib.Config{
-		Resolvers: &Resolver{
-			DB:     cfg.DB().Engine(),
-			Loader: loaders.DataLoaden,
-			my:     directive.MewMe,
-		},
+		Resolvers: resolver,
 		Directives: lib.DirectiveRoot{
 			Perm: directive.Perm(),
 		},
@@ -55,6 +62,7 @@ type Resolver struct {
 	DB     *xorm.Engine
 	Loader func(ctx context.Context) loaders.Loader
 	my     func(ctx context.Context) directive.Me
+	wxmp   wxmp.IContext
 }
 
 func (r *Resolver) Mutation() lib.MutationResolver {

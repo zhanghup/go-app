@@ -1,0 +1,15 @@
+extend type Query{
+    "用户列表（分页）"
+    wxmp_menus:[WxmpMenu!]  @perm(entity: "wxmp-menu",perm: "R")
+}
+
+extend type Mutation {
+    "用户新建"
+    wxmp_menu_create(input:[NewWxmpMenu!]!):Boolean!  @perm(entity: "wxmp-menu",perm: "C")
+    "用户批量删除"
+    wxmp_menu_removes:Boolean! @perm(entity: "wxmp-menu",perm: "D")
+}
+
+type WxmpMenu{
+
+}
