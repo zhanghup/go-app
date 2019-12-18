@@ -74,11 +74,15 @@ func (r *Resolver) Query() lib.QueryResolver {
 
 type mutationResolver struct{ *Resolver }
 
+
+
 func (this mutationResolver) World(ctx context.Context) (*string, error) {
 	return tools.Ptr().String("hello"), nil
 }
 
 type queryResolver struct{ *Resolver }
+
+
 
 func (this queryResolver) Hello(ctx context.Context) (*string, error) {
 	return tools.Ptr().String("world"), nil

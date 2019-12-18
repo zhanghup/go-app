@@ -15,6 +15,7 @@ import (
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-wxmp"
 )
 
 // region    ************************** generated!.gotpl **************************
@@ -91,6 +92,8 @@ type ComplexityRoot struct {
 		UserRemoves       func(childComplexity int, ids []string) int
 		UserUpdate        func(childComplexity int, id string, input UpdUser) int
 		World             func(childComplexity int) int
+		WxmpMenuCreate    func(childComplexity int, input []wxmp.Button) int
+		WxmpMenuRemoves   func(childComplexity int) int
 	}
 
 	PermObj struct {
@@ -109,6 +112,7 @@ type ComplexityRoot struct {
 		Stat            func(childComplexity int) int
 		User            func(childComplexity int, id string) int
 		Users           func(childComplexity int, query QUser) int
+		WxmpMenus       func(childComplexity int) int
 	}
 
 	Role struct {
@@ -148,6 +152,17 @@ type ComplexityRoot struct {
 		Data  func(childComplexity int) int
 		Total func(childComplexity int) int
 	}
+
+	WxmpMenu struct {
+		Appid     func(childComplexity int) int
+		Key       func(childComplexity int) int
+		Name      func(childComplexity int) int
+		Pagepath  func(childComplexity int) int
+		SubButton func(childComplexity int) int
+		Type      func(childComplexity int) int
+		Url       func(childComplexity int) int
+		Value     func(childComplexity int) int
+	}
 }
 
 type DictResolver interface {
@@ -170,6 +185,8 @@ type MutationResolver interface {
 	UserCreate(ctx context.Context, input NewUser) (*beans.User, error)
 	UserUpdate(ctx context.Context, id string, input UpdUser) (bool, error)
 	UserRemoves(ctx context.Context, ids []string) (bool, error)
+	WxmpMenuCreate(ctx context.Context, input []wxmp.Button) (bool, error)
+	WxmpMenuRemoves(ctx context.Context) (bool, error)
 }
 type QueryResolver interface {
 	Stat(ctx context.Context) (interface{}, error)
@@ -182,6 +199,7 @@ type QueryResolver interface {
 	RolePermObjects(ctx context.Context, id string) ([]PermObj, error)
 	Users(ctx context.Context, query QUser) (*Users, error)
 	User(ctx context.Context, id string) (*beans.User, error)
+	WxmpMenus(ctx context.Context) ([]wxmp.Button, error)
 }
 
 type executableSchema struct {
@@ -526,6 +544,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.World(childComplexity), true
 
+	case "Mutation.wxmp_menu_create":
+		if e.complexity.Mutation.WxmpMenuCreate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_wxmp_menu_create_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.WxmpMenuCreate(childComplexity, args["input"].([]wxmp.Button)), true
+
+	case "Mutation.wxmp_menu_removes":
+		if e.complexity.Mutation.WxmpMenuRemoves == nil {
+			break
+		}
+
+		return e.complexity.Mutation.WxmpMenuRemoves(childComplexity), true
+
 	case "PermObj.mask":
 		if e.complexity.PermObj.Mask == nil {
 			break
@@ -649,6 +686,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Users(childComplexity, args["query"].(QUser)), true
+
+	case "Query.wxmp_menus":
+		if e.complexity.Query.WxmpMenus == nil {
+			break
+		}
+
+		return e.complexity.Query.WxmpMenus(childComplexity), true
 
 	case "Role.created":
 		if e.complexity.Role.Created == nil {
@@ -831,6 +875,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Users.Total(childComplexity), true
+
+	case "WxmpMenu.appid":
+		if e.complexity.WxmpMenu.Appid == nil {
+			break
+		}
+
+		return e.complexity.WxmpMenu.Appid(childComplexity), true
+
+	case "WxmpMenu.key":
+		if e.complexity.WxmpMenu.Key == nil {
+			break
+		}
+
+		return e.complexity.WxmpMenu.Key(childComplexity), true
+
+	case "WxmpMenu.name":
+		if e.complexity.WxmpMenu.Name == nil {
+			break
+		}
+
+		return e.complexity.WxmpMenu.Name(childComplexity), true
+
+	case "WxmpMenu.pagepath":
+		if e.complexity.WxmpMenu.Pagepath == nil {
+			break
+		}
+
+		return e.complexity.WxmpMenu.Pagepath(childComplexity), true
+
+	case "WxmpMenu.sub_button":
+		if e.complexity.WxmpMenu.SubButton == nil {
+			break
+		}
+
+		return e.complexity.WxmpMenu.SubButton(childComplexity), true
+
+	case "WxmpMenu.type":
+		if e.complexity.WxmpMenu.Type == nil {
+			break
+		}
+
+		return e.complexity.WxmpMenu.Type(childComplexity), true
+
+	case "WxmpMenu.url":
+		if e.complexity.WxmpMenu.Url == nil {
+			break
+		}
+
+		return e.complexity.WxmpMenu.Url(childComplexity), true
+
+	case "WxmpMenu.value":
+		if e.complexity.WxmpMenu.Value == nil {
+			break
+		}
+
+		return e.complexity.WxmpMenu.Value(childComplexity), true
 
 	}
 	return 0, false
@@ -1159,9 +1259,9 @@ extend type Mutation {
     "用户新建"
     user_create(input:NewUser!):User  @perm(entity: "user",perm: "C")
     "用户更新"
-    user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "dict",perm: "U")
+    user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U")
     "用户批量删除"
-    user_removes(ids: [String!]):Boolean! @perm(entity: "dict",perm: "D")
+    user_removes(ids: [String!]):Boolean! @perm(entity: "user",perm: "D")
 }
 
 input QUser{
@@ -1264,6 +1364,39 @@ input UpdUser {
 }
 
 `},
+	&ast.Source{Name: "schema/sechma_wxmp.graphql", Input: `extend type Query{
+    "公众号菜单列表"
+    wxmp_menus:[WxmpMenu!]  @perm(entity: "wxmp-menu",perm: "R")
+}
+
+extend type Mutation {
+    "公众号菜单新建"
+    wxmp_menu_create(input:[NewWxmpMenu!]!):Boolean!  @perm(entity: "wxmp-menu",perm: "C")
+    "公众号菜单删除全部"
+    wxmp_menu_removes:Boolean! @perm(entity: "wxmp-menu",perm: "D")
+}
+
+input NewWxmpMenu @goModel(model:"github.com/zhanghup/go-wxmp.Button") {
+    type: String!
+    name: String!
+    key: String
+    url: String
+    value: String
+    appid: String
+    pagepath: String
+    sub_button: [NewWxmpMenu!]
+}
+
+type WxmpMenu @goModel(model:"github.com/zhanghup/go-wxmp.Button") {
+    type: String
+    name: String
+    key: String
+    url: String
+    value: String
+    appid: String
+    pagepath: String
+    sub_button: [WxmpMenu!]
+}`},
 )
 
 // endregion ************************** generated!.gotpl **************************
@@ -1563,6 +1696,20 @@ func (ec *executionContext) field_Mutation_user_update_args(ctx context.Context,
 		}
 	}
 	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_wxmp_menu_create_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []wxmp.Button
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewWxmpMenu2ᚕgithubᚗcomᚋzhanghupᚋgoᚑwxmpᚐButton(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -3404,7 +3551,7 @@ func (ec *executionContext) _Mutation_user_update(ctx context.Context, field gra
 			return ec.resolvers.Mutation().UserUpdate(rctx, args["id"].(string), args["input"].(UpdUser))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "user")
 			if err != nil {
 				return nil, err
 			}
@@ -3476,7 +3623,144 @@ func (ec *executionContext) _Mutation_user_removes(ctx context.Context, field gr
 			return ec.resolvers.Mutation().UserRemoves(rctx, args["ids"].([]string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "user")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "D")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_wxmp_menu_create(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_wxmp_menu_create_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().WxmpMenuCreate(rctx, args["input"].([]wxmp.Button))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "wxmp-menu")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "C")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_wxmp_menu_removes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().WxmpMenuRemoves(rctx)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "wxmp-menu")
 			if err != nil {
 				return nil, err
 			}
@@ -4210,6 +4494,68 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOUser2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_wxmp_menus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().WxmpMenus(rctx)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "wxmp-menu")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]wxmp.Button); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []github.com/zhanghup/go-wxmp.Button`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]wxmp.Button)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOWxmpMenu2ᚕgithubᚗcomᚋzhanghupᚋgoᚑwxmpᚐButton(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -5169,6 +5515,278 @@ func (ec *executionContext) _Users_data(ctx context.Context, field graphql.Colle
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOUser2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WxmpMenu_type(ctx context.Context, field graphql.CollectedField, obj *wxmp.Button) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "WxmpMenu",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WxmpMenu_name(ctx context.Context, field graphql.CollectedField, obj *wxmp.Button) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "WxmpMenu",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WxmpMenu_key(ctx context.Context, field graphql.CollectedField, obj *wxmp.Button) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "WxmpMenu",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Key, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WxmpMenu_url(ctx context.Context, field graphql.CollectedField, obj *wxmp.Button) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "WxmpMenu",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Url, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WxmpMenu_value(ctx context.Context, field graphql.CollectedField, obj *wxmp.Button) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "WxmpMenu",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Value, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WxmpMenu_appid(ctx context.Context, field graphql.CollectedField, obj *wxmp.Button) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "WxmpMenu",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Appid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WxmpMenu_pagepath(ctx context.Context, field graphql.CollectedField, obj *wxmp.Button) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "WxmpMenu",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Pagepath, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WxmpMenu_sub_button(ctx context.Context, field graphql.CollectedField, obj *wxmp.Button) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "WxmpMenu",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SubButton, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]wxmp.Button)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOWxmpMenu2ᚕgithubᚗcomᚋzhanghupᚋgoᚑwxmpᚐButton(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -6556,6 +7174,66 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewWxmpMenu(ctx context.Context, obj interface{}) (wxmp.Button, error) {
+	var it wxmp.Button
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "type":
+			var err error
+			it.Type, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "key":
+			var err error
+			it.Key, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "url":
+			var err error
+			it.Url, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "value":
+			var err error
+			it.Value, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "appid":
+			var err error
+			it.Appid, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pagepath":
+			var err error
+			it.Pagepath, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sub_button":
+			var err error
+			it.SubButton, err = ec.unmarshalONewWxmpMenu2ᚕgithubᚗcomᚋzhanghupᚋgoᚑwxmpᚐButton(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputQDict(ctx context.Context, obj interface{}) (QDict, error) {
 	var it QDict
 	var asMap = obj.(map[string]interface{})
@@ -7047,6 +7725,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "wxmp_menu_create":
+			out.Values[i] = ec._Mutation_wxmp_menu_create(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "wxmp_menu_removes":
+			out.Values[i] = ec._Mutation_wxmp_menu_removes(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7215,6 +7903,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_user(ctx, field)
 				return res
 			})
+		case "wxmp_menus":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_wxmp_menus(ctx, field)
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -7359,6 +8058,44 @@ func (ec *executionContext) _Users(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Users_total(ctx, field, obj)
 		case "data":
 			out.Values[i] = ec._Users_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var wxmpMenuImplementors = []string{"WxmpMenu"}
+
+func (ec *executionContext) _WxmpMenu(ctx context.Context, sel ast.SelectionSet, obj *wxmp.Button) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, wxmpMenuImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("WxmpMenu")
+		case "type":
+			out.Values[i] = ec._WxmpMenu_type(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._WxmpMenu_name(ctx, field, obj)
+		case "key":
+			out.Values[i] = ec._WxmpMenu_key(ctx, field, obj)
+		case "url":
+			out.Values[i] = ec._WxmpMenu_url(ctx, field, obj)
+		case "value":
+			out.Values[i] = ec._WxmpMenu_value(ctx, field, obj)
+		case "appid":
+			out.Values[i] = ec._WxmpMenu_appid(ctx, field, obj)
+		case "pagepath":
+			out.Values[i] = ec._WxmpMenu_pagepath(ctx, field, obj)
+		case "sub_button":
+			out.Values[i] = ec._WxmpMenu_sub_button(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7677,6 +8414,30 @@ func (ec *executionContext) unmarshalNNewUser2githubᚗcomᚋzhanghupᚋgoᚑapp
 	return ec.unmarshalInputNewUser(ctx, v)
 }
 
+func (ec *executionContext) unmarshalNNewWxmpMenu2githubᚗcomᚋzhanghupᚋgoᚑwxmpᚐButton(ctx context.Context, v interface{}) (wxmp.Button, error) {
+	return ec.unmarshalInputNewWxmpMenu(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNewWxmpMenu2ᚕgithubᚗcomᚋzhanghupᚋgoᚑwxmpᚐButton(ctx context.Context, v interface{}) ([]wxmp.Button, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]wxmp.Button, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNNewWxmpMenu2githubᚗcomᚋzhanghupᚋgoᚑwxmpᚐButton(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) marshalNPermObj2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐPermObj(ctx context.Context, sel ast.SelectionSet, v PermObj) graphql.Marshaler {
 	return ec._PermObj(ctx, sel, &v)
 }
@@ -7758,6 +8519,10 @@ func (ec *executionContext) unmarshalNUpdUser2githubᚗcomᚋzhanghupᚋgoᚑapp
 
 func (ec *executionContext) marshalNUser2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐUser(ctx context.Context, sel ast.SelectionSet, v beans.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNWxmpMenu2githubᚗcomᚋzhanghupᚋgoᚑwxmpᚐButton(ctx context.Context, sel ast.SelectionSet, v wxmp.Button) graphql.Marshaler {
+	return ec._WxmpMenu(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -8182,6 +8947,26 @@ func (ec *executionContext) marshalOInt2ᚖint64(ctx context.Context, sel ast.Se
 	return ec.marshalOInt2int64(ctx, sel, *v)
 }
 
+func (ec *executionContext) unmarshalONewWxmpMenu2ᚕgithubᚗcomᚋzhanghupᚋgoᚑwxmpᚐButton(ctx context.Context, v interface{}) ([]wxmp.Button, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]wxmp.Button, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNNewWxmpMenu2githubᚗcomᚋzhanghupᚋgoᚑwxmpᚐButton(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) marshalOPermObj2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐPermObj(ctx context.Context, sel ast.SelectionSet, v []PermObj) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -8399,6 +9184,46 @@ func (ec *executionContext) marshalOUsers2ᚖgithubᚗcomᚋzhanghupᚋgoᚑapp�
 		return graphql.Null
 	}
 	return ec._Users(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOWxmpMenu2ᚕgithubᚗcomᚋzhanghupᚋgoᚑwxmpᚐButton(ctx context.Context, sel ast.SelectionSet, v []wxmp.Button) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNWxmpMenu2githubᚗcomᚋzhanghupᚋgoᚑwxmpᚐButton(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValue(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

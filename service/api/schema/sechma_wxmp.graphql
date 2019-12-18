@@ -1,15 +1,33 @@
 extend type Query{
-    "用户列表（分页）"
+    "公众号菜单列表"
     wxmp_menus:[WxmpMenu!]  @perm(entity: "wxmp-menu",perm: "R")
 }
 
 extend type Mutation {
-    "用户新建"
+    "公众号菜单新建"
     wxmp_menu_create(input:[NewWxmpMenu!]!):Boolean!  @perm(entity: "wxmp-menu",perm: "C")
-    "用户批量删除"
+    "公众号菜单删除全部"
     wxmp_menu_removes:Boolean! @perm(entity: "wxmp-menu",perm: "D")
 }
 
-type WxmpMenu{
+input NewWxmpMenu @goModel(model:"github.com/zhanghup/go-wxmp.Button") {
+    type: String!
+    name: String!
+    key: String
+    url: String
+    value: String
+    appid: String
+    pagepath: String
+    sub_button: [NewWxmpMenu!]
+}
 
+type WxmpMenu @goModel(model:"github.com/zhanghup/go-wxmp.Button") {
+    type: String
+    name: String
+    key: String
+    url: String
+    value: String
+    appid: String
+    pagepath: String
+    sub_button: [WxmpMenu!]
 }
