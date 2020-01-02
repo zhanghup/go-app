@@ -19,25 +19,17 @@ import (
 
 func ggin() func(c *gin.Context) {
 	resolver := &Resolver{
-		DB:     cfg.DB().Engine(),
+		DB:     ctx.DB().Engine(),
 		Loader: loaders.DataLoaden,
 		my:     directive.MewMe,
 	}
 
-	if cfg.WxmpEnable() {
-		resolver.wxmp = wxmp.NewContext(cfg.Wxmp().Appid, cfg.Wxmp().AppSecret, cfg.Wxmp().Token)
+	if ctx.WxmpEnable() {
+		resolver.wxmp = wxmp.NewContext(ctx.Wxmp().Appid, ctx.Wxmp().AppSecret, ctx.Wxmp().Token)
 	}
 
 	c := lib.Config{
-<<<<<<< HEAD
-		Resolvers: &Resolver{
-			DB:     ctx.DB().Engine(),
-			Loader: loaders.DataLoaden,
-			my:     directive.MewMe,
-		},
-=======
 		Resolvers: resolver,
->>>>>>> 154555912a2000f35d3691387558fa159235c0c5
 		Directives: lib.DirectiveRoot{
 			Perm: directive.Perm(),
 		},

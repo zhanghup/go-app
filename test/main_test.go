@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"github.com/zhanghup/go-app/libs/wx/qiye"
 	"os"
 	"testing"
 	"text/template"
@@ -22,8 +21,6 @@ func TestName(t *testing.T) {
 		panic(err)
 	}
 }
-
-
 
 func TestQueryHello(t *testing.T) {
 	r, err := Query(t, `
