@@ -1,6 +1,7 @@
 package boot
 
 import (
+	"github.com/gin-gonic/gin"
 	rice "github.com/giter/go.rice"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhanghup/go-app/beans"
@@ -57,4 +58,8 @@ func Run() error {
 		return nil
 	}
 	return ctx.Web().Run()
+}
+
+func Gin() *gin.Engine {
+	return ctx.Web().Engine()
 }

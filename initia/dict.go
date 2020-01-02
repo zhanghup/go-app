@@ -109,3 +109,11 @@ func initWxqy() {
 		{Name: tools.Ptr().String("弹出地理位置选择器"), Value: tools.Ptr().String("location_select")},
 	})
 }
+
+func initWxmp(){
+	InitDictCode(beans.Dict{Code: tools.Ptr().String("WXMP001"), Name: tools.Ptr().String("人物性别")}, []beans.DictItem{
+		{Name: tools.Ptr().String("未知"), Value: tools.Ptr().String("0")},
+		{Name: tools.Ptr().String("男"), Value: tools.Ptr().String("1")},
+		{Name: tools.Ptr().String("女"), Value: tools.Ptr().String("2")},
+	})
+}

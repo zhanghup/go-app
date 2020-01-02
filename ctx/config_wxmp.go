@@ -3,8 +3,9 @@ package ctx
 type configWxmp struct {
 	Enable bool `ini:"enable"`
 
-	Appid string `ini:"appid"`
+	Appid     string `ini:"appid"`
 	AppSecret string `ini:"appsecret"`
+	Token     string `ini:"token"`
 }
 
 // api服务配置
