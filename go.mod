@@ -18,12 +18,7 @@ require (
 	github.com/vektah/dataloaden v0.3.0 // indirect
 	github.com/vektah/gqlparser v1.1.2
 	github.com/zhanghup/go-tools v1.0.18
-<<<<<<< HEAD
 	github.com/zhanghup/go-wxmp v0.0.10 // indirect
-=======
-	github.com/zhanghup/go-wxmp v0.0.3
-
->>>>>>> 154555912a2000f35d3691387558fa159235c0c5
 	gopkg.in/ini.v1 v1.51.0
 )
 
