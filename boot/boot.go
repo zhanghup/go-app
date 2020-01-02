@@ -4,7 +4,7 @@ import (
 	rice "github.com/giter/go.rice"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/cfg"
+	"github.com/zhanghup/go-app/ctx"
 	"github.com/zhanghup/go-app/initia"
 	"github.com/zhanghup/go-app/service/api"
 	"github.com/zhanghup/go-app/service/auth"
@@ -13,14 +13,14 @@ import (
 
 func Boot(fn func() (*rice.Box, error)) {
 	// 初始化配置文件
-	cfg.InitConfFile()
+	ctx.InitConfFile()
 	box, err := fn()
 	if err != nil {
 		panic(err)
 	}
-	cfg.InitConfig(box)
+	ctx.InitConfig(box)
 
-	if cfg.DBEnable() {
+	if ctx.DBEnable() {
 		// 同步表结构
 		beans.Sync()
 
@@ -29,10 +29,10 @@ func Boot(fn func() (*rice.Box, error)) {
 	}
 
 	// 初始化基础路由
-	if cfg.WebEnable() {
+	if ctx.WebEnable() {
 		// http服务状态监听
 		{
-			cfg.Web().Engine().Use(api.StatsRequest())
+			ctx.Web().Engine().Use(api.StatsRequest())
 		}
 
 		// 文件操作
@@ -53,8 +53,8 @@ func Boot(fn func() (*rice.Box, error)) {
 }
 
 func Run() error {
-	if !cfg.WebEnable() {
+	if !ctx.WebEnable() {
 		return nil
 	}
-	return cfg.Web().Run()
+	return ctx.Web().Run()
 }

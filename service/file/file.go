@@ -8,7 +8,7 @@ import (
 	"github.com/nfnt/resize"
 	"github.com/pkg/errors"
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/cfg"
+	"github.com/zhanghup/go-app/ctx"
 	"github.com/zhanghup/go-tools"
 	"image"
 	"image/gif"
@@ -22,7 +22,7 @@ import (
 )
 
 func NewUploader() *Uploader {
-	return &Uploader{db: cfg.DB().Engine()}
+	return &Uploader{db: ctx.DB().Engine()}
 }
 
 type Uploader struct {
@@ -219,8 +219,8 @@ func (this *Uploader) Resize() func(c *gin.Context) {
 
 func Gin() {
 	up := NewUploader()
-	cfg.Web().Engine().Group("/").POST("/upload", up.Upload())
-	cfg.Web().Engine().Group("/").GET("/upload/:id", up.Get())
-	cfg.Web().Engine().Group("/").GET("/upload/:id/:width/:height", up.Resize())
-	cfg.Web().Engine().Group("/").GET("/upload/:id/:width", up.Resize())
+	ctx.Web().Engine().Group("/").POST("/upload", up.Upload())
+	ctx.Web().Engine().Group("/").GET("/upload/:id", up.Get())
+	ctx.Web().Engine().Group("/").GET("/upload/:id/:width/:height", up.Resize())
+	ctx.Web().Engine().Group("/").GET("/upload/:id/:width", up.Resize())
 }

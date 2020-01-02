@@ -2,13 +2,13 @@ package initia
 
 import (
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/cfg"
+	"github.com/zhanghup/go-app/ctx"
 	"github.com/zhanghup/go-tools"
 )
 
 func InitDictCode(dict beans.Dict, dictitems []beans.DictItem) {
 	hisDict := beans.Dict{}
-	ok, err := cfg.DB().Engine().Table(hisDict).Where("code = ?", dict.Code).Get(&hisDict)
+	ok, err := ctx.DB().Engine().Table(hisDict).Where("code = ?", dict.Code).Get(&hisDict)
 	if err != nil {
 		panic(err)
 	}
@@ -17,7 +17,7 @@ func InitDictCode(dict beans.Dict, dictitems []beans.DictItem) {
 	if !ok {
 		dict.Id = tools.ObjectString()
 		dict.Status = tools.Ptr().Int(1)
-		_, err = cfg.DB().Engine().Table(dict).Insert(dict)
+		_, err = ctx.DB().Engine().Table(dict).Insert(dict)
 		if err != nil {
 			panic(err)
 		}
@@ -32,7 +32,7 @@ func InitDictCode(dict beans.Dict, dictitems []beans.DictItem) {
 			o.Status = tools.Ptr().Int(1)
 			o.Id = tools.ObjectString()
 			o.Code = dict.Id
-			_, err = cfg.DB().Engine().Table(o).Insert(o)
+			_, err = ctx.DB().Engine().Table(o).Insert(o)
 			if err != nil {
 				panic(err)
 			}
@@ -44,7 +44,7 @@ func InitDictCode(dict beans.Dict, dictitems []beans.DictItem) {
 func initDict() {
 	initDictSys()
 	initDictSta()
-	if cfg.WxqyEnable() {
+	if ctx.WxqyEnable() {
 		initWxqy()
 	}
 }

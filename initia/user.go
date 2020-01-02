@@ -2,12 +2,12 @@ package initia
 
 import (
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/cfg"
+	"github.com/zhanghup/go-app/ctx"
 	"github.com/zhanghup/go-tools"
 )
 
 func initUser() {
-	ok, err := cfg.DB().Engine().Table(beans.User{}).Where("id = ?", "root").Exist()
+	ok, err := ctx.DB().Engine().Table(beans.User{}).Where("id = ?", "root").Exist()
 	if err != nil {
 		panic(err)
 	}
@@ -28,7 +28,7 @@ func initUser() {
 		Password: &password,
 		Slat:     &slat,
 	}
-	_, err = cfg.DB().Engine().Table(user).Insert(user)
+	_, err = ctx.DB().Engine().Table(user).Insert(user)
 	if err != nil {
 		panic(err)
 	}

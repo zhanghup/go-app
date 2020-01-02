@@ -2,7 +2,7 @@ package directive
 
 import (
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/cfg"
+	"github.com/zhanghup/go-app/ctx"
 	"strings"
 	"time"
 
@@ -10,7 +10,7 @@ import (
 )
 
 func UserAuth() gin.HandlerFunc {
-	e := cfg.DB().Engine()
+	e := ctx.DB().Engine()
 	return func(c *gin.Context) {
 		tok, err := c.Cookie(GIN_TOKEN)
 		if err != nil {
