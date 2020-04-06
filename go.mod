@@ -8,6 +8,6 @@ require (
 	github.com/giter/go.rice v0.0.0-20171227004756-39a3aa768429
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/pkg/errors v0.8.1
-	github.com/zhanghup/go-tools v1.0.39
+	github.com/zhanghup/go-tools v1.0.42
 	xorm.io/xorm v1.0.1
 )

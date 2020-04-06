@@ -4,15 +4,16 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"github.com/99designs/gqlgen/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/toolxorm"
 	"net/http"
+	"time"
 	"xorm.io/xorm"
 )
 
@@ -84,35 +85,7 @@ func (this mutationResolver) Login(ctx context.Context, account string, password
 }
 
 func (this mutationResolver) Token(ctx context.Context, uid string) (string, error) {
-
-
-	ctx, err := this.DB.Ts(ctx, func(s *xorm.Session) error {
-		_, e := s.SF(`update {{ table "user_token" }} set status = 0 where uid = :uid and type = :type`, map[string]interface{}{
-			"uid":  uid,
-			"type": ty,
-		}).Execute()
-		if e != nil {
-			return e
-		}
-		token.Id = tools.ObjectString()
-		token.Status = tools.Ptr().Int(1)
-		token.Uid = &uid
-		token.Type = tools.Ptr().String(string(ty))
-		token.Agent = tools.Ptr().String(this.me(ctx).GinContext().Request.UserAgent())
-		token.Expire = tools.Ptr().Int64(2 * 60 * 60)
-		token.Ops = tools.Ptr().Int64(0)
-		_, e = s.Insert(token)
-		if e != nil {
-			return e
-		}
-		this.me(ctx).GinContext().SetCookie(directive.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
-		return nil
-	})
-
-	if err != nil {
-		return "", err
-	}
-	return *token.Id, nil
+	return tools.Crypto.DES(fmt.Sprintf("%s&%d", uid, time.Now().Unix()+2*3600), "12345678").ECBEncrypt(), nil
 }
 
 type queryResolver struct{ *Resolver }
