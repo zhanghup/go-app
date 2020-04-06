@@ -2,14 +2,14 @@ package directive
 
 import (
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/ctx"
 	"strings"
 	"time"
+	"xorm.io/xorm"
 
 	"github.com/gin-gonic/gin"
 )
 
-func UserAuth() gin.HandlerFunc {
+func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 	e := ctx.DB().Engine()
 	return func(c *gin.Context) {
 		tok, err := c.Cookie(GIN_TOKEN)

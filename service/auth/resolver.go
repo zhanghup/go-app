@@ -6,25 +6,23 @@ import (
 	"context"
 	"github.com/99designs/gqlgen/handler"
 	"github.com/gin-gonic/gin"
-	"github.com/go-xorm/xorm"
+	"github.com/pkg/errors"
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/ctx"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
-	"github.com/zhanghup/go-app/service/loaders"
 	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-tools/database/toolxorm"
 	"net/http"
+	"xorm.io/xorm"
 )
 
-func ggin() func(c *gin.Context) {
+func ggin(db *xorm.Engine) func(c *gin.Context) {
 	c := Config{Resolvers: &Resolver{
-		DB:     ctx.DB().Engine(),
-		Loader: loaders.DataLoaden,
-		me:     directive.MewMe,
+		DB:  db,
+		DBS: toolxorm.NewEngine(db),
 	}}
 
 	hu := handler.GraphQL(NewExecutableSchema(c))
-	hu = loaders.DataLoadenMiddleware(ctx.DB().Engine(), hu)
 	hu = func(next http.HandlerFunc) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			r.Header.Set("Content-Type", "application/json")
@@ -33,23 +31,21 @@ func ggin() func(c *gin.Context) {
 	}(hu)
 
 	return func(c *gin.Context) {
-		ctx := context.WithValue(c.Request.Context(), directive.GIN_CONTEXT, c)
-		hu.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
+		hu.ServeHTTP(c.Writer, c.Request)
 	}
 }
 
-func Gin() {
-	ctx.Web().Engine().POST("/auth", ggin())
-	gs.Playground("/auth/playground1", "/auth")
-	ctx.Web().Engine().GET("/auth/playground2", func(c *gin.Context) {
+func Gin(g gin.IRouter, db *xorm.Engine) {
+	g.POST("/auth", ggin(db))
+	gs.Playground(g, "/auth/playground1", "/auth")
+	g.GET("/auth/playground2", func(c *gin.Context) {
 		handler.Playground("标题", "/auth").ServeHTTP(c.Writer, c.Request)
 	})
 }
 
 type Resolver struct {
-	DB     *xorm.Engine
-	Loader func(ctx context.Context) loaders.Loader
-	me     func(ctx context.Context) directive.Me
+	DB  *xorm.Engine
+	DBS *toolxorm.Engine
 }
 
 func (r *Resolver) Mutation() MutationResolver {
@@ -68,7 +64,7 @@ func (this mutationResolver) Login(ctx context.Context, account string, password
 		return "", err
 	}
 	if !ok {
-		return "", gin.NewErr("用户不存在")
+		return "", errors.New("用户不存在")
 	}
 
 	flag := false
@@ -77,18 +73,19 @@ func (this mutationResolver) Login(ctx context.Context, account string, password
 			flag = true
 		}
 	} else {
-		if *user.Password == tools.Password(password, *user.Slat) {
+		if *user.Password == tools.Crypto.Password(password, *user.Slat) {
 			flag = true
 		}
 	}
 	if !flag {
-		return "", gin.NewErr("登录失败")
+		return "", errors.New("用户名或者密码错误")
 	}
-	return this.Token(ctx, *user.Id, directive.TokenPc)
+	return this.Token(ctx, *user.Id)
 }
 
-func (this mutationResolver) Token(ctx context.Context, uid string, ty directive.TokenType) (string, error) {
-	token := new(beans.UserToken)
+func (this mutationResolver) Token(ctx context.Context, uid string) (string, error) {
+
+
 	ctx, err := this.DB.Ts(ctx, func(s *xorm.Session) error {
 		_, e := s.SF(`update {{ table "user_token" }} set status = 0 where uid = :uid and type = :type`, map[string]interface{}{
 			"uid":  uid,

@@ -3,11 +3,10 @@ package gs
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/zhanghup/go-app/ctx"
 )
 
-func Playground(url, query string) {
-	ctx.Web().Engine().GET(url, func(c *gin.Context) {
+func Playground(g gin.IRouter, url, query string) {
+	g.GET(url, func(c *gin.Context) {
 		var page = []byte(fmt.Sprintf(`
 		<!DOCTYPE html>
 		<html>

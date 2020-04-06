@@ -19,6 +19,4 @@ type Query {
 type Mutation {
   "用户登录"
   login(account:String!,password:String!): String!
-
-  login_wxmp(appid: String!,code: String!): String!
 }

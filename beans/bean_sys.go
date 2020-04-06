@@ -85,16 +85,6 @@ type User struct {
 	Admin    *int    `json:"admin"`
 }
 
-// 授权
-type UserToken struct {
-	Bean   `xorm:"extends"`
-	Uid    *string `json:"uid"`
-	Ops    *int64  `json:"ops"`    // 接口调用次数
-	Type   *string `json:"type"`   // 授权类型 [pc,wxmi:微信小程序，wxmp:微信公众号]
-	Expire *int64  `json:"expire"` // 到期时间
-	Agent  *string `json:"agent"`  // User-Agent
-}
-
 // 菜单
 type Menu struct {
 	Bean `xorm:"extends"`
@@ -135,5 +125,5 @@ type Cron struct {
 }
 
 func sys_tables() []interface{} {
-	return []interface{}{new(Dict), new(DictItem), new(Menu), new(Role), new(RoleUser), new(Perm), new(PermObject), new(User), new(UserToken), new(Resource), new(Cron)}
+	return []interface{}{new(Dict), new(DictItem), new(Menu), new(Role), new(RoleUser), new(Perm), new(PermObject), new(User), new(Resource), new(Cron)}
 }

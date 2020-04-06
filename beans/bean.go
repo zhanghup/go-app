@@ -1,23 +1,17 @@
 package beans
 
 import (
-	"github.com/zhanghup/go-app/ctx"
+	"xorm.io/xorm"
 )
 
-func Sync() {
-	err := ctx.DB().Engine().Sync2(sys_tables()...)
+func Sync(db *xorm.Engine) {
+	err := db.Sync2(sys_tables()...)
 	if err != nil {
 		panic(err)
 	}
-	err = ctx.DB().Engine().Sync2(log_tables()...)
+	err = db.Sync2(log_tables()...)
 	if err != nil {
 		panic(err)
 	}
 
-	if ctx.WxmiEnable() {
-		err = ctx.DB().Engine().Sync2(wxmi_tables()...)
-		if err != nil {
-			panic(err)
-		}
-	}
 }

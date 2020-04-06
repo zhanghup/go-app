@@ -2,12 +2,12 @@ package initia
 
 import (
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/ctx"
 	"github.com/zhanghup/go-tools"
+	"xorm.io/xorm"
 )
 
-func initUser() {
-	ok, err := ctx.DB().Engine().Table(beans.User{}).Where("id = ?", "root").Exist()
+func InitUser(db *xorm.Engine) {
+	ok, err := db.Table(beans.User{}).Where("id = ?", "root").Exist()
 	if err != nil {
 		panic(err)
 	}
@@ -15,20 +15,20 @@ func initUser() {
 		return
 	}
 
-	slat := *tools.ObjectString()
-	password := tools.Password("bwg7xj98b3", slat)
+	slat := tools.Str.Uid()
+	password := tools.Crypto.Password("zhang3611", slat)
 	user := beans.User{
 		Bean: beans.Bean{
-			Id:     tools.Ptr().String("root"),
-			Status: tools.Ptr().Int(1),
-			Weight: tools.Ptr().Int(0),
+			Id:     tools.Ptr.String("root"),
+			Status: tools.Ptr.Int(1),
+			Weight: tools.Ptr.Int(0),
 		},
-		Type:     tools.Ptr().String("0"), // 超级管理员
-		Account:  tools.Ptr().String("root"),
+		Type:     tools.Ptr.String("0"), // 超级管理员
+		Account:  tools.Ptr.String("root"),
 		Password: &password,
 		Slat:     &slat,
 	}
-	_, err = ctx.DB().Engine().Table(user).Insert(user)
+	_, err = db.Table(user).Insert(user)
 	if err != nil {
 		panic(err)
 	}

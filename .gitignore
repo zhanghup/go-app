@@ -2,3 +2,4 @@
 *.sum
 upload
 conf/
+boot/test_main/conf
