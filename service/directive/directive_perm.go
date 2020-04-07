@@ -12,7 +12,7 @@ type Perms map[string][]string
 
 func Perm() func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string) (res interface{}, err error) {
 	return func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string) (res interface{}, err error) {
-		md := MewMe(ctx)
+		md := MyInfo(ctx)
 		user := md.User()
 
 		// root 无限操作权限
@@ -23,10 +23,10 @@ func Perm() func(ctx context.Context, obj interface{}, next graphql.Resolver, en
 		if !md.Admin() {
 			data, ok := md.PermObjs()[entity]
 			if !ok {
-				return nil, errors.New("【无操作权限 1】")
+				return nil, errors.New("[1] 无操作权限")
 			}
 			if strings.Contains(data, perm) {
-				return nil, errors.New("【无操作权限 2】")
+				return nil, errors.New("[2] 无操作权限")
 			}
 		}
 

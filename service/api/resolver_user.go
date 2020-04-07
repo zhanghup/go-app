@@ -17,7 +17,7 @@ func (this *Resolver) UserLoader(ctx context.Context, id string) (*beans.User, e
 
 func (this queryResolver) Users(ctx context.Context, query lib.QUser) (*lib.Users, error) {
 	users := make([]beans.User, 0)
-	_, total, err := this.DB.SF(`
+	_, total, err := this.DBS.SF(`
 		select * from {{ table "user" }} u
 		where 1 = 1
 	`).Page2(query.Index, query.Size, query.Count, &users)

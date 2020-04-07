@@ -6,6 +6,7 @@ import (
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-app/initia"
+	"github.com/zhanghup/go-app/service/auth"
 	"github.com/zhanghup/go-app/service/file"
 	"github.com/zhanghup/go-tools/database/toolxorm"
 	"github.com/zhanghup/go-tools/toolgin"
@@ -18,6 +19,7 @@ func main() {
 	}
 	cfg.InitConfig(box)
 	e, err := toolxorm.NewXorm(cfg.DB)
+	e.ShowSQL(true)
 	if err != nil {
 		panic(err)
 	}
@@ -30,6 +32,7 @@ func main() {
 	// http router
 	err = toolgin.NewGin(cfg.Web, func(g *gin.Engine) error {
 		file.Gin(g.Group("/"), g.Group("/"), e)
+		auth.Gin(g.Group("/auth"), e)
 		return nil
 	})
 

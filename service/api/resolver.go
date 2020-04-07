@@ -6,28 +6,22 @@ import (
 	"context"
 	"github.com/99designs/gqlgen/handler"
 	"github.com/gin-gonic/gin"
-	"github.com/go-xorm/xorm"
-	"github.com/zhanghup/go-app/ctx"
 	"github.com/zhanghup/go-app/service/api/lib"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-app/service/loaders"
 	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-wxmp"
+	"github.com/zhanghup/go-tools/database/toolxorm"
 	"net/http"
+	"xorm.io/xorm"
 )
 
-func ggin() func(c *gin.Context) {
+func ggin(db *xorm.Engine) func(c *gin.Context) {
 	resolver := &Resolver{
-		DB:     ctx.DB().Engine(),
+		DB:     db,
+		DBS:    toolxorm.NewEngine(db),
 		Loader: loaders.DataLoaden,
-		my:     directive.MewMe,
 	}
-
-	if ctx.WxmpEnable() {
-		resolver.wxmp = wxmp.NewContext(ctx.Wxmp().Appid, ctx.Wxmp().AppSecret, ctx.Wxmp().Token)
-	}
-
 	c := lib.Config{
 		Resolvers: resolver,
 		Directives: lib.DirectiveRoot{
@@ -36,7 +30,7 @@ func ggin() func(c *gin.Context) {
 	}
 
 	hu := handler.GraphQL(lib.NewExecutableSchema(c))
-	hu = loaders.DataLoadenMiddleware(ctx.DB().Engine(), hu)
+	hu = loaders.DataLoadenMiddleware(db, hu)
 	hu = func(next http.HandlerFunc) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			r.Header.Set("Content-Type", "application/json")
@@ -50,19 +44,19 @@ func ggin() func(c *gin.Context) {
 	}
 }
 
-func Gin() {
-	ctx.Web().Engine().Group("/", directive.UserAuth()).POST("/api", ggin())
-	gs.Playground("/api/playground1", "/api")
-	ctx.Web().Engine().GET("/api/playground2", func(c *gin.Context) {
+func Gin(g gin.IRouter, db *xorm.Engine) {
+	g.POST("/api", ggin(db))
+	gs.Playground(g, "/api/playground1", "/api")
+	g.GET("/api/playground2", func(c *gin.Context) {
 		handler.Playground("标题", "/api").ServeHTTP(c.Writer, c.Request)
 	})
 }
 
 type Resolver struct {
 	DB     *xorm.Engine
+	DBS    *toolxorm.Engine
 	Loader func(ctx context.Context) loaders.Loader
 	my     func(ctx context.Context) directive.Me
-	wxmp   wxmp.IContext
 }
 
 func (r *Resolver) Mutation() lib.MutationResolver {
@@ -74,15 +68,11 @@ func (r *Resolver) Query() lib.QueryResolver {
 
 type mutationResolver struct{ *Resolver }
 
-
-
 func (this mutationResolver) World(ctx context.Context) (*string, error) {
 	return tools.Ptr().String("hello"), nil
 }
 
 type queryResolver struct{ *Resolver }
-
-
 
 func (this queryResolver) Hello(ctx context.Context) (*string, error) {
 	return tools.Ptr().String("world"), nil

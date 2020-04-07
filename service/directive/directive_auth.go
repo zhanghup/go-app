@@ -2,7 +2,7 @@ package directive
 
 import (
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-tools/database/toolxorm"
 	"github.com/zhanghup/go-tools/toolgin"
 	"strings"
 	"time"
@@ -12,37 +12,39 @@ import (
 )
 
 func WebAuth(db *xorm.Engine) gin.HandlerFunc {
+	dbs := toolxorm.NewEngine(db)
 	return func(c *gin.Context) {
-		toolgin.Do(c, func(c *gin.Context) (i interface{}, s string) {
+		toolgin.Do(c, func(c *gin.Context) (interface{}, string) {
 			tok, err := c.Cookie(GIN_TOKEN)
 			if err != nil {
-				return err.Error(), "未授权【1】"
+				return err.Error(), "[1] 未授权"
 			}
 			if len(tok) == 0 {
 				tok = c.GetHeader("Authorization")
 			}
 			if len(tok) == 0 {
-				return nil, "未授权【2】"
+				return nil, "[2] 未授权"
 			}
-			tok = tools.Crypto.DES(tok, "12345678").ECBDecrypt()
-			if len(tok) == 0 {
-				return nil, "未授权【3】"
+			token := beans.UserToken{}
+			ok, err := db.Table(token).Where("id = ?", tok).Get(&token)
+			if err != nil {
+				return err.Error(), "[3] 未授权"
 			}
-
-			ss := strings.Split(tok, "&")
-			if len(ss) != 2 {
-				return nil, "未授权【4】"
+			if !ok {
+				return nil, "[4] 未授权"
 			}
-			uid := ss[0]
-			expire := tools.Str.MustInt64(ss[1])
-			if expire == 0 {
-				return nil, "未授权【5】"
+			if token.Status == nil || *token.Status != 1 {
+				return nil, "[5] 未授权"
 			}
-
-			if time.Now().Unix() > expire {
-				return nil, "未授权【6】"
+			if time.Now().Unix() > *token.Updated+*token.Expire {
+				return nil, "[6] 未授权"
 			}
-
+			*token.Ops += 1
+			*token.Expire = 7200
+			_, err = db.Table(token).Where("id = ?", token.Id).Update(token)
+			if err != nil {
+				return err.Error(), "[7] 未授权"
+			}
 			// 读取权限列表
 			myPerms := Perms{}
 			{
@@ -50,14 +52,13 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 					Type string `json:"type"`
 					Oid  string `json:"oid"`
 				}, 0)
-				err = e.SF(`
-					select p.type,p.oid from {{ table "user" }} u 
-					join {{ table "role_user" }} ru on u.id = ru.uid
-					join {{ table "perm" }} p on p.role = ru.id
-				`).Find(&perms)
+				err = dbs.SF(`
+						select p.type,p.oid from user u 
+						join role_user ru on u.id = ru.uid
+						join perm p on p.role = ru.id
+					`).Find(&perms)
 				if err != nil {
-					c.Fail401("【8:未授权】", err)
-					return
+					return err.Error(), "[8] 未授权"
 				}
 				// 去重
 				fn := func(strs []string, str string) bool {
@@ -88,16 +89,14 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 					Object string `json:"object"`
 					Mask   string `json:"mask"`
 				}, 0)
-				err = e.SF(`
-			select p.object,p.mask from {{ table "user" }} u 
-			join {{ table "role_user" }} ru on u.id = ru.uid
-			join {{ table "perm_object" }} p on p.role = ru.id
-		`).Find(&permObjects)
+				err = dbs.SF(`
+						select p.object,p.mask from user u 
+						join {role_user ru on u.id = ru.uid
+						join perm_object p on p.role = ru.id
+					`).Find(&permObjects)
 				if err != nil {
-					c.Fail401("【9:未授权】", err)
-					return
+					return err.Error(), "[9] 未授权"
 				}
-
 				for _, p := range permObjects {
 					if o, ok := myPermObj[p.Object]; ok {
 						myPermObj[p.Object] = o + p.Mask
@@ -118,15 +117,14 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 					}
 					myPermObj[k] = str
 				}
+
 			}
 
 			u := beans.User{}
-			ok, err = e.Table(u).Where("id = ? and status = 1", *token.Uid).Get(&u)
+			ok, err = db.Table(u).Where("id = ? and status = 1", *token.Uid).Get(&u)
 			if err != nil {
-				c.Fail401("【10:未授权】", err)
-				return
+				return err.Error(), "[10] 未授权"
 			}
-
 			// 是否为管理员用户
 			admin := true
 			if u.Admin == nil || *u.Admin == 0 {
@@ -140,8 +138,7 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 			c.Set("admin", admin)
 			c.SetCookie(GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
 			c.Next()
-
+			return nil, ""
 		})
-
 	}
 }

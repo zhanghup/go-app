@@ -15,7 +15,7 @@ type Me struct {
 	gin *gin.Context
 }
 
-func MewMe(g context.Context) Me {
+func MyInfo(g context.Context) Me {
 	gg := g.Value(GIN_CONTEXT)
 	return Me{gg.(*gin.Context)}
 }

@@ -12,9 +12,6 @@ directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITI
   | FIELD_DEFINITION
 
 
-type Query {
-  hello: String
-}
 
 type Mutation {
   "用户登录"
