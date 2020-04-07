@@ -85,7 +85,7 @@ type User struct {
 	Type     *string `json:"type"` // 字典SYS0001 用户类型
 	Account  *string `json:"account" xorm:"unique"`
 	Password *string `json:"password"`
-	Slat     *string `json:"-" xorm:"slat"`
+	Salt     *string `json:"-" xorm:"salt"`
 	Name     *string `json:"name"`
 	Avatar   *string `json:"avatar"`
 	ICard    *string `json:"i_card"`

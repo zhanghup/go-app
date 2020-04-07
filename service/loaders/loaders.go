@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/go-xorm/xorm"
 	"github.com/zhanghup/go-tools"
 	"net/http"
 	"reflect"
 	"strings"
 	"sync"
 	"time"
+	"xorm.io/xorm"
 )
 
 const DATA_LOADEN = "go-app-dataloaden"
@@ -22,7 +22,7 @@ type Loader interface {
 
 type dataLoaden struct {
 	sync  sync.Mutex
-	store tools.IMap
+	store tools.ICache
 	db    *xorm.Session
 }
 
@@ -33,7 +33,7 @@ func DataLoadenMiddleware(db *xorm.Engine, next http.HandlerFunc) http.HandlerFu
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), DATA_LOADEN, &dataLoaden{
 			sync:  sync.Mutex{},
-			store: tools.NewCache(),
+			store: tools.CacheCreate(),
 			db:    db.Context(r.Context()),
 		})
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -50,11 +50,12 @@ func (this *dataLoaden) Object(obj interface{}) *CommonLoader {
 	}
 
 	objType := "Common-Object-" + ty.PkgPath() + "." + ty.Name()
-	o := this.store.Get(objType)
-	if o != nil {
-		return o.(*CommonLoader)
-	}
 	var lo *CommonLoader
+	ok := this.store.Get(objType, lo)
+	if ok {
+		return lo
+	}
+
 	defer this.store.Set(objType, lo)
 
 	lo = &CommonLoader{
@@ -105,12 +106,14 @@ func (this *dataLoaden) Slice(obj interface{}, key string, params ...map[string]
 		ty = ty.Elem()
 	}
 
-	objType := fmt.Sprintf("Common-Slice-%s.%s,key=%v&param=%v", ty.PkgPath(), ty.Name(), key, tools.Str().JSONString(param))
-	o := this.store.Get(objType)
-	if o != nil {
-		return o.(*CommonSliceLoader)
+	objType := fmt.Sprintf("Common-Slice-%s.%s,key=%v&param=%v", ty.PkgPath(), ty.Name(), key, tools.Str.JSONString(param))
+	var lo *CommonSliceLoader
+	ok := this.store.Get(objType, lo)
+	if ok {
+		return lo
 	}
-	this.store.Set(objType, &CommonSliceLoader{
+	defer this.store.Set(objType, lo)
+	lo = &CommonSliceLoader{
 		maxBatch: 128,
 		wait:     1 * time.Millisecond,
 		fetch: func(keys []string) (i interface{}, errors []error) {
@@ -155,8 +158,8 @@ func (this *dataLoaden) Slice(obj interface{}, key string, params ...map[string]
 			}
 			return rmap.Interface(), nil
 		},
-	})
-	return this.store.Get(objType).(*CommonSliceLoader)
+	}
+	return lo
 }
 func UpTitle(str string) string {
 	ss := ""

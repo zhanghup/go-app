@@ -4,7 +4,7 @@
 # for detailed .gqlgen.yml documentation.
 
 schema:
-  - "schema/**/*.graphql"
+  - schema/schema*.graphql
 exec:
   filename: lib/generated.go
   package: lib
@@ -15,4 +15,11 @@ resolver:
   filename: resolver.go
   type: Resolver
 omit_slice_element_pointers: true
-
+models:
+  Int:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int
+      - github.com/99designs/gqlgen/graphql.Int64
+  Int64:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int64

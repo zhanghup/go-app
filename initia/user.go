@@ -26,7 +26,7 @@ func InitUser(db *xorm.Engine) {
 		Type:     tools.Ptr.String("0"), // 超级管理员
 		Account:  tools.Ptr.String("root"),
 		Password: &password,
-		Slat:     &slat,
+		Salt:     &slat,
 	}
 	_, err = db.Table(user).Insert(user)
 	if err != nil {

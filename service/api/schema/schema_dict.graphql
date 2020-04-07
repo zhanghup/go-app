@@ -1,136 +1,136 @@
-#extend type Query{
-#    "字典列表（分页）"
-#    dicts(query:QDict!):Dicts @perm(entity: "dict",perm: "R")
-#    "字典单个对象"
-#    dict(id: String!):Dict @perm(entity: "dict",perm: "R")
-#}
-#
-#extend type Mutation {
-#    "字典新建"
-#    dict_create(input:NewDict!):Dict  @perm(entity: "dict",perm: "C")
-#    "字典更新"
-#    dict_update(id: String!,input:UpdDict!):Boolean!  @perm(entity: "dict",perm: "U")
-#    "字典批量删除"
-#    dict_removes(ids: [String!]):Boolean! @perm(entity: "dict",perm: "D")
-#
-#    "字典项新建"
-#    dict_item_create(input:NewDictItem!):DictItem  @perm(entity: "dict",perm: "C")
-#    "字典项更新"
-#    dict_item_update(id: String!,input:UpdDictItem!):Boolean!  @perm(entity: "dict",perm: "U")
-#    "字典项批量删除"
-#    dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict",perm: "D")
-#}
-#
-#input QDict{
-#    index: Int
-#    size: Int
-#    count: Boolean
-#}
-#
-#type Dicts{
-#    total: Int
-#    data:[Dict!]
-#}
-#
-#type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
-#    id: String
-#
-#    "字典编码"
-#    code: String
-#    "字典名称"
-#    name: String
-#    "备注"
-#    remark: String
-#
-#    "创建时间"
-#    created: Int
-#    "更新时间"
-#    updated: Int
-#    "排序"
-#    weight: Int
-#    "状态[dict:STA0001]"
-#    status: Int
-#
-#    "选项列表"
-#    values: [DictItem!]
-#
-#}
-#
-#input NewDict {
-#    "字典编码"
-#    code: String
-#    "字典名称"
-#    name: String
-#    "备注"
-#    remark: String
-#
-#    "排序"
-#    weight: Int
-#    "状态[dict:STA0001]"
-#    status: Int
-#}
-#
-#input UpdDict {
-#    "字典名称"
-#    name: String
-#    "备注"
-#    remark: String
-#
-#    "排序"
-#    weight: Int
-#    "状态[dict:STA0001]"
-#    status: Int
-#}
-#
-#type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
-#    id: String
-#
-#    "字典id"
-#    code: String
-#    "名称"
-#    name: String
-#    "值"
-#    value: String
-#    "扩展"
-#    extension: String
-#
-#    "创建时间"
-#    created: Int
-#    "更新时间"
-#    updated: Int
-#    "排序"
-#    weight: Int
-#    "状态[dict:STA0001]"
-#    status: Int
-#
-#}
-#
-#input NewDictItem{
-#    "字典id"
-#    code: String
-#    "名称"
-#    name: String
-#    "值"
-#    value: String
-#    "扩展"
-#    extension: String
-#
-#    "排序"
-#    weight: Int
-#    "状态[dict:STA0001]"
-#    status: Int
-#}
-#
-#input UpdDictItem{
-#    "名称"
-#    name: String
-#    "值"
-#    value: String
-#    "扩展"
-#    extension: String
-#
-#    "排序"
-#    weight: Int
-#    "状态[dict:STA0001]"
-#    status: Int
-#}
+extend type Query{
+    "字典列表（分页）"
+    dicts(query:QDict!):Dicts @perm(entity: "dict",perm: "R")
+    "字典单个对象"
+    dict(id: String!):Dict @perm(entity: "dict",perm: "R")
+}
+
+extend type Mutation {
+    "字典新建"
+    dict_create(input:NewDict!):Dict  @perm(entity: "dict",perm: "C")
+    "字典更新"
+    dict_update(id: String!,input:UpdDict!):Boolean!  @perm(entity: "dict",perm: "U")
+    "字典批量删除"
+    dict_removes(ids: [String!]):Boolean! @perm(entity: "dict",perm: "D")
+
+    "字典项新建"
+    dict_item_create(input:NewDictItem!):DictItem  @perm(entity: "dict",perm: "C")
+    "字典项更新"
+    dict_item_update(id: String!,input:UpdDictItem!):Boolean!  @perm(entity: "dict",perm: "U")
+    "字典项批量删除"
+    dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict",perm: "D")
+}
+
+input QDict{
+    index: Int
+    size: Int
+    count: Boolean
+}
+
+type Dicts{
+    total: Int
+    data:[Dict!]
+}
+
+type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
+    id: String
+
+    "字典编码"
+    code: String
+    "字典名称"
+    name: String
+    "备注"
+    remark: String
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
+
+    "选项列表"
+    values: [DictItem!]
+
+}
+
+input NewDict {
+    "字典编码"
+    code: String
+    "字典名称"
+    name: String
+    "备注"
+    remark: String
+
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
+}
+
+input UpdDict {
+    "字典名称"
+    name: String
+    "备注"
+    remark: String
+
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
+}
+
+type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
+    id: String
+
+    "字典id"
+    code: String
+    "名称"
+    name: String
+    "值"
+    value: String
+    "扩展"
+    extension: String
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
+
+}
+
+input NewDictItem{
+    "字典id"
+    code: String
+    "名称"
+    name: String
+    "值"
+    value: String
+    "扩展"
+    extension: String
+
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
+}
+
+input UpdDictItem{
+    "名称"
+    name: String
+    "值"
+    value: String
+    "扩展"
+    extension: String
+
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
+}
