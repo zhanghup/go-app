@@ -18,6 +18,16 @@ type Bean struct {
 	Status  *int    `json:"status" xorm:"status  Int(1)"`
 }
 
+// 授权
+type UserToken struct {
+	Bean   `xorm:"extends"`
+	Uid    *string `json:"uid"`
+	Ops    *int64  `json:"ops"`    // 接口调用次数
+	Type   *string `json:"type"`   // 授权类型 [pc]
+	Expire *int64  `json:"expire"` // 到期时间
+	Agent  *string `json:"agent"`  // User-Agent
+}
+
 // 数据字典
 type Dict struct {
 	Bean `xorm:"extends"`
@@ -125,5 +135,5 @@ type Cron struct {
 }
 
 func sys_tables() []interface{} {
-	return []interface{}{new(Dict), new(DictItem), new(Menu), new(Role), new(RoleUser), new(Perm), new(PermObject), new(User), new(Resource), new(Cron)}
+	return []interface{}{new(UserToken), new(Dict), new(DictItem), new(Menu), new(Role), new(RoleUser), new(Perm), new(PermObject), new(User), new(Resource), new(Cron)}
 }

@@ -8,8 +8,8 @@ import (
 )
 
 type config struct {
-	Database toolxorm.Config
-	Web      toolgin.Config
+	Database toolxorm.Config `yaml:"databse"`
+	Web      toolgin.Config `yaml:"web"`
 }
 
 var DB toolxorm.Config
