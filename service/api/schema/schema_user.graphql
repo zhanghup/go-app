@@ -1,115 +1,115 @@
-extend type Query{
-    "用户列表（分页）"
-    users(query:QUser!):Users  @perm(entity: "user",perm: "R")
-    "用户获取单个"
-    user(id: String!):User  @perm(entity: "user",perm: "R")
-}
-
-extend type Mutation {
-    "用户新建"
-    user_create(input:NewUser!):User  @perm(entity: "user",perm: "C")
-    "用户更新"
-    user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U")
-    "用户批量删除"
-    user_removes(ids: [String!]):Boolean! @perm(entity: "user",perm: "D")
-}
-
-input QUser{
-    index: Int
-    size: Int
-    count: Boolean
-}
-
-type Users{
-    total: Int
-    data:[User!]
-}
-
-type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
-    id: String
-
-    "用户类型"
-    type: String
-    "账户"
-    account: String
-    "密码"
-    password: String
-    "用户名称"
-    name: String
-    "头像"
-    avatar: String
-    "身份证"
-    i_card: String
-    "出生年月"
-    birth: Int
-    "性别[dict:STA0002]"
-    sex: Int
-    "移动电话"
-    mobile: String
-    "是否为管理员[0: 否,1: 是]"
-    admin: Int
-    "创建时间"
-    created: Int
-    "更新时间"
-    updated: Int
-    "排序"
-    weight: Int
-    "状态[dict:STA0001]"
-    status: Int
-
-}
-
-input NewUser {
-    "用户类型"
-    type: String!
-    "账户"
-    account: String!
-    "密码"
-    password: String!
-    "用户名称"
-    name: String!
-    "头像"
-    avatar: String
-    "身份证"
-    i_card: String
-    "出生年月"
-    birth: Int
-    "性别[dict:STA0002]"
-    sex: Int
-    "移动电话"
-    mobile: String
-    "是否为管理员[0: 否,1: 是]"
-    admin: Int
-    "排序"
-    weight: Int
-    "状态[dict:STA0001]"
-    status: Int
-}
-
-input UpdUser {
-    "用户类型"
-    type: String!
-    "账户"
-    account: String!
-    "密码"
-    password: String!
-    "用户名称"
-    name: String!
-    "头像"
-    avatar: String
-    "身份证"
-    i_card: String
-    "出生年月"
-    birth: Int
-    "性别[dict:STA0002]"
-    sex: Int
-    "移动电话"
-    mobile: String
-    "是否为管理员[0: 否,1: 是]"
-    admin: Int
-    "排序"
-    weight: Int
-    "状态[dict:STA0001]"
-    status: Int
-}
-
+#extend type Query{
+#    "用户列表（分页）"
+#    users(query:QUser!):Users  @perm(entity: "user",perm: "R")
+#    "用户获取单个"
+#    user(id: String!):User  @perm(entity: "user",perm: "R")
+#}
+#
+#extend type Mutation {
+#    "用户新建"
+#    user_create(input:NewUser!):User  @perm(entity: "user",perm: "C")
+#    "用户更新"
+#    user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U")
+#    "用户批量删除"
+#    user_removes(ids: [String!]):Boolean! @perm(entity: "user",perm: "D")
+#}
+#
+#input QUser{
+#    index: Int
+#    size: Int
+#    count: Boolean
+#}
+#
+#type Users{
+#    total: Int
+#    data:[User!]
+#}
+#
+#type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
+#    id: String
+#
+#    "用户类型"
+#    type: String
+#    "账户"
+#    account: String
+#    "密码"
+#    password: String
+#    "用户名称"
+#    name: String
+#    "头像"
+#    avatar: String
+#    "身份证"
+#    i_card: String
+#    "出生年月"
+#    birth: Int
+#    "性别[dict:STA0002]"
+#    sex: Int
+#    "移动电话"
+#    mobile: String
+#    "是否为管理员[0: 否,1: 是]"
+#    admin: Int
+#    "创建时间"
+#    created: Int
+#    "更新时间"
+#    updated: Int
+#    "排序"
+#    weight: Int
+#    "状态[dict:STA0001]"
+#    status: Int
+#
+#}
+#
+#input NewUser {
+#    "用户类型"
+#    type: String!
+#    "账户"
+#    account: String!
+#    "密码"
+#    password: String!
+#    "用户名称"
+#    name: String!
+#    "头像"
+#    avatar: String
+#    "身份证"
+#    i_card: String
+#    "出生年月"
+#    birth: Int
+#    "性别[dict:STA0002]"
+#    sex: Int
+#    "移动电话"
+#    mobile: String
+#    "是否为管理员[0: 否,1: 是]"
+#    admin: Int
+#    "排序"
+#    weight: Int
+#    "状态[dict:STA0001]"
+#    status: Int
+#}
+#
+#input UpdUser {
+#    "用户类型"
+#    type: String!
+#    "账户"
+#    account: String!
+#    "密码"
+#    password: String!
+#    "用户名称"
+#    name: String!
+#    "头像"
+#    avatar: String
+#    "身份证"
+#    i_card: String
+#    "出生年月"
+#    birth: Int
+#    "性别[dict:STA0002]"
+#    sex: Int
+#    "移动电话"
+#    mobile: String
+#    "是否为管理员[0: 否,1: 是]"
+#    admin: Int
+#    "排序"
+#    weight: Int
+#    "状态[dict:STA0001]"
+#    status: Int
+#}
+#

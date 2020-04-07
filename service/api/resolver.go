@@ -10,7 +10,6 @@ import (
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-app/service/loaders"
-	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/toolxorm"
 	"net/http"
 	"xorm.io/xorm"
@@ -69,11 +68,11 @@ func (r *Resolver) Query() lib.QueryResolver {
 type mutationResolver struct{ *Resolver }
 
 func (this mutationResolver) World(ctx context.Context) (*string, error) {
-	return tools.Ptr().String("hello"), nil
+	panic("implement me")
 }
 
 type queryResolver struct{ *Resolver }
 
 func (this queryResolver) Hello(ctx context.Context) (*string, error) {
-	return tools.Ptr().String("world"), nil
+	panic("implement me")
 }

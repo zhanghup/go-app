@@ -19,7 +19,6 @@ func main() {
 	}
 	cfg.InitConfig(box)
 	e, err := toolxorm.NewXorm(cfg.DB)
-	e.ShowSQL(true)
 	if err != nil {
 		panic(err)
 	}

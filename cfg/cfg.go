@@ -8,7 +8,7 @@ import (
 )
 
 type config struct {
-	Database toolxorm.Config `yaml:"databse"`
+	Database toolxorm.Config `yaml:"database"`
 	Web      toolgin.Config `yaml:"web"`
 }
 
