@@ -112,3 +112,13 @@ func (this mutationResolver) Token(ctx context.Context, uid, ty string) (string,
 
 	return *token.Id, nil
 }
+
+type queryResolver struct{ *Resolver }
+
+func (q queryResolver) Hello(ctx context.Context) (*string, error) {
+	panic("implement me")
+}
+
+func (this *Resolver) Query() QueryResolver{
+	return &queryResolver{this}
+}

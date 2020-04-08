@@ -8,7 +8,6 @@ import (
 	"github.com/zhanghup/go-app/initia"
 	"github.com/zhanghup/go-app/service/api"
 	"github.com/zhanghup/go-app/service/auth"
-	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/file"
 	"github.com/zhanghup/go-tools/database/toolxorm"
 	"github.com/zhanghup/go-tools/toolgin"
@@ -34,7 +33,7 @@ func main() {
 	err = toolgin.NewGin(cfg.Web, func(g *gin.Engine) error {
 		file.Gin(g.Group("/"), g.Group("/"), e)
 		auth.Gin(g.Group("/auth"), e)
-		api.Gin(g.Group("/api", directive.WebAuth(e)), e)
+		api.Gin(g.Group("/api"), e)
 		return nil
 	})
 

@@ -34,6 +34,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Mutation() MutationResolver
+	Query() QueryResolver
 }
 
 type DirectiveRoot struct {
@@ -46,11 +47,15 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Hello func(childComplexity int) int
 	}
 }
 
 type MutationResolver interface {
 	Login(ctx context.Context, account string, password string) (string, error)
+}
+type QueryResolver interface {
+	Hello(ctx context.Context) (*string, error)
 }
 
 type executableSchema struct {
@@ -79,6 +84,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Login(childComplexity, args["account"].(string), args["password"].(string)), true
+
+	case "Query.hello":
+		if e.complexity.Query.Hello == nil {
+			break
+		}
+
+		return e.complexity.Query.Hello(childComplexity), true
 
 	}
 	return 0, false
@@ -157,7 +169,9 @@ directive @goModel(model: String, models: [String!]) on OBJECT
 directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION
   | FIELD_DEFINITION
 
-
+type Query {
+  hello: String
+}
 
 type Mutation {
   "用户登录"
@@ -304,6 +318,37 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Hello(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1484,6 +1529,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "hello":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_hello(ctx, field)
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":

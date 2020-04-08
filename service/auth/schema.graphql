@@ -11,7 +11,9 @@ directive @goModel(model: String, models: [String!]) on OBJECT
 directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION
   | FIELD_DEFINITION
 
-
+type Query {
+  hello: String
+}
 
 type Mutation {
   "用户登录"
