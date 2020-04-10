@@ -38,7 +38,7 @@ func (this DictResolver) Values(ctx context.Context, obj *beans.Dict) ([]beans.D
 func (this queryResolver) Dicts(ctx context.Context, query lib.QDict) (*lib.Dicts, error) {
 	dicts := make([]beans.Dict, 0)
 	total, err := this.DBS.SF(`
-		select * from {{ table "dict" }} u
+		select * from dict u
 		where 1 = 1
 		order by u.code
 	`).Page2(query.Index, query.Size, query.Count, &dicts)

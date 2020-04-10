@@ -45,7 +45,7 @@ func ggin(db *xorm.Engine) func(c *gin.Context) {
 
 func Gin(g gin.IRouter, db *xorm.Engine) {
 	g.Group("/", directive.WebAuth(db)).POST("/api", ggin(db))
-	gs.Playground(g, "/api/playground1", "/api/api")
+	gs.Playground(g, "/api/playground1", "/api")
 	g.GET("/api/playground2", func(c *gin.Context) {
 		handler.Playground("标题", "/api/api").ServeHTTP(c.Writer, c.Request)
 	})

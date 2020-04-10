@@ -14,7 +14,7 @@ import (
 func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 	dbs := toolxorm.NewEngine(db)
 	return func(c *gin.Context) {
-		toolgin.Do(c, func(c *gin.Context) (interface{}, string) {
+		toolgin.DoCustom(c, func(c *gin.Context) (interface{}, string) {
 			tok, err := c.Cookie(GIN_TOKEN)
 			if err != nil {
 				return err.Error(), "[1] 未授权"

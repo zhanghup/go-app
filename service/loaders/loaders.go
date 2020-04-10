@@ -23,7 +23,7 @@ type Loader interface {
 type dataLoaden struct {
 	sync  sync.Mutex
 	store tools.ICache
-	db    *xorm.Session
+	db    *xorm.Engine
 }
 
 func DataLoaden(ctx context.Context) Loader {
@@ -34,7 +34,7 @@ func DataLoadenMiddleware(db *xorm.Engine, next http.HandlerFunc) http.HandlerFu
 		ctx := context.WithValue(r.Context(), DATA_LOADEN, &dataLoaden{
 			sync:  sync.Mutex{},
 			store: tools.CacheCreate(),
-			db:    db.Context(r.Context()),
+			db:    db,
 		})
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

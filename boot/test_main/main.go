@@ -32,8 +32,8 @@ func main() {
 	// http router
 	err = toolgin.NewGin(cfg.Web, func(g *gin.Engine) error {
 		file.Gin(g.Group("/"), g.Group("/"), e)
-		auth.Gin(g.Group("/auth"), e)
-		api.Gin(g.Group("/api"), e)
+		auth.Gin(g.Group("/"), e)
+		api.Gin(g.Group("/"), e)
 		return nil
 	})
 

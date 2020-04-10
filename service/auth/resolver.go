@@ -40,9 +40,9 @@ func ggin(db *xorm.Engine) func(c *gin.Context) {
 
 func Gin(g gin.IRouter, db *xorm.Engine) {
 	g.POST("/auth", ggin(db))
-	gs.Playground(g, "/auth/playground1", "/auth/auth")
+	gs.Playground(g, "/auth/playground1", "/auth")
 	g.GET("/auth/playground2", func(c *gin.Context) {
-		handler.Playground("标题", "/auth/auth").ServeHTTP(c.Writer, c.Request)
+		handler.Playground("标题", "/auth").ServeHTTP(c.Writer, c.Request)
 	})
 }
 
