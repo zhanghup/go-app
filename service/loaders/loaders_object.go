@@ -64,7 +64,6 @@ func (l *ObjectLoader) LoadThunk(key string) func() (interface{}, error) {
 	if l.batch == nil {
 		l.batch = &objectLoaderBatch{done: make(chan struct{})}
 	} else if l.batch.closing {
-		fmt.Println("----------------------------------")
 		l.batch.keys = nil
 		l.batch.data = nil
 		l.batch.error = nil
@@ -101,7 +100,7 @@ func (l *ObjectLoader) unsafeSet(key string, value interface{}) {
 }
 
 func (b *objectLoaderBatch) keyIndex(l *ObjectLoader, key string) int {
-	fmt.Println(b.keys,"keyskeyskeyskeyskeyskeyskeyskeyskeys")
+	fmt.Println(b.keys, "keyskeyskeyskeyskeyskeyskeyskeyskeys")
 	for i, existingKey := range b.keys {
 		if key == existingKey {
 			return i

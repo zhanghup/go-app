@@ -44,7 +44,7 @@ func TestObj(t *testing.T) {
 				}
 			}(k)
 		}
-		time.Sleep(time.Millisecond * 10)
+		time.Sleep(time.Millisecond * 1000)
 	}
 
 	time.Sleep(time.Second * 3)

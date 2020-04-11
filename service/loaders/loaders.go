@@ -32,7 +32,6 @@ func (this *dataLoaden) Object(table interface{}, sql string, param map[string]i
 	name := reflect.TypeOf(tools.Rft.RealValue(table)).Name()
 	key := fmt.Sprintf("table: %s/%s, sql: %s, param: %s, field: %s", path, name, sql, tools.Str.JSONString(query), keyField)
 	key = tools.Crypto.MD5([]byte(key))
-
 	this.sync.Lock()
 	defer this.sync.Unlock()
 	objLoader := new(ObjectLoader)
