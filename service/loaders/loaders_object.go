@@ -1,12 +1,12 @@
 package loaders
 
 import (
-	"fmt"
-	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-tools/database/toolxorm"
 	"reflect"
 	"sync"
 	"time"
+
+	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-tools/database/toolxorm"
 )
 
 type ObjectLoader struct {
@@ -66,7 +66,6 @@ func (this *ObjectLoader) fetch(keys []string) (map[string]interface{}, error) {
 			return true
 		})
 	}
-	fmt.Println(result)
 	return result, nil
 }
 
@@ -112,7 +111,6 @@ func (l *ObjectLoader) LoadThunk(key string) func() (interface{}, error) {
 			l.sync.Unlock()
 		}
 
-		//fmt.Println(batch.data)
 		return batch.data[key], batch.error
 	}
 }

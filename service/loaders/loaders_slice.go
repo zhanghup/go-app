@@ -1,12 +1,12 @@
 package loaders
 
 import (
-	"fmt"
-	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-tools/database/toolxorm"
 	"reflect"
 	"sync"
 	"time"
+
+	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-tools/database/toolxorm"
 )
 
 type SliceLoader struct {
@@ -38,9 +38,9 @@ func (this *SliceLoader) fetch(keys []string) (map[string]interface{}, error) {
 	ty := reflect.TypeOf(this.table)
 	var sliceType reflect.Type
 	if ty.Kind() == reflect.Ptr {
-		sliceType = reflect.SliceOf(ty)
+		sliceType = reflect.SliceOf(ty.Elem())
 	} else if ty.Kind() == reflect.Struct {
-		sliceType = reflect.SliceOf(reflect.New(ty).Type())
+		sliceType = reflect.SliceOf(ty)
 	} else {
 		panic("输入必须为*struct或者struct")
 	}
@@ -67,11 +67,11 @@ func (this *SliceLoader) fetch(keys []string) (map[string]interface{}, error) {
 					}
 				} else if v.Kind() == reflect.String {
 					if ls, ok := result[v.String()]; ok {
-						reflect.Append(reflect.ValueOf(ls), vv)
-						result[v.String()] = reflect.ValueOf(ls).Interface()
+						lss := reflect.Append(reflect.ValueOf(ls), vv)
+						result[v.String()] = lss.Interface()
 					} else {
 						ls := reflect.New(sliceType).Elem()
-						reflect.Append(ls, vv)
+						ls = reflect.Append(ls, vv)
 						result[v.String()] = ls.Interface()
 					}
 				}
@@ -80,7 +80,6 @@ func (this *SliceLoader) fetch(keys []string) (map[string]interface{}, error) {
 			return true
 		})
 	}
-	fmt.Println(result)
 	return result, nil
 }
 
@@ -126,7 +125,6 @@ func (l *SliceLoader) LoadThunk(key string) func() (interface{}, error) {
 			l.sync.Unlock()
 		}
 
-		//fmt.Println(batch.data)
 		return batch.data[key], batch.error
 	}
 }

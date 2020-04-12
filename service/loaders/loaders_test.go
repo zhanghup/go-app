@@ -1,10 +1,13 @@
 package loaders
 
 import (
-	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-tools/database/toolxorm"
+	"fmt"
 	"testing"
 	"time"
+
+	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-tools/database/toolxorm"
 )
 
 func TestObj(t *testing.T) {
@@ -35,11 +38,12 @@ func TestObj(t *testing.T) {
 			}(k)
 		}
 
-		ids := []string{"5e8c9a361fa8d53580284d09", "5e8c9a361fa8d535804aafe1", "5e8c9a371fa8d535801f0cfd", "5e8c9a371fa8d5358040db79", "5e8c9a371fa8d5358083d181", "5e8c9a381fa8d5358037929d"}
+		ids := []string{"5dcd5f3a3a391110a5002080", "5df0f6a33a3911288ebc244f", "5dcd5f3a3a391110a500207d", "5dcd5f3a3a391110a5002079", "5df0f6a33a3911288ebc2449", "5e8c9a371fa8d535801f0cfd"}
 		for _, k := range ids {
 			go func(i string) {
 				dictItem := make([]beans.DictItem, 0)
-				err := load.Slice(new(beans.DictItem), "select * from dict_item where code in :keys", nil, "Code").Load(i, &dictItem)
+				err := load.Slice(new(beans.DictItem), "select di.* from dict_item di where di.code in :keys", nil, "Code").Load(i, &dictItem)
+				fmt.Println(tools.Str.JSONString(dictItem), i)
 				if err != nil {
 					panic(err)
 				}
