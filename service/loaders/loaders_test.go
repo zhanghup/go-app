@@ -28,6 +28,7 @@ func TestObj(t *testing.T) {
 			go func(i string) {
 				dict := new(beans.Dict)
 				err := load.Object(dict, "select * from dict where code in :keys", nil, "Code").Load(i, dict)
+				//fmt.Println(tools.Str.JSONString(dict, true), i)
 				if err != nil {
 					panic(err)
 				}
@@ -37,14 +38,14 @@ func TestObj(t *testing.T) {
 		ids := []string{"5e8c9a361fa8d53580284d09", "5e8c9a361fa8d535804aafe1", "5e8c9a371fa8d535801f0cfd", "5e8c9a371fa8d5358040db79", "5e8c9a371fa8d5358083d181", "5e8c9a381fa8d5358037929d"}
 		for _, k := range ids {
 			go func(i string) {
-				dictItem := new(beans.DictItem)
-				err := load.Object(dictItem, "select * from dict_item where code in :keys", nil, "Code").Load(i, dictItem)
+				dictItem := make([]beans.DictItem, 0)
+				err := load.Slice(new(beans.DictItem), "select * from dict_item where code in :keys", nil, "Code").Load(i, &dictItem)
 				if err != nil {
 					panic(err)
 				}
 			}(k)
 		}
-		time.Sleep(time.Millisecond * 1000)
+		time.Sleep(time.Millisecond * 10)
 	}
 
 	time.Sleep(time.Second * 3)

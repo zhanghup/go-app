@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type ObjectLoader struct {
+type SliceLoader struct {
 	sql      string
 	param    map[string]interface{}
 	db       *toolxorm.Engine
@@ -17,11 +17,11 @@ type ObjectLoader struct {
 	table    interface{}
 
 	cache map[string]interface{}
-	batch *objectLoaderBatch
+	batch *sliceLoaderBatch
 	sync  *sync.RWMutex
 }
 
-type objectLoaderBatch struct {
+type sliceLoaderBatch struct {
 	keys    []string
 	data    map[string]interface{}
 	error   error
@@ -29,7 +29,7 @@ type objectLoaderBatch struct {
 	done    chan struct{}
 }
 
-func (this *ObjectLoader) fetch(keys []string) (map[string]interface{}, error) {
+func (this *SliceLoader) fetch(keys []string) (map[string]interface{}, error) {
 	query := map[string]interface{}{}
 	for k, v := range this.param {
 		query[k] = v
@@ -57,9 +57,23 @@ func (this *ObjectLoader) fetch(keys []string) (map[string]interface{}, error) {
 		tools.Rft.DeepGet(vv.Interface(), func(t reflect.Type, v reflect.Value, tf reflect.StructField) bool {
 			if tf.Name == this.keyField {
 				if v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.String && v.Pointer() != 0 {
-					result[v.Elem().String()] = v.Interface()
+					if ls, ok := result[v.Elem().String()]; ok {
+						reflect.Append(reflect.ValueOf(ls), vv)
+						result[v.Elem().String()] = reflect.ValueOf(ls).Interface()
+					} else {
+						ls := reflect.New(sliceType).Elem()
+						reflect.Append(ls, vv)
+						result[v.Elem().String()] = ls.Interface()
+					}
 				} else if v.Kind() == reflect.String {
-					result[v.String()] = vv.Interface()
+					if ls, ok := result[v.String()]; ok {
+						reflect.Append(reflect.ValueOf(ls), vv)
+						result[v.String()] = reflect.ValueOf(ls).Interface()
+					} else {
+						ls := reflect.New(sliceType).Elem()
+						reflect.Append(ls, vv)
+						result[v.String()] = ls.Interface()
+					}
 				}
 				return false
 			}
@@ -70,7 +84,7 @@ func (this *ObjectLoader) fetch(keys []string) (map[string]interface{}, error) {
 	return result, nil
 }
 
-func (l *ObjectLoader) Load(key string, result interface{}) error {
+func (l *SliceLoader) Load(key string, result interface{}) error {
 	i, err := l.LoadThunk(key)()
 	if err != nil {
 		return err
@@ -78,11 +92,11 @@ func (l *ObjectLoader) Load(key string, result interface{}) error {
 	if i == nil {
 		return nil
 	}
-	reflect.ValueOf(result).Elem().Set(reflect.ValueOf(i).Elem())
+	reflect.ValueOf(result).Elem().Set(reflect.ValueOf(i))
 	return nil
 }
 
-func (l *ObjectLoader) LoadThunk(key string) func() (interface{}, error) {
+func (l *SliceLoader) LoadThunk(key string) func() (interface{}, error) {
 	l.sync.Lock()
 	if it, ok := l.cache[key]; ok {
 		l.sync.Unlock()
@@ -91,7 +105,7 @@ func (l *ObjectLoader) LoadThunk(key string) func() (interface{}, error) {
 		}
 	}
 	if l.batch == nil {
-		l.batch = &objectLoaderBatch{done: make(chan struct{})}
+		l.batch = &sliceLoaderBatch{done: make(chan struct{})}
 	} else if l.batch.closing {
 		l.batch.keys = nil
 		l.batch.data = nil
@@ -117,14 +131,14 @@ func (l *ObjectLoader) LoadThunk(key string) func() (interface{}, error) {
 	}
 }
 
-func (l *ObjectLoader) unsafeSet(key string, value interface{}) {
+func (l *SliceLoader) unsafeSet(key string, value interface{}) {
 	if l.cache == nil {
 		l.cache = map[string]interface{}{}
 	}
 	l.cache[key] = value
 }
 
-func (b *objectLoaderBatch) keyIndex(l *ObjectLoader, key string) {
+func (b *sliceLoaderBatch) keyIndex(l *SliceLoader, key string) {
 	for _, existingKey := range b.keys {
 		if key == existingKey {
 			return
@@ -140,7 +154,7 @@ func (b *objectLoaderBatch) keyIndex(l *ObjectLoader, key string) {
 	return
 }
 
-func (b *objectLoaderBatch) startTimer(l *ObjectLoader) {
+func (b *sliceLoaderBatch) startTimer(l *SliceLoader) {
 	time.Sleep(time.Millisecond * 5)
 	l.sync.Lock()
 
@@ -153,7 +167,7 @@ func (b *objectLoaderBatch) startTimer(l *ObjectLoader) {
 	b.end(l)
 }
 
-func (b *objectLoaderBatch) end(l *ObjectLoader) {
+func (b *sliceLoaderBatch) end(l *SliceLoader) {
 	b.data, b.error = l.fetch(b.keys)
 	close(b.done)
 	b.closing = true
