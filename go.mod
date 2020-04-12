@@ -11,6 +11,6 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a
 	github.com/vektah/gqlparser v1.3.1
 	github.com/vektah/gqlparser/v2 v2.0.1
-	github.com/zhanghup/go-tools v1.1.16
+	github.com/zhanghup/go-tools v1.1.17
 	xorm.io/xorm v1.0.1
 )
