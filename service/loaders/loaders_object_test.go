@@ -21,7 +21,7 @@ func TestObj(t *testing.T) {
 	}
 	load := NewDataLoaden(e)
 
-	for j := 0; j < 10; j++ {
+	for j := 0; j < 2; j++ {
 		keys := []string{"SYS0002", "SYS0001", "SYS0003", "STA0001", "SYS0004", "STA0002"}
 
 		for _, k := range keys {

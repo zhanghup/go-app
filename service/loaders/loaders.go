@@ -38,8 +38,9 @@ func (this *dataLoaden) Object(table interface{}, sql string, param map[string]i
 	if this.store.Get(key, objLoader) {
 		return objLoader
 	}
+	fmt.Println("create new ObjectLoader")
 	objLoader = &ObjectLoader{
-		sync:     &sync.Mutex{},
+		sync:     &sync.RWMutex{},
 		db:       toolxorm.NewEngine(this.db),
 		keyField: keyField,
 		sql:      sql,

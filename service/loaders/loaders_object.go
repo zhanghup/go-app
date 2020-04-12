@@ -17,7 +17,7 @@ type ObjectLoader struct {
 
 	cache map[string]interface{}
 	batch *objectLoaderBatch
-	sync  sync.Locker
+	sync  *sync.RWMutex
 }
 
 type objectLoaderBatch struct {
@@ -29,13 +29,11 @@ type objectLoaderBatch struct {
 }
 
 func (this *ObjectLoader) fetch(keys []string) ([]interface{}, error) {
-	this.sync.Lock()
 	query := map[string]interface{}{}
 	for k, v := range this.param {
 		query[k] = v
 	}
 	query["keys"] = keys
-	this.sync.Unlock()
 	this.db.SF(this.sql, query)
 	fmt.Println("------------------------------=================", keys)
 	return nil, nil
@@ -55,6 +53,7 @@ func (l *ObjectLoader) Load(key string, result interface{}) error {
 
 func (l *ObjectLoader) LoadThunk(key string) func() (interface{}, error) {
 	l.sync.Lock()
+	time.Sleep(time.Second * 1)
 	if it, ok := l.cache[key]; ok {
 		l.sync.Unlock()
 		return func() (interface{}, error) {
@@ -62,6 +61,7 @@ func (l *ObjectLoader) LoadThunk(key string) func() (interface{}, error) {
 		}
 	}
 	if l.batch == nil {
+		fmt.Println("batch is ", l.batch)
 		l.batch = &objectLoaderBatch{done: make(chan struct{})}
 	} else if l.batch.closing {
 		l.batch.keys = nil
@@ -85,6 +85,7 @@ func (l *ObjectLoader) LoadThunk(key string) func() (interface{}, error) {
 		if batch.error == nil {
 			l.sync.Lock()
 			l.unsafeSet(key, data)
+			fmt.Println("set cache is", l.cache)
 			l.sync.Unlock()
 		}
 
@@ -100,7 +101,6 @@ func (l *ObjectLoader) unsafeSet(key string, value interface{}) {
 }
 
 func (b *objectLoaderBatch) keyIndex(l *ObjectLoader, key string) int {
-	fmt.Println(b.keys, "keyskeyskeyskeyskeyskeyskeyskeyskeys")
 	for i, existingKey := range b.keys {
 		if key == existingKey {
 			return i
