@@ -53,7 +53,6 @@ func (l *ObjectLoader) Load(key string, result interface{}) error {
 
 func (l *ObjectLoader) LoadThunk(key string) func() (interface{}, error) {
 	l.sync.Lock()
-	time.Sleep(time.Second * 1)
 	if it, ok := l.cache[key]; ok {
 		l.sync.Unlock()
 		return func() (interface{}, error) {
@@ -61,7 +60,6 @@ func (l *ObjectLoader) LoadThunk(key string) func() (interface{}, error) {
 		}
 	}
 	if l.batch == nil {
-		fmt.Println("batch is ", l.batch)
 		l.batch = &objectLoaderBatch{done: make(chan struct{})}
 	} else if l.batch.closing {
 		l.batch.keys = nil
