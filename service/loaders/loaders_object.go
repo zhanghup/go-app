@@ -10,11 +10,13 @@ import (
 )
 
 type ObjectLoader struct {
-	sql      string
-	param    map[string]interface{}
-	db       *toolxorm.Engine
-	keyField string
-	table    interface{}
+	sql          string
+	param        map[string]interface{}
+	db           *toolxorm.Engine
+	keyField     string
+	resultField  string
+	requestTable reflect.Type
+	resultTable  reflect.Type
 
 	cache map[string]interface{}
 	batch *objectLoaderBatch
@@ -35,16 +37,10 @@ func (this *ObjectLoader) fetch(keys []string) (map[string]interface{}, error) {
 		query[k] = v
 	}
 	query["keys"] = keys
-	ty := reflect.TypeOf(this.table)
-	var sliceType reflect.Type
-	if ty.Kind() == reflect.Ptr {
-		sliceType = reflect.SliceOf(ty)
-	} else if ty.Kind() == reflect.Struct {
-		sliceType = reflect.SliceOf(reflect.New(ty).Type())
-	} else {
-		panic("输入必须为*struct或者struct")
+	if this.requestTable.Kind() != reflect.Struct {
+		panic("输入必须为struct")
 	}
-	vl := reflect.New(sliceType)
+	vl := reflect.New(reflect.SliceOf(this.requestTable))
 
 	err := this.db.SF(this.sql, query).Find(vl.Interface())
 	if err != nil {
@@ -56,10 +52,18 @@ func (this *ObjectLoader) fetch(keys []string) (map[string]interface{}, error) {
 		vv := vl.Elem().Index(i)
 		tools.Rft.DeepGet(vv.Interface(), func(t reflect.Type, v reflect.Value, tf reflect.StructField) bool {
 			if tf.Name == this.keyField {
-				if v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.String && v.Pointer() != 0 {
-					result[v.Elem().String()] = v.Interface()
-				} else if v.Kind() == reflect.String {
-					result[v.String()] = vv.Interface()
+				if v.Kind() == reflect.Ptr && v.Pointer() != 0 {
+					t = t.Elem()
+					v = v.Elem()
+				}
+
+				if v.Kind() == reflect.String {
+					if len(this.resultField) > 0 {
+						vvv := vv.FieldByName(this.resultField)
+						result[v.String()] = vvv.Interface()
+					} else {
+						result[v.String()] = vv.Interface()
+					}
 				}
 				return false
 			}
@@ -77,7 +81,7 @@ func (l *ObjectLoader) Load(key string, result interface{}) error {
 	if i == nil {
 		return nil
 	}
-	reflect.ValueOf(result).Elem().Set(reflect.ValueOf(i).Elem())
+	reflect.ValueOf(result).Elem().Set(reflect.ValueOf(i))
 	return nil
 }
 

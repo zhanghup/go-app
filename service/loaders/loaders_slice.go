@@ -10,11 +10,13 @@ import (
 )
 
 type SliceLoader struct {
-	sql      string
-	param    map[string]interface{}
-	db       *toolxorm.Engine
-	keyField string
-	table    interface{}
+	sql          string
+	param        map[string]interface{}
+	db           *toolxorm.Engine
+	keyField     string
+	resultField  string
+	requestTable reflect.Type
+	resultTable  reflect.Type
 
 	cache map[string]interface{}
 	batch *sliceLoaderBatch
@@ -35,16 +37,13 @@ func (this *SliceLoader) fetch(keys []string) (map[string]interface{}, error) {
 		query[k] = v
 	}
 	query["keys"] = keys
-	ty := reflect.TypeOf(this.table)
-	var sliceType reflect.Type
-	if ty.Kind() == reflect.Ptr {
-		sliceType = reflect.SliceOf(ty.Elem())
-	} else if ty.Kind() == reflect.Struct {
-		sliceType = reflect.SliceOf(ty)
-	} else {
-		panic("输入必须为*struct或者struct")
+	if this.requestTable.Kind() != reflect.Struct {
+		panic("requestTable必须为struct")
 	}
-	vl := reflect.New(sliceType)
+	if this.resultTable.Kind() != reflect.Struct {
+		panic("resultTable必须为struct")
+	}
+	vl := reflect.New(reflect.SliceOf(this.requestTable))
 
 	err := this.db.SF(this.sql, query).Find(vl.Interface())
 	if err != nil {
@@ -56,22 +55,37 @@ func (this *SliceLoader) fetch(keys []string) (map[string]interface{}, error) {
 		vv := vl.Elem().Index(i)
 		tools.Rft.DeepGet(vv.Interface(), func(t reflect.Type, v reflect.Value, tf reflect.StructField) bool {
 			if tf.Name == this.keyField {
-				if v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.String && v.Pointer() != 0 {
-					if ls, ok := result[v.Elem().String()]; ok {
-						reflect.Append(reflect.ValueOf(ls), vv)
-						result[v.Elem().String()] = reflect.ValueOf(ls).Interface()
-					} else {
-						ls := reflect.New(sliceType).Elem()
-						reflect.Append(ls, vv)
-						result[v.Elem().String()] = ls.Interface()
-					}
-				} else if v.Kind() == reflect.String {
+				if v.Kind() == reflect.Ptr && v.Pointer() != 0 {
+					t = t.Elem()
+					v = v.Elem()
+				}
+
+				if v.Kind() == reflect.String {
 					if ls, ok := result[v.String()]; ok {
-						lss := reflect.Append(reflect.ValueOf(ls), vv)
+						var lss reflect.Value
+						if len(this.resultField) > 0 {
+							vvv := vv.FieldByName(this.resultField)
+							if !vv.CanInterface() {
+								return false
+							}
+							lss = reflect.Append(reflect.ValueOf(ls), vvv)
+						} else {
+							lss = reflect.Append(reflect.ValueOf(ls), vv)
+						}
 						result[v.String()] = lss.Interface()
 					} else {
-						ls := reflect.New(sliceType).Elem()
-						ls = reflect.Append(ls, vv)
+						ls := reflect.New(reflect.SliceOf(this.resultTable)).Elem()
+						if len(this.resultField) > 0 {
+							tools.Rft.DeepGet(vv.Interface(), func(t reflect.Type, v reflect.Value, tf reflect.StructField) bool {
+								if tf.Name == this.resultField {
+									ls = reflect.Append(ls, v)
+									return false
+								}
+								return true
+							})
+						} else {
+							ls = reflect.Append(ls, vv)
+						}
 						result[v.String()] = ls.Interface()
 					}
 				}
