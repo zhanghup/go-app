@@ -9,7 +9,7 @@ import (
 
 func (this *Resolver) RoleLoader(ctx context.Context, id string) (*beans.Role, error) {
 	result := new(beans.Role)
-	_, err := this.Loader(ctx).Object(new(beans.Role)).Load(id, result)
+	err := this.Loader(ctx).Object(result, "select * from role where id in :keys", nil, "Id", "").Load(id, result)
 	return result, err
 }
 

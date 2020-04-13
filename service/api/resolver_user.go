@@ -11,7 +11,7 @@ import (
 
 func (this *Resolver) UserLoader(ctx context.Context, id string) (*beans.User, error) {
 	result := new(beans.User)
-	_, err := this.Loader(ctx).Object(new(beans.User)).Load(id, result)
+	err := this.Loader(ctx).Object(result, "select * from user where id in :keys", nil, "Id", "").Load(id, result)
 	return result, err
 }
 

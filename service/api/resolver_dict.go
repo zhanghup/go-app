@@ -16,13 +16,13 @@ func (this *Resolver) Dict() lib.DictResolver {
 
 func (this *Resolver) DictLoader(ctx context.Context, id string) (*beans.Dict, error) {
 	result := new(beans.Dict)
-	_, err := this.Loader(ctx).Object(new(beans.Dict)).Load(id, result)
+	err := this.Loader(ctx).Object(result, "select * from dict where id in :keys", nil, "Id", "").Load(id, result)
 	return result, err
 }
 
 func (this *Resolver) DictItemLoader(ctx context.Context, id string) (*beans.DictItem, error) {
 	result := new(beans.DictItem)
-	_, err := this.Loader(ctx).Object(new(beans.DictItem)).Load(id, result)
+	err := this.Loader(ctx).Object(result, "select * from dict_item where id in :keys", nil, "Id", "").Load(id, result)
 	return result, err
 }
 
@@ -31,7 +31,7 @@ func (this DictResolver) Values(ctx context.Context, obj *beans.Dict) ([]beans.D
 		return nil, nil
 	}
 	c := make([]beans.DictItem, 0)
-	err := this.Loader(ctx).Slice(new(beans.DictItem), "code").Load(*obj.Id, &c)
+	err := this.Loader(ctx).Slice(c, "select * from dict_item where id in :keys", nil, "Code", "").Load(*obj.Id, &c)
 	return c, err
 }
 

@@ -1,9 +1,11 @@
 package loaders
 
 import (
+	"context"
 	"fmt"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/toolxorm"
+	"net/http"
 	"reflect"
 	"sync"
 	"xorm.io/xorm"
@@ -13,6 +15,8 @@ type Loader interface {
 	Object(table interface{}, sql string, param map[string]interface{}, keyField string, resultField string) *ObjectLoader
 	Slice(table interface{}, sql string, param map[string]interface{}, keyField string, resultField string) *SliceLoader
 }
+
+const DATALOADEN_KEY = "go-app-dataloaden"
 
 type dataLoaden struct {
 	db *xorm.Engine
@@ -33,6 +37,18 @@ func NewDataLoaden(db *xorm.Engine) Loader {
 		sliceSync:  &sync.Mutex{},
 		sliceStore: map[string]*SliceLoader{},
 	}
+}
+
+func DataLoadenMiddleware(db *xorm.Engine, next http.Handler) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), DATALOADEN_KEY, NewDataLoaden(db))
+		r = r.WithContext(ctx)
+		next.ServeHTTP(w, r)
+	})
+}
+
+func DataLoaden(ctx context.Context) Loader {
+	return ctx.Value(DATALOADEN_KEY).(Loader)
 }
 
 func (this *dataLoaden) Object(table interface{}, sql string, param map[string]interface{}, keyField string, resultField string) *ObjectLoader {
@@ -72,8 +88,8 @@ func (this *dataLoaden) Object(table interface{}, sql string, param map[string]i
 		return l
 	}
 	objLoader := &ObjectLoader{
-		sync:     &sync.RWMutex{},
-		db:       toolxorm.NewEngine(this.db),
+		sync:         &sync.RWMutex{},
+		db:           toolxorm.NewEngine(this.db),
 		keyField:     keyField,
 		resultField:  resultField,
 		sql:          sql,
