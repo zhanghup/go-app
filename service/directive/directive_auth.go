@@ -2,8 +2,8 @@ package directive
 
 import (
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-tools/database/toolxorm"
-	"github.com/zhanghup/go-tools/toolgin"
+	"github.com/zhanghup/go-tools/database/txorm"
+	"github.com/zhanghup/go-tools/tgin"
 	"strings"
 	"time"
 	"xorm.io/xorm"
@@ -12,9 +12,9 @@ import (
 )
 
 func WebAuth(db *xorm.Engine) gin.HandlerFunc {
-	dbs := toolxorm.NewEngine(db)
+	dbs := txorm.NewEngine(db)
 	return func(c *gin.Context) {
-		toolgin.DoCustom(c, func(c *gin.Context) (interface{}, string) {
+		tgin.DoCustom(c, func(c *gin.Context) (interface{}, string) {
 			tok, err := c.Cookie(GIN_TOKEN)
 			if err != nil {
 				return err.Error(), "[1] 未授权"

@@ -9,8 +9,8 @@ import (
 	"github.com/zhanghup/go-app/service/api"
 	"github.com/zhanghup/go-app/service/auth"
 	"github.com/zhanghup/go-app/service/file"
-	"github.com/zhanghup/go-tools/database/toolxorm"
-	"github.com/zhanghup/go-tools/toolgin"
+	"github.com/zhanghup/go-tools/database/txorm"
+	"github.com/zhanghup/go-tools/tgin"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 		panic(err)
 	}
 	cfg.InitConfig(box)
-	e, err := toolxorm.NewXorm(cfg.DB)
+	e, err := txorm.NewXorm(cfg.DB)
 	if err != nil {
 		panic(err)
 	}
@@ -30,7 +30,7 @@ func main() {
 	initia.InitAction(e)
 
 	// http router
-	err = toolgin.NewGin(cfg.Web, func(g *gin.Engine) error {
+	err = tgin.NewGin(cfg.Web, func(g *gin.Engine) error {
 		file.Gin(g.Group("/"), g.Group("/"), e)
 		auth.Gin(g.Group("/"), e)
 		api.Gin(g.Group("/"), e)

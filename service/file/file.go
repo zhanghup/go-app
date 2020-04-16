@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-tools/toolgin"
+	"github.com/zhanghup/go-tools/tgin"
 	"image"
 	"image/gif"
 	"image/jpeg"
@@ -33,7 +33,7 @@ type Uploader struct {
 
 func (this *Uploader) Upload() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		toolgin.Do(c, func(c *gin.Context) (interface{}, string) {
+		tgin.Do(c, func(c *gin.Context) (interface{}, string) {
 			hd, err := c.FormFile("file")
 			if err != nil {
 				return err.Error(), "读取文件失败【1】"
@@ -115,7 +115,7 @@ func (this *Uploader) GetFile(id string) (*beans.Resource, *os.File, error) {
 
 func (this *Uploader) Get() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		toolgin.DoCustom(c, func(c *gin.Context) (interface{}, string) {
+		tgin.DoCustom(c, func(c *gin.Context) (interface{}, string) {
 			id := c.Param("id")
 			if strings.LastIndex(id, ".") > 0 {
 				id = id[:strings.LastIndex(id, ".")]
@@ -139,7 +139,7 @@ func (this *Uploader) Get() func(c *gin.Context) {
 
 func (this *Uploader) Resize() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		toolgin.DoCustom(c, func(c *gin.Context) (interface{}, string) {
+		tgin.DoCustom(c, func(c *gin.Context) (interface{}, string) {
 			id := c.Param("id")
 
 			widthStr := c.Param("width")

@@ -9,8 +9,8 @@ import (
 	"github.com/zhanghup/go-app/service/api/lib"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
-	"github.com/zhanghup/go-app/service/loaders"
-	"github.com/zhanghup/go-tools/database/toolxorm"
+	"github.com/zhanghup/go-tools/database/txorm"
+	"github.com/zhanghup/go-tools/tgql"
 	"net/http"
 	"xorm.io/xorm"
 )
@@ -18,8 +18,8 @@ import (
 func ggin(db *xorm.Engine) func(c *gin.Context) {
 	resolver := &Resolver{
 		DB:     db,
-		DBS:    toolxorm.NewEngine(db),
-		Loader: loaders.DataLoaden,
+		DBS:    txorm.NewEngine(db),
+		Loader: tgql.DataLoaden,
 	}
 	c := lib.Config{
 		Resolvers: resolver,
@@ -29,7 +29,7 @@ func ggin(db *xorm.Engine) func(c *gin.Context) {
 	}
 
 	hu := handler.GraphQL(lib.NewExecutableSchema(c))
-	hu = loaders.DataLoadenMiddleware(db, hu)
+	hu = tgql.DataLoadenMiddleware(db, hu)
 	hu = func(next http.HandlerFunc) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			r.Header.Set("Content-Type", "application/json")
@@ -53,8 +53,8 @@ func Gin(g gin.IRouter, db *xorm.Engine) {
 
 type Resolver struct {
 	DB     *xorm.Engine
-	DBS    *toolxorm.Engine
-	Loader func(ctx context.Context) loaders.Loader
+	DBS    *txorm.Engine
+	Loader func(ctx context.Context) tgql.Loader
 	my     func(ctx context.Context) directive.Me
 }
 

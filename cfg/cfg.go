@@ -3,17 +3,17 @@ package cfg
 import (
 	rice "github.com/giter/go.rice"
 	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-tools/database/toolxorm"
-	"github.com/zhanghup/go-tools/toolgin"
+	"github.com/zhanghup/go-tools/database/txorm"
+	"github.com/zhanghup/go-tools/tgin"
 )
 
 type config struct {
-	Database toolxorm.Config `yaml:"database"`
-	Web      toolgin.Config `yaml:"web"`
+	Database txorm.Config `yaml:"database"`
+	Web      tgin.Config `yaml:"web"`
 }
 
-var DB toolxorm.Config
-var Web toolgin.Config
+var DB txorm.Config
+var Web tgin.Config
 var Config *config
 
 func InitConfig(box *rice.Box) *config {

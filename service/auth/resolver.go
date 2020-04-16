@@ -11,7 +11,7 @@ import (
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-tools/database/toolxorm"
+	"github.com/zhanghup/go-tools/database/txorm"
 	"net/http"
 	"xorm.io/xorm"
 )
@@ -19,7 +19,7 @@ import (
 func ggin(db *xorm.Engine) func(c *gin.Context) {
 	c := Config{Resolvers: &Resolver{
 		DB:  db,
-		DBS: toolxorm.NewEngine(db),
+		DBS: txorm.NewEngine(db),
 		Me:  directive.MyInfo,
 	}}
 
@@ -48,7 +48,7 @@ func Gin(g gin.IRouter, db *xorm.Engine) {
 
 type Resolver struct {
 	DB  *xorm.Engine
-	DBS *toolxorm.Engine
+	DBS *txorm.Engine
 	Me  func(g context.Context) directive.Me
 }
 
@@ -86,7 +86,7 @@ func (this mutationResolver) Login(ctx context.Context, account string, password
 
 func (this mutationResolver) Token(ctx context.Context, uid, ty string) (string, error) {
 	token := new(beans.UserToken)
-	this.DBS.TS(func(sess *toolxorm.Session) error {
+	this.DBS.TS(func(sess *txorm.Session) error {
 		e := sess.SF(`update user_token set status = 0 where uid = :uid and type = :type`, map[string]interface{}{
 			"uid":  uid,
 			"type": ty,
