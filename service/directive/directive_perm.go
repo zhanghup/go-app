@@ -10,8 +10,8 @@ import (
 type PermObjects map[string]string
 type Perms map[string][]string
 
-func Perm() func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string) (res interface{}, err error) {
-	return func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string) (res interface{}, err error) {
+func Perm() func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string, remark string) (res interface{}, err error) {
+	return func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string, remark string) (res interface{}, err error) {
 		md := MyInfo(ctx)
 		user := md.User()
 

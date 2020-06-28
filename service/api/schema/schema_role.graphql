@@ -1,27 +1,27 @@
 extend type Query {
     "角色列表（分页）"
-    roles(query: QRole!): Roles @perm(entity: "role",perm: "R")
+    roles(query: QRole!): Roles @perm(entity: "role",perm: "R",remark:"角色列表查询")
     "角色获取单个"
-    role(id: String!): Role @perm(entity: "role",perm: "R")
+    role(id: String!): Role @perm(entity: "role",perm: "R",remark:"角色查询")
     "权限列表"
-    role_perms(id: String!,type: String): [String!] @perm(entity: "role",perm: "R")
+    role_perms(id: String!,type: String): [String!] @perm(entity: "role",perm: "R",remark:"角色权限查询")
     "对象权限列表"
-    role_perm_objects(id: String!): [PermObj!] @perm(entity: "role",perm: "R")
+    role_perm_objects(id: String!): [PermObj!] @perm(entity: "role",perm: "R",remark:"角色对象权限查询")
 }
 
 extend type Mutation {
     "角色新建"
-    role_create(input: NewRole!): Role @perm(entity: "role",perm: "C")
+    role_create(input: NewRole!): Role @perm(entity: "role",perm: "C",remark:"角色新增")
     "角色更新"
-    role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "role",perm: "U")
+    role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "role",perm: "U",remark:"角色更新")
     "角色批量删除"
-    role_removes(ids: [String!]): Boolean! @perm(entity: "role",perm: "D")
+    role_removes(ids: [String!]): Boolean! @perm(entity: "role",perm: "D",remark:"角色删除")
     "新增权限"
-    role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean! @perm(entity: "role",perm: "M")
+    role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean! @perm(entity: "role",perm: "M",remark:"角色权限新增")
     "新增对象权限"
-    role_perm_obj_create(id: String!, perms:[IPermObj!]!): Boolean! @perm(entity: "role",perm: "M")
+    role_perm_obj_create(id: String!, perms:[IPermObj!]!): Boolean! @perm(entity: "role",perm: "M",remark:"角色对象权限新增")
     "角色分配"
-    role_to_user(uid: String!,roles:[String!]!): Boolean! @perm(entity: "role",perm: "M")
+    role_to_user(uid: String!,roles:[String!]!): Boolean! @perm(entity: "role",perm: "M",remark:"角色分配")
 }
 
 input IPermObj{
