@@ -29,8 +29,6 @@ type Uploader struct {
 	db *xorm.Engine
 }
 
-
-
 func (this *Uploader) Upload() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		tgin.Do(c, func(c *gin.Context) (interface{}, string) {

@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/gql"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-tools"
@@ -119,6 +120,6 @@ func (q queryResolver) Hello(ctx context.Context) (*string, error) {
 	panic("implement me")
 }
 
-func (this *Resolver) Query() QueryResolver{
+func (this *Resolver) Query() QueryResolver {
 	return &queryResolver{this}
 }

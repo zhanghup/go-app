@@ -11,6 +11,7 @@ import (
 	"github.com/zhanghup/go-app/service/file"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
+	"github.com/zhanghup/go-tools/tog"
 )
 
 func main() {
@@ -21,6 +22,7 @@ func main() {
 	cfg.InitConfig(box)
 	e, err := txorm.NewXorm(cfg.DB)
 	if err != nil {
+		tog.Error(err.Error())
 		panic(err)
 	}
 	//  同步表结构
