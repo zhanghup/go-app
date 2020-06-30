@@ -11,7 +11,7 @@ type PageParam struct {
 }
 
 type Bean struct {
-	Id      *string `json:"id" xorm:"Varchar(32) pk"`
+	Id      *string `json:"id" xorm:"Varchar(128) pk"`
 	Created *int64  `json:"created" xorm:"created Int(14)"`
 	Updated *int64  `json:"updated" xorm:"updated  Int(14)"`
 	Weight  *int    `json:"weight" xorm:"weight  Int(9)"`
