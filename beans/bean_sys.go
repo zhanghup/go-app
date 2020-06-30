@@ -126,12 +126,11 @@ type Resource struct {
 type Cron struct {
 	Bean `xorm:"extends"`
 
-	Code       *string `json:"code" xorm:"index"`   // 编码
-	Name       *string `json:"name"`                // 任务名称
-	Expression *string `json:"expression"`          // 任务表达式
-	Previous   *int64  `json:"previous"`            // 上一次执行时间
-	Last       *int64  `json:"last"`                // 任务持续时间（秒）
-	Message    *string `json:"message" xorm:"text"` // 任务结果
+	Name       *string  `json:"name"`                // 任务名称
+	Expression *string  `json:"expression"`          // 任务表达式
+	Previous   *int64   `json:"previous"`            // 上一次执行时间
+	Last       *float64 `json:"last"`                // 任务持续时间（秒）
+	Message    *string  `json:"message" xorm:"text"` // 任务结果
 }
 
 func sys_tables() []interface{} {
