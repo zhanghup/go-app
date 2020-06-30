@@ -41,7 +41,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
-	Perm func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string, remark string) (res interface{}, err error)
+	Perm func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string, remark *string) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -899,7 +899,7 @@ var sources = []*ast.Source{
 	&ast.Source{Name: "schema/schema.graphql", Input: `scalar Any
 
 "数据操作权限"
-directive @perm(entity:String!, perm: String!,remark:String!) on FIELD_DEFINITION
+directive @perm(entity:String!, perm: String!,remark:String) on FIELD_DEFINITION
 
 directive @goModel(model: String, models: [String!]) on OBJECT
     | INPUT_OBJECT
@@ -923,25 +923,25 @@ type Mutation {
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/schema_dict.graphql", Input: `extend type Query{
     "字典列表（分页）"
-    dicts(query:QDict!):Dicts @perm(entity: "dict",perm: "R",remark:"字典列表查询")
+    dicts(query:QDict!):Dicts @perm(entity: "dict",perm: "R")
     "字典单个对象"
-    dict(id: String!):Dict @perm(entity: "dict",perm: "R",remark:"字典项查询")
+    dict(id: String!):Dict @perm(entity: "dict",perm: "R")
 }
 
 extend type Mutation {
     "字典新建"
-    dict_create(input:NewDict!):Dict  @perm(entity: "dict",perm: "C",remark:"字典新增")
+    dict_create(input:NewDict!):Dict  @perm(entity: "dict",perm: "C")
     "字典更新"
-    dict_update(id: String!,input:UpdDict!):Boolean!  @perm(entity: "dict",perm: "U",remark:"字典更新")
+    dict_update(id: String!,input:UpdDict!):Boolean!  @perm(entity: "dict",perm: "U")
     "字典批量删除"
-    dict_removes(ids: [String!]):Boolean! @perm(entity: "dict",perm: "D",remark:"字典删除")
+    dict_removes(ids: [String!]):Boolean! @perm(entity: "dict",perm: "D")
 
     "字典项新建"
-    dict_item_create(input:NewDictItem!):DictItem  @perm(entity: "dict",perm: "C",remark:"字典项新增")
+    dict_item_create(input:NewDictItem!):DictItem  @perm(entity: "dict",perm: "C")
     "字典项更新"
-    dict_item_update(id: String!,input:UpdDictItem!):Boolean!  @perm(entity: "dict",perm: "U",remark:"字典项更新")
+    dict_item_update(id: String!,input:UpdDictItem!):Boolean!  @perm(entity: "dict",perm: "U")
     "字典项批量删除"
-    dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict",perm: "D",remark:"字典项删除")
+    dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict",perm: "D")
 }
 
 input QDict{
@@ -1059,9 +1059,9 @@ input UpdDictItem{
 }`, BuiltIn: false},
 	&ast.Source{Name: "schema/schema_role.graphql", Input: `extend type Query {
     "角色列表（分页）"
-    roles(query: QRole!): Roles @perm(entity: "role",perm: "R",remark:"角色列表查询")
+    roles(query: QRole!): Roles @perm(entity: "role",perm: "R")
     "角色获取单个"
-    role(id: String!): Role @perm(entity: "role",perm: "R",remark:"角色查询")
+    role(id: String!): Role @perm(entity: "role",perm: "R")
     "权限列表"
     role_perms(id: String!,type: String): [String!] @perm(entity: "role",perm: "R",remark:"角色权限查询")
     "对象权限列表"
@@ -1070,11 +1070,11 @@ input UpdDictItem{
 
 extend type Mutation {
     "角色新建"
-    role_create(input: NewRole!): Role @perm(entity: "role",perm: "C",remark:"角色新增")
+    role_create(input: NewRole!): Role @perm(entity: "role",perm: "C")
     "角色更新"
-    role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "role",perm: "U",remark:"角色更新")
+    role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "role",perm: "U")
     "角色批量删除"
-    role_removes(ids: [String!]): Boolean! @perm(entity: "role",perm: "D",remark:"角色删除")
+    role_removes(ids: [String!]): Boolean! @perm(entity: "role",perm: "D")
     "新增权限"
     role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean! @perm(entity: "role",perm: "M",remark:"角色权限新增")
     "新增对象权限"
@@ -1152,18 +1152,18 @@ input UpdRole {
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/schema_user.graphql", Input: `extend type Query{
     "用户列表（分页）"
-    users(query:QUser!):Users  @perm(entity: "user",perm: "R",remark:"用户列表查询")
+    users(query:QUser!):Users  @perm(entity: "user",perm: "R")
     "用户获取单个"
-    user(id: String!):User  @perm(entity: "user",perm: "R",remark:"用户查询")
+    user(id: String!):User  @perm(entity: "user",perm: "R")
 }
 
 extend type Mutation {
     "用户新建"
-    user_create(input:NewUser!):User  @perm(entity: "user",perm: "C",remark:"用户新增")
+    user_create(input:NewUser!):User  @perm(entity: "user",perm: "C")
     "用户更新"
-    user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U",remark:"用户更新")
+    user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U")
     "用户批量删除"
-    user_removes(ids: [String!]):Boolean! @perm(entity: "user",perm: "D",remark:"用户删除")
+    user_removes(ids: [String!]):Boolean! @perm(entity: "user",perm: "D")
 }
 
 input QUser{
@@ -1292,9 +1292,9 @@ func (ec *executionContext) dir_perm_args(ctx context.Context, rawArgs map[strin
 		}
 	}
 	args["perm"] = arg1
-	var arg2 string
+	var arg2 *string
 	if tmp, ok := rawArgs["remark"]; ok {
-		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2434,14 +2434,10 @@ func (ec *executionContext) _Mutation_dict_create(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "字典新增")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -2504,14 +2500,10 @@ func (ec *executionContext) _Mutation_dict_update(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "字典更新")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -2577,14 +2569,10 @@ func (ec *executionContext) _Mutation_dict_removes(ctx context.Context, field gr
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "字典删除")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -2650,14 +2638,10 @@ func (ec *executionContext) _Mutation_dict_item_create(ctx context.Context, fiel
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "字典项新增")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -2720,14 +2704,10 @@ func (ec *executionContext) _Mutation_dict_item_update(ctx context.Context, fiel
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "字典项更新")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -2793,14 +2773,10 @@ func (ec *executionContext) _Mutation_dict_item_removes(ctx context.Context, fie
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "字典项删除")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -2866,14 +2842,10 @@ func (ec *executionContext) _Mutation_role_create(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "角色新增")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -2936,14 +2908,10 @@ func (ec *executionContext) _Mutation_role_update(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "角色更新")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -3009,14 +2977,10 @@ func (ec *executionContext) _Mutation_role_removes(ctx context.Context, field gr
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "角色删除")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -3082,7 +3046,7 @@ func (ec *executionContext) _Mutation_role_perm_create(ctx context.Context, fiel
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "角色权限新增")
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色权限新增")
 			if err != nil {
 				return nil, err
 			}
@@ -3155,7 +3119,7 @@ func (ec *executionContext) _Mutation_role_perm_obj_create(ctx context.Context, 
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "角色对象权限新增")
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色对象权限新增")
 			if err != nil {
 				return nil, err
 			}
@@ -3228,7 +3192,7 @@ func (ec *executionContext) _Mutation_role_to_user(ctx context.Context, field gr
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "角色分配")
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色分配")
 			if err != nil {
 				return nil, err
 			}
@@ -3301,14 +3265,10 @@ func (ec *executionContext) _Mutation_user_create(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "用户新增")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -3371,14 +3331,10 @@ func (ec *executionContext) _Mutation_user_update(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "用户更新")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -3444,14 +3400,10 @@ func (ec *executionContext) _Mutation_user_removes(ctx context.Context, field gr
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "用户删除")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -3647,14 +3599,10 @@ func (ec *executionContext) _Query_dicts(ctx context.Context, field graphql.Coll
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "字典列表查询")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -3717,14 +3665,10 @@ func (ec *executionContext) _Query_dict(ctx context.Context, field graphql.Colle
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "字典项查询")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -3787,14 +3731,10 @@ func (ec *executionContext) _Query_roles(ctx context.Context, field graphql.Coll
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "角色列表查询")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -3857,14 +3797,10 @@ func (ec *executionContext) _Query_role(ctx context.Context, field graphql.Colle
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "角色查询")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -3927,7 +3863,7 @@ func (ec *executionContext) _Query_role_perms(ctx context.Context, field graphql
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "角色权限查询")
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色权限查询")
 			if err != nil {
 				return nil, err
 			}
@@ -3997,7 +3933,7 @@ func (ec *executionContext) _Query_role_perm_objects(ctx context.Context, field 
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "角色对象权限查询")
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色对象权限查询")
 			if err != nil {
 				return nil, err
 			}
@@ -4067,14 +4003,10 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "用户列表查询")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -4137,14 +4069,10 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalNString2string(ctx, "用户查询")
-			if err != nil {
-				return nil, err
-			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
 		}
 
 		tmp, err := directive1(rctx)

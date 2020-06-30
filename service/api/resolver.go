@@ -51,28 +51,9 @@ func Gin(g gin.IRouter, db *xorm.Engine) {
 	})
 }
 
-type Resolver struct {
+type Resolver struct{
 	DB     *xorm.Engine
 	DBS    *txorm.Engine
 	Loader func(ctx context.Context) tgql.Loader
 	my     func(ctx context.Context) directive.Me
-}
-
-func (r *Resolver) Mutation() lib.MutationResolver {
-	return &mutationResolver{r}
-}
-func (r *Resolver) Query() lib.QueryResolver {
-	return &queryResolver{r}
-}
-
-type mutationResolver struct{ *Resolver }
-
-func (this mutationResolver) World(ctx context.Context) (*string, error) {
-	panic("implement me")
-}
-
-type queryResolver struct{ *Resolver }
-
-func (this queryResolver) Hello(ctx context.Context) (*string, error) {
-	panic("implement me")
 }

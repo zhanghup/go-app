@@ -12,8 +12,9 @@ model:
   filename: lib/models_gen.go
   package: lib
 resolver:
-  filename: resolver.go
-  type: Resolver
+  layout: follow-schema
+  dir: .
+  package: api
 omit_slice_element_pointers: true
 models:
   Int:

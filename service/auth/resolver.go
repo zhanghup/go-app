@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/gql"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-tools"
