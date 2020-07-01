@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"strconv"
 	"sync"
 
@@ -38,6 +39,7 @@ type ResolverRoot interface {
 	Dict() DictResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
+	Subscription() SubscriptionResolver
 }
 
 type DirectiveRoot struct {
@@ -126,6 +128,10 @@ type ComplexityRoot struct {
 		Total func(childComplexity int) int
 	}
 
+	Subscription struct {
+		Hello func(childComplexity int) int
+	}
+
 	User struct {
 		Account  func(childComplexity int) int
 		Admin    func(childComplexity int) int
@@ -182,6 +188,9 @@ type QueryResolver interface {
 	RolePermObjects(ctx context.Context, id string) ([]PermObj, error)
 	Users(ctx context.Context, query QUser) (*Users, error)
 	User(ctx context.Context, id string) (*beans.User, error)
+}
+type SubscriptionResolver interface {
+	Hello(ctx context.Context) (<-chan *string, error)
 }
 
 type executableSchema struct {
@@ -713,6 +722,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Roles.Total(childComplexity), true
 
+	case "Subscription.hello":
+		if e.complexity.Subscription.Hello == nil {
+			break
+		}
+
+		return e.complexity.Subscription.Hello(childComplexity), true
+
 	case "User.account":
 		if e.complexity.User.Account == nil {
 			break
@@ -870,6 +886,23 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 				Data: buf.Bytes(),
 			}
 		}
+	case ast.Subscription:
+		next := ec._Subscription(ctx, rc.Operation.SelectionSet)
+
+		var buf bytes.Buffer
+		return func(ctx context.Context) *graphql.Response {
+			buf.Reset()
+			data := next()
+
+			if data == nil {
+				return nil
+			}
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
+		}
 
 	default:
 		return graphql.OneShot(graphql.ErrorResponse(ctx, "unsupported GraphQL operation"))
@@ -919,6 +952,10 @@ type Query {
 
 type Mutation {
     world: String
+}
+
+type Subscription {
+    hello: String
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/schema_dict.graphql", Input: `extend type Query{
@@ -1150,6 +1187,7 @@ input UpdRole {
     status: Int = 1
 }
 `, BuiltIn: false},
+	&ast.Source{Name: "schema/schema_subscribe.graphql", Input: ``, BuiltIn: false},
 	&ast.Source{Name: "schema/schema_user.graphql", Input: `extend type Query{
     "用户列表（分页）"
     users(query:QUser!):Users  @perm(entity: "user",perm: "R")
@@ -4447,6 +4485,47 @@ func (ec *executionContext) _Roles_data(ctx context.Context, field graphql.Colle
 	return ec.marshalORole2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐRoleᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Subscription_hello(ctx context.Context, field graphql.CollectedField) (ret func() graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = nil
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Subscription",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Subscription().Hello(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	if resTmp == nil {
+		return nil
+	}
+	return func() graphql.Marshaler {
+		res, ok := <-resTmp.(<-chan *string)
+		if !ok {
+			return nil
+		}
+		return graphql.WriterFunc(func(w io.Writer) {
+			w.Write([]byte{'{'})
+			graphql.MarshalString(field.Alias).MarshalGQL(w)
+			w.Write([]byte{':'})
+			ec.marshalOString2ᚖstring(ctx, field.Selections, res).MarshalGQL(w)
+			w.Write([]byte{'}'})
+		})
+	}
+}
+
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -7001,6 +7080,26 @@ func (ec *executionContext) _Roles(ctx context.Context, sel ast.SelectionSet, ob
 		return graphql.Null
 	}
 	return out
+}
+
+var subscriptionImplementors = []string{"Subscription"}
+
+func (ec *executionContext) _Subscription(ctx context.Context, sel ast.SelectionSet) func() graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, subscriptionImplementors)
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Subscription",
+	})
+	if len(fields) != 1 {
+		ec.Errorf(ctx, "must subscribe to exactly one stream")
+		return nil
+	}
+
+	switch fields[0].Name {
+	case "hello":
+		return ec._Subscription_hello(ctx, fields[0])
+	default:
+		panic("unknown field " + strconv.Quote(fields[0].Name))
+	}
 }
 
 var userImplementors = []string{"User"}

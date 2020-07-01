@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/directive"
+	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
@@ -81,12 +82,18 @@ func (this mutationResolver) Login(ctx context.Context, account string, password
 	if !flag {
 		return "", errors.New("用户名或者密码错误")
 	}
-	return this.Token(ctx, *user.Id, "pc")
+	tok, err := this.Token(ctx, *user.Id, "pc")
+	if err != nil {
+		return "", err
+	} else {
+		go event.UserLogin("pc", user)
+	}
+	return tok, nil
 }
 
 func (this mutationResolver) Token(ctx context.Context, uid, ty string) (string, error) {
 	token := new(beans.UserToken)
-	this.DBS.TS(func(sess *txorm.Session) error {
+	err := this.DBS.TS(func(sess *txorm.Session) error {
 		e := sess.SF(`update user_token set status = 0 where uid = :uid and type = :type`, map[string]interface{}{
 			"uid":  uid,
 			"type": ty,
@@ -110,7 +117,7 @@ func (this mutationResolver) Token(ctx context.Context, uid, ty string) (string,
 
 	})
 
-	return *token.Id, nil
+	return *token.Id, err
 }
 
 type queryResolver struct{ *Resolver }

@@ -2,6 +2,7 @@ package directive
 
 import (
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
 	"strings"
@@ -74,18 +75,9 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 						return err.Error(), "[8] 未授权"
 					}
 					// 去重
-					fn := func(strs []string, str string) bool {
-						for _, s := range strs {
-							if s == str {
-								return true
-							}
-						}
-						return false
-					}
-
 					for _, p := range perms {
 						if o, ok := myPerms[p.Type]; ok {
-							if !fn(o, p.Oid) {
+							if !tools.Str.Contains(o, p.Oid) {
 								o = append(o, p.Oid)
 								myPerms[p.Type] = o
 							}

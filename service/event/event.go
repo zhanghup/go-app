@@ -18,5 +18,9 @@ func EventSubscribeOnce(topic string, fn interface{}) {
 	_ = bus.SubscribeOnce(topic, fn)
 }
 
+func EventUnsubscribe(topic string, fn interface{}) {
+	_ = bus.Unsubscribe(topic, fn)
+}
+
 func init() {
 }
