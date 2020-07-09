@@ -16,10 +16,7 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 	dbs := txorm.NewEngine(db)
 	return func(c *gin.Context) {
 		tgin.DoCustom(c, func(c *gin.Context) (interface{}, string) {
-			tok, err := c.Cookie(GIN_TOKEN)
-			if err != nil {
-				return err.Error(), "[1] 未授权"
-			}
+			tok, _ := c.Cookie(GIN_TOKEN)
 			if len(tok) == 0 {
 				tok = c.GetHeader("Authorization")
 			}

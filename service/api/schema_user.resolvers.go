@@ -47,7 +47,7 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 func (r *queryResolver) Users(ctx context.Context, query lib.QUser) (*lib.Users, error) {
 	users := make([]beans.User, 0)
 	total, err := r.DBS.SF(`
-		select * from {{ table "user" }} u
+		select * from user u
 		where 1 = 1
 	`).Page2(query.Index, query.Size, query.Count, &users)
 	return &lib.Users{Data: users, Total: &total}, err

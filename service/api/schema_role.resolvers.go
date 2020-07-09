@@ -30,7 +30,7 @@ func (r *mutationResolver) RoleRemoves(ctx context.Context, ids []string) (bool,
 func (r *mutationResolver) RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error) {
 	sess := r.DBS.NewSession(ctx)
 
-	err := sess.SF(`delete from {{ table "perm" }} where role = :id and type = :type`, map[string]interface{}{
+	err := sess.SF(`delete from perm where role = :id and type = :type`, map[string]interface{}{
 		"type": typeArg,
 		"id":   id,
 	}).Exec()
@@ -59,7 +59,7 @@ func (r *mutationResolver) RolePermCreate(ctx context.Context, id string, typeAr
 func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, perms []lib.IPermObj) (bool, error) {
 	sess := r.DBS.NewSession(ctx)
 
-	err := sess.SF(`delete from {{ table "perm_object" }} where role = :id`, map[string]interface{}{
+	err := sess.SF(`delete from perm_object where role = :id`, map[string]interface{}{
 		"id": id,
 	}).Exec()
 	if err != nil {
@@ -87,7 +87,7 @@ func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, per
 
 func (r *mutationResolver) RoleToUser(ctx context.Context, uid string, roles []string) (bool, error) {
 	sess := r.DBS.NewSession(ctx)
-	err := sess.SF(`delete from {{ table "role_user" }} where uid = :uid`, map[string]interface{}{
+	err := sess.SF(`delete from role_user where uid = :uid`, map[string]interface{}{
 		"uid": uid,
 	}).Exec()
 	if err != nil {
@@ -114,7 +114,7 @@ func (r *mutationResolver) RoleToUser(ctx context.Context, uid string, roles []s
 func (r *queryResolver) Roles(ctx context.Context, query lib.QRole) (*lib.Roles, error) {
 	roles := make([]beans.Role, 0)
 	total, err := r.DBS.SF(`
-		select * from {{ table "role" }} u
+		select * from role u
 		where 1 = 1
 	`).Page2(query.Index, query.Size, query.Count, &roles)
 	return &lib.Roles{Data: roles, Total: &total}, err
@@ -127,7 +127,7 @@ func (r *queryResolver) Role(ctx context.Context, id string) (*beans.Role, error
 func (r *queryResolver) RolePerms(ctx context.Context, id string, typeArg *string) ([]string, error) {
 	result := make([]string, 0)
 	err := r.DBS.SF(`
-		select oid from {{ table "perm" }} where role = :role 
+		select oid from perm where role = :role 
 		{{ if .type }} and type = :type {{ end }}
 	`, map[string]interface{}{
 		"role": id,
@@ -139,7 +139,7 @@ func (r *queryResolver) RolePerms(ctx context.Context, id string, typeArg *strin
 func (r *queryResolver) RolePermObjects(ctx context.Context, id string) ([]lib.PermObj, error) {
 	result := make([]lib.PermObj, 0)
 	err := r.DBS.SF(`
-		select object,mask from {{ table "perm_object" }} where role = :role 
+		select object,mask from perm_object where role = :role 
 	`, map[string]interface{}{
 		"role": id,
 	}).Find(&result)

@@ -5,6 +5,7 @@ package api
 import (
 	"context"
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
@@ -43,6 +44,8 @@ func ggin(db *xorm.Engine) func(c *gin.Context) {
 			},
 		},
 	})
+	srv.Use(extension.Introspection{})
+
 
 	hu := tgql.DataLoadenMiddleware(db, srv)
 
@@ -54,6 +57,7 @@ func ggin(db *xorm.Engine) func(c *gin.Context) {
 }
 
 func Gin(g gin.IRouter, db *xorm.Engine) {
+
 	g.Group("/", directive.WebAuth(db)).POST("/api", ggin(db))
 	g.Group("/", directive.WebAuth(db)).GET("/api", ggin(db))
 	gs.Playground(g, "/api/playground1", "/api")

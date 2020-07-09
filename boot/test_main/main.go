@@ -21,6 +21,7 @@ func main() {
 	}
 	cfg.InitConfig(box)
 	e, err := txorm.NewXorm(cfg.DB)
+	e.ShowSQL(true)
 	if err != nil {
 		tog.Error(err.Error())
 		panic(err)

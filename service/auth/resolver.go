@@ -4,7 +4,10 @@ package auth
 
 import (
 	"context"
-	"github.com/99designs/gqlgen/handler"
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/zhanghup/go-app/beans"
@@ -13,7 +16,6 @@ import (
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
-	"net/http"
 	"xorm.io/xorm"
 )
 
@@ -24,18 +26,15 @@ func ggin(db *xorm.Engine) func(c *gin.Context) {
 		Me:  directive.MyInfo,
 	}}
 
-	hu := handler.GraphQL(NewExecutableSchema(c))
-	hu = func(next http.HandlerFunc) http.HandlerFunc {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			r.Header.Set("Content-Type", "application/json")
-			next.ServeHTTP(w, r)
-		})
-	}(hu)
+	srv := handler.New(NewExecutableSchema(c))
+	srv.AddTransport(transport.POST{})
+
+	srv.Use(extension.Introspection{})
 
 	return func(c *gin.Context) {
-		ctx := c.Request.Context()
-		ctx = context.WithValue(ctx, directive.GIN_CONTEXT, c)
-		hu.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
+		c.Header("Content-Type", "application/json")
+		ctx := context.WithValue(c.Request.Context(), directive.GIN_CONTEXT, c)
+		srv.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
 	}
 }
 
@@ -43,7 +42,7 @@ func Gin(g gin.IRouter, db *xorm.Engine) {
 	g.POST("/auth", ggin(db))
 	gs.Playground(g, "/auth/playground1", "/auth")
 	g.GET("/auth/playground2", func(c *gin.Context) {
-		handler.Playground("标题", "/auth").ServeHTTP(c.Writer, c.Request)
+		playground.Handler("标题", "/auth")(c.Writer, c.Request)
 	})
 }
 
