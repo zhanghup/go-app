@@ -1218,7 +1218,7 @@ type Users{
 type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     id: String
 
-    "用户类型"
+    "用户类型[dict:SYS0001]"
     type: String
     "账户"
     account: String
@@ -1250,7 +1250,7 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
 }
 
 input NewUser {
-    "用户类型"
+    "用户类型[dict:SYS0001]"
     type: String!
     "账户"
     account: String!
@@ -1277,7 +1277,7 @@ input NewUser {
 }
 
 input UpdUser {
-    "用户类型"
+    "用户类型[dict:SYS0001]"
     type: String!
     "账户"
     account: String!

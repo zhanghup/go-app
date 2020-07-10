@@ -15,7 +15,7 @@ func (r *dictResolver) Values(ctx context.Context, obj *beans.Dict) ([]beans.Dic
 		return nil, nil
 	}
 	c := make([]beans.DictItem, 0)
-	err := r.Loader(ctx).Slice(c, "select * from dict_item where id in :keys", nil, "Code", "").Load(*obj.Id, &c)
+	err := r.Loader(ctx).Slice(c, "select * from dict_item where code in :keys", nil, "Code", "").Load(*obj.Id, &c)
 	return c, err
 }
 

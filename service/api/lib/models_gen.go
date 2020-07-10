@@ -58,7 +58,7 @@ type NewRole struct {
 }
 
 type NewUser struct {
-	// 用户类型
+	// 用户类型[dict:SYS0001]
 	Type string `json:"type"`
 	// 账户
 	Account string `json:"account"`
@@ -150,7 +150,7 @@ type UpdRole struct {
 }
 
 type UpdUser struct {
-	// 用户类型
+	// 用户类型[dict:SYS0001]
 	Type string `json:"type"`
 	// 账户
 	Account string `json:"account"`

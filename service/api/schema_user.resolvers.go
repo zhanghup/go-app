@@ -41,6 +41,9 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input lib.
 }
 
 func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool, error) {
+	if tools.Str.Contains(ids, "root") {
+		return false, errors.New("root用户无法删除")
+	}
 	return r.Removes(ctx, new(beans.User), ids)
 }
 
