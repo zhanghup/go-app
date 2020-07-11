@@ -18,4 +18,5 @@ type Query {
 type Mutation {
   "用户登录"
   login(account:String!,password:String!): String!
+  login_status(token:String): Boolean!
 }

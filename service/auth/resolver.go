@@ -58,6 +58,10 @@ func (r *Resolver) Mutation() MutationResolver {
 
 type mutationResolver struct{ *Resolver }
 
+func (this mutationResolver) LoginStatus(ctx context.Context, token *string) (bool, error) {
+	panic("implement me")
+}
+
 func (this mutationResolver) Login(ctx context.Context, account string, password string) (string, error) {
 	user := beans.User{}
 	ok, err := this.DB.Where("account = ? and status = 1", account).Get(&user)
