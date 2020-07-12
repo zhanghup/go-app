@@ -16,6 +16,7 @@ import (
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
+	"time"
 	"xorm.io/xorm"
 )
 
@@ -59,7 +60,27 @@ func (r *Resolver) Mutation() MutationResolver {
 type mutationResolver struct{ *Resolver }
 
 func (this mutationResolver) LoginStatus(ctx context.Context, token *string) (bool, error) {
-	panic("implement me")
+	var tok string
+	if token != nil {
+		tok = *token
+	} else {
+		tok = this.Me(ctx).GinContext().GetHeader(directive.GIN_TOKEN)
+	}
+	if tok == "" {
+		return false, nil
+	}
+	t := beans.UserToken{}
+	ok, err := this.DB.Where("id = ?", tok).Get(&t)
+	if err != nil {
+		return false, err
+	}
+	if !ok {
+		return false, nil
+	}
+	if time.Now().Unix() > *t.Updated+*t.Expire {
+		return false, nil
+	}
+	return true, nil
 }
 
 func (this mutationResolver) Login(ctx context.Context, account string, password string) (string, error) {
