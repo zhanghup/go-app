@@ -9,6 +9,7 @@ import (
 const (
 	GIN_CONTEXT = "gin-context"
 	GIN_TOKEN   = "gin-token"
+	GIN_AUTHORIZATION = "Authorization"
 )
 
 type Me struct {

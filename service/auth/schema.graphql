@@ -19,7 +19,7 @@ type Mutation {
   "用户登录"
   login(account:String!,password:String!): String!
   "登录状态查询"
-  login_status(token:String): Boolean!
+  login_status: Boolean!
   "登出"
-  logout(token: String):Boolean!
+  logout:Boolean!
 }

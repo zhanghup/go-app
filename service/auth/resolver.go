@@ -59,12 +59,32 @@ func (r *Resolver) Mutation() MutationResolver {
 
 type mutationResolver struct{ *Resolver }
 
-func (this mutationResolver) LoginStatus(ctx context.Context, token *string) (bool, error) {
-	var tok string
-	if token != nil {
-		tok = *token
-	} else {
-		tok = this.Me(ctx).GinContext().GetHeader(directive.GIN_TOKEN)
+func (this mutationResolver) Logout(ctx context.Context) (bool, error) {
+	tok := this.Me(ctx).GinContext().GetHeader(directive.GIN_AUTHORIZATION)
+
+	if tok == "" {
+		tokk, err := this.Me(ctx).GinContext().Cookie(directive.GIN_TOKEN)
+		if err != nil {
+			return false, err
+		}
+		tok = tokk
+	}
+	if tok == "" {
+		return false, nil
+	}
+	_, err := this.DB.Table(beans.UserToken{}).Where("id = ?").Update(map[string]interface{}{"status": 0, "updated": time.Now().Unix()})
+	return err == nil, err
+}
+
+func (this mutationResolver) LoginStatus(ctx context.Context) (bool, error) {
+	tok := this.Me(ctx).GinContext().GetHeader(directive.GIN_AUTHORIZATION)
+
+	if tok == "" {
+		tokk, err := this.Me(ctx).GinContext().Cookie(directive.GIN_TOKEN)
+		if err != nil {
+			return false, err
+		}
+		tok = tokk
 	}
 	if tok == "" {
 		return false, nil
