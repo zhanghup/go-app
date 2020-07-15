@@ -7,7 +7,7 @@ extend type Query{
 
 extend type Mutation {
     "用户新建"
-    user_create(input:NewUser!):User  @perm(entity: "user",perm: "C")
+    user_create(input:NewUser!):Boolean!  @perm(entity: "user",perm: "C")
     "用户更新"
     user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U")
     "用户批量删除"

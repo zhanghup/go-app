@@ -6,24 +6,32 @@ package api
 import (
 	"context"
 	"errors"
+	"github.com/zhanghup/go-app/service/event"
+	"github.com/zhanghup/go-tools/tog"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/lib"
 	"github.com/zhanghup/go-tools"
 )
 
-func (r *mutationResolver) UserCreate(ctx context.Context, input lib.NewUser) (*beans.User, error) {
+func (r *mutationResolver) UserCreate(ctx context.Context, input lib.NewUser) (bool, error) {
 	user := &beans.User{
 		Salt: tools.Ptr.String(tools.Str.RandString(10)),
 	}
 	input.Password = tools.Crypto.Password(input.Password, *user.Salt)
 
 	id, err := r.Create(ctx, user, input)
-	if err != nil {
-		return nil, err
-	}
 
-	return r.UserLoader(ctx, id)
+	// 用户新增推送
+	go func() {
+		user, err := r.UserLoader(ctx, id)
+		if err != nil {
+			tog.Error(err.Error())
+		}
+		event.UserCreate(user)
+	}()
+
+	return err == nil, err
 }
 
 func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input lib.UpdUser) (bool, error) {
@@ -37,14 +45,44 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input lib.
 	if *user.Password != input.Password {
 		input.Password = tools.Crypto.Password(input.Password, *user.Salt)
 	}
-	return r.Update(ctx, new(beans.User), id, input)
+	ok, err := r.Update(ctx, new(beans.User), id, input)
+	if err != nil {
+		return false, err
+	}
+
+	// 用户更新推送
+	go func() {
+		user, err := r.UserLoader(ctx, id)
+		if err != nil {
+			tog.Error(err.Error())
+		}
+		event.UserCreate(user)
+	}()
+
+	return ok, nil
 }
 
 func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool, error) {
 	if tools.Str.Contains(ids, "root") {
 		return false, errors.New("root用户无法删除")
 	}
-	return r.Removes(ctx, new(beans.User), ids)
+	users := make([]beans.User, 0)
+	err := r.DB.In("id", ids).Find(&users)
+	if err != nil {
+		return false, err
+	}
+	ok, err := r.Removes(ctx, new(beans.User), ids)
+	if err != nil || !ok {
+		return false, err
+	}
+
+	go func() {
+		for _, user := range users {
+			event.UserCreate(&user)
+		}
+	}()
+
+	return true, nil
 }
 
 func (r *queryResolver) Users(ctx context.Context, query lib.QUser) (*lib.Users, error) {

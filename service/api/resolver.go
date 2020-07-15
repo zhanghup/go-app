@@ -10,6 +10,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/lib"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
@@ -20,21 +21,30 @@ import (
 	"xorm.io/xorm"
 )
 
-func ggin(db *xorm.Engine) func(c *gin.Context) {
+func NewResolver(db *xorm.Engine) lib.Config {
+
+	//cache, err := directive.NewDictCache(db)
+	//if err != nil {
+	//	panic(err)
+	//}
+
 	resolver := &Resolver{
 		DB:     db,
 		DBS:    txorm.NewEngine(db),
 		Loader: tgql.DataLoaden,
-		my:     directive.MyInfo,
+		Me:     directive.MyInfo,
 	}
-	c := lib.Config{
+
+	return lib.Config{
 		Resolvers: resolver,
 		Directives: lib.DirectiveRoot{
 			Perm: directive.Perm(),
 		},
 	}
+}
 
-	srv := handler.New(lib.NewExecutableSchema(c))
+func ggin(db *xorm.Engine) func(c *gin.Context) {
+	srv := handler.New(lib.NewExecutableSchema(NewResolver(db)))
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.Websocket{
 		KeepAlivePingInterval: 10 * time.Second,
@@ -45,7 +55,6 @@ func ggin(db *xorm.Engine) func(c *gin.Context) {
 		},
 	})
 	srv.Use(extension.Introspection{})
-
 
 	hu := tgql.DataLoadenMiddleware(db, srv)
 
@@ -67,8 +76,9 @@ func Gin(g gin.IRouter, db *xorm.Engine) {
 }
 
 type Resolver struct {
-	DB     *xorm.Engine
-	DBS    *txorm.Engine
-	Loader func(ctx context.Context) tgql.Loader
-	my     func(ctx context.Context) directive.Me
+	DB        *xorm.Engine
+	DBS       *txorm.Engine
+	Loader    func(ctx context.Context) tgql.Loader
+	Me        func(ctx context.Context) directive.Me
+	DictCache func(dict string) (*beans.Dict, []beans.DictItem, bool)
 }

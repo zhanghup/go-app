@@ -2,6 +2,7 @@ package directive
 
 import (
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/service/ca"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
@@ -22,8 +23,21 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 				tok, _ = c.Cookie(GIN_TOKEN)
 			}
 			if len(tok) == 0 {
-				return nil, "[2] 未授权"
+				return nil, "[1] 未授权"
 			}
+
+			user, ok := ca.UserCache.Get(tok)
+			if ok {
+				if time.Now().Unix() > *user.Token.Updated+*user.Token.Expire {
+					return nil, "[2] 未授权"
+				}
+				*user.Token.Ops += 1
+				*user.Token.Expire = 7200
+				ca.UserCache.Set(tok, user)
+				c.Set("user_info", user)
+				return nil, ""
+			}
+
 			token := beans.UserToken{}
 			ok, err := db.Table(token).Where("id = ?", tok).Get(&token)
 			if err != nil {

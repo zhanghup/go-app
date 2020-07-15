@@ -5,18 +5,20 @@ package api
 
 import (
 	"context"
+	"github.com/zhanghup/go-app/service/event"
+	"github.com/zhanghup/go-tools/tog"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/lib"
 	"github.com/zhanghup/go-tools"
 )
 
-func (r *mutationResolver) RoleCreate(ctx context.Context, input lib.NewRole) (*beans.Role, error) {
-	id, err := r.Create(ctx, new(beans.Role), input)
+func (r *mutationResolver) RoleCreate(ctx context.Context, input lib.NewRole) (bool, error) {
+	_, err := r.Create(ctx, new(beans.Role), input)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
-	return r.RoleLoader(ctx, id)
+	return true, nil
 }
 
 func (r *mutationResolver) RoleUpdate(ctx context.Context, id string, input lib.UpdRole) (bool, error) {
@@ -108,6 +110,15 @@ func (r *mutationResolver) RoleToUser(ctx context.Context, uid string, roles []s
 			return false, err
 		}
 	}
+
+	// 用户角色变化推送
+	go func() {
+		user, err := r.UserLoader(ctx, uid)
+		if err != nil {
+			tog.Error(err.Error())
+		}
+		event.UserCreate(user)
+	}()
 	return true, nil
 }
 

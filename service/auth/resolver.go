@@ -130,7 +130,7 @@ func (this mutationResolver) Login(ctx context.Context, account string, password
 	if err != nil {
 		return "", err
 	} else {
-		go event.UserLogin("pc", user)
+		go event.UserLogin("pc", &user)
 	}
 	return tok, nil
 }

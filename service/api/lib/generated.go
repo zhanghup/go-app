@@ -102,7 +102,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Dict            func(childComplexity int, id string) int
-		Dicts           func(childComplexity int, query QDict) int
+		Dicts           func(childComplexity int) int
 		Hello           func(childComplexity int) int
 		Role            func(childComplexity int, id string) int
 		RolePermObjects func(childComplexity int, id string) int
@@ -161,26 +161,26 @@ type DictResolver interface {
 }
 type MutationResolver interface {
 	World(ctx context.Context) (*string, error)
-	DictCreate(ctx context.Context, input NewDict) (*beans.Dict, error)
+	DictCreate(ctx context.Context, input NewDict) (bool, error)
 	DictUpdate(ctx context.Context, id string, input UpdDict) (bool, error)
 	DictRemoves(ctx context.Context, ids []string) (bool, error)
-	DictItemCreate(ctx context.Context, input NewDictItem) (*beans.DictItem, error)
+	DictItemCreate(ctx context.Context, input NewDictItem) (bool, error)
 	DictItemUpdate(ctx context.Context, id string, input UpdDictItem) (bool, error)
 	DictItemRemoves(ctx context.Context, ids []string) (bool, error)
-	RoleCreate(ctx context.Context, input NewRole) (*beans.Role, error)
+	RoleCreate(ctx context.Context, input NewRole) (bool, error)
 	RoleUpdate(ctx context.Context, id string, input UpdRole) (bool, error)
 	RoleRemoves(ctx context.Context, ids []string) (bool, error)
 	RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error)
 	RolePermObjCreate(ctx context.Context, id string, perms []IPermObj) (bool, error)
 	RoleToUser(ctx context.Context, uid string, roles []string) (bool, error)
-	UserCreate(ctx context.Context, input NewUser) (*beans.User, error)
+	UserCreate(ctx context.Context, input NewUser) (bool, error)
 	UserUpdate(ctx context.Context, id string, input UpdUser) (bool, error)
 	UserRemoves(ctx context.Context, ids []string) (bool, error)
 }
 type QueryResolver interface {
 	Stat(ctx context.Context) (interface{}, error)
 	Hello(ctx context.Context) (*string, error)
-	Dicts(ctx context.Context, query QDict) (*Dicts, error)
+	Dicts(ctx context.Context) ([]beans.Dict, error)
 	Dict(ctx context.Context, id string) (*beans.Dict, error)
 	Roles(ctx context.Context, query QRole) (*Roles, error)
 	Role(ctx context.Context, id string) (*beans.Role, error)
@@ -566,12 +566,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_dicts_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Dicts(childComplexity, args["query"].(QDict)), true
+		return e.complexity.Query.Dicts(childComplexity), true
 
 	case "Query.hello":
 		if e.complexity.Query.Hello == nil {
@@ -960,21 +955,21 @@ type Subscription {
 `, BuiltIn: false},
 	&ast.Source{Name: "schema/schema_dict.graphql", Input: `extend type Query{
     "字典列表（分页）"
-    dicts(query:QDict!):Dicts @perm(entity: "dict",perm: "R")
+    dicts:[Dict!] @perm(entity: "dict",perm: "R")
     "字典单个对象"
     dict(id: String!):Dict @perm(entity: "dict",perm: "R")
 }
 
 extend type Mutation {
     "字典新建"
-    dict_create(input:NewDict!):Dict  @perm(entity: "dict",perm: "C")
+    dict_create(input:NewDict!):Boolean!  @perm(entity: "dict",perm: "C")
     "字典更新"
     dict_update(id: String!,input:UpdDict!):Boolean!  @perm(entity: "dict",perm: "U")
     "字典批量删除"
     dict_removes(ids: [String!]):Boolean! @perm(entity: "dict",perm: "D")
 
     "字典项新建"
-    dict_item_create(input:NewDictItem!):DictItem  @perm(entity: "dict",perm: "C")
+    dict_item_create(input:NewDictItem!):Boolean!  @perm(entity: "dict",perm: "C")
     "字典项更新"
     dict_item_update(id: String!,input:UpdDictItem!):Boolean!  @perm(entity: "dict",perm: "U")
     "字典项批量删除"
@@ -1107,7 +1102,7 @@ input UpdDictItem{
 
 extend type Mutation {
     "角色新建"
-    role_create(input: NewRole!): Role @perm(entity: "role",perm: "C")
+    role_create(input: NewRole!):Boolean! @perm(entity: "role",perm: "C")
     "角色更新"
     role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "role",perm: "U")
     "角色批量删除"
@@ -1197,7 +1192,7 @@ input UpdRole {
 
 extend type Mutation {
     "用户新建"
-    user_create(input:NewUser!):User  @perm(entity: "user",perm: "C")
+    user_create(input:NewUser!):Boolean!  @perm(entity: "user",perm: "C")
     "用户更新"
     user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U")
     "用户批量删除"
@@ -1640,20 +1635,6 @@ func (ec *executionContext) field_Query_dict_args(ctx context.Context, rawArgs m
 		}
 	}
 	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_dicts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 QDict
-	if tmp, ok := rawArgs["query"]; ok {
-		arg0, err = ec.unmarshalNQDict2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐQDict(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["query"] = arg0
 	return args, nil
 }
 
@@ -2485,21 +2466,24 @@ func (ec *executionContext) _Mutation_dict_create(ctx context.Context, field gra
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*beans.Dict); ok {
+		if data, ok := tmp.(bool); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Dict`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*beans.Dict)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalODict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDict(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_dict_update(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2689,21 +2673,24 @@ func (ec *executionContext) _Mutation_dict_item_create(ctx context.Context, fiel
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*beans.DictItem); ok {
+		if data, ok := tmp.(bool); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.DictItem`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*beans.DictItem)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalODictItem2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDictItem(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_dict_item_update(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2893,21 +2880,24 @@ func (ec *executionContext) _Mutation_role_create(ctx context.Context, field gra
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*beans.Role); ok {
+		if data, ok := tmp.(bool); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Role`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*beans.Role)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalORole2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐRole(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_role_update(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3316,21 +3306,24 @@ func (ec *executionContext) _Mutation_user_create(ctx context.Context, field gra
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*beans.User); ok {
+		if data, ok := tmp.(bool); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.User`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*beans.User)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐUser(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_user_update(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3616,17 +3609,10 @@ func (ec *executionContext) _Query_dicts(ctx context.Context, field graphql.Coll
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_dicts_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Dicts(rctx, args["query"].(QDict))
+			return ec.resolvers.Query().Dicts(rctx)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			entity, err := ec.unmarshalNString2string(ctx, "dict")
@@ -3650,10 +3636,10 @@ func (ec *executionContext) _Query_dicts(ctx context.Context, field graphql.Coll
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*Dicts); ok {
+		if data, ok := tmp.([]beans.Dict); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/lib.Dicts`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []github.com/zhanghup/go-app/beans.Dict`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3662,9 +3648,9 @@ func (ec *executionContext) _Query_dicts(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*Dicts)
+	res := resTmp.([]beans.Dict)
 	fc.Result = res
-	return ec.marshalODicts2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐDicts(ctx, field.Selections, res)
+	return ec.marshalODict2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDictᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_dict(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6776,6 +6762,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_world(ctx, field)
 		case "dict_create":
 			out.Values[i] = ec._Mutation_dict_create(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "dict_update":
 			out.Values[i] = ec._Mutation_dict_update(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -6788,6 +6777,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "dict_item_create":
 			out.Values[i] = ec._Mutation_dict_item_create(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "dict_item_update":
 			out.Values[i] = ec._Mutation_dict_item_update(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -6800,6 +6792,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "role_create":
 			out.Values[i] = ec._Mutation_role_create(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "role_update":
 			out.Values[i] = ec._Mutation_role_update(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -6827,6 +6822,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "user_create":
 			out.Values[i] = ec._Mutation_user_create(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "user_update":
 			out.Values[i] = ec._Mutation_user_update(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -7491,10 +7489,6 @@ func (ec *executionContext) marshalNPermObj2githubᚗcomᚋzhanghupᚋgoᚑapp�
 	return ec._PermObj(ctx, sel, &v)
 }
 
-func (ec *executionContext) unmarshalNQDict2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐQDict(ctx context.Context, v interface{}) (QDict, error) {
-	return ec.unmarshalInputQDict(ctx, v)
-}
-
 func (ec *executionContext) unmarshalNQRole2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐQRole(ctx context.Context, v interface{}) (QRole, error) {
 	return ec.unmarshalInputQRole(ctx, v)
 }
@@ -7884,10 +7878,6 @@ func (ec *executionContext) marshalODict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑapp�
 	return ec._Dict(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalODictItem2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDictItem(ctx context.Context, sel ast.SelectionSet, v beans.DictItem) graphql.Marshaler {
-	return ec._DictItem(ctx, sel, &v)
-}
-
 func (ec *executionContext) marshalODictItem2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDictItemᚄ(ctx context.Context, sel ast.SelectionSet, v []beans.DictItem) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -7926,24 +7916,6 @@ func (ec *executionContext) marshalODictItem2ᚕgithubᚗcomᚋzhanghupᚋgoᚑa
 	}
 	wg.Wait()
 	return ret
-}
-
-func (ec *executionContext) marshalODictItem2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDictItem(ctx context.Context, sel ast.SelectionSet, v *beans.DictItem) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._DictItem(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalODicts2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐDicts(ctx context.Context, sel ast.SelectionSet, v Dicts) graphql.Marshaler {
-	return ec._Dicts(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalODicts2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐDicts(ctx context.Context, sel ast.SelectionSet, v *Dicts) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Dicts(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {

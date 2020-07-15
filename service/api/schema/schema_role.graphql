@@ -11,7 +11,7 @@ extend type Query {
 
 extend type Mutation {
     "角色新建"
-    role_create(input: NewRole!): Role @perm(entity: "role",perm: "C")
+    role_create(input: NewRole!):Boolean! @perm(entity: "role",perm: "C")
     "角色更新"
     role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "role",perm: "U")
     "角色批量删除"
