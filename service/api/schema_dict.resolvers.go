@@ -25,7 +25,7 @@ func (r *mutationResolver) DictCreate(ctx context.Context, input lib.NewDict) (b
 	if err != nil {
 		return false, err
 	}
-	go event.DictChangePush()
+	go event.DictChange()
 	return true, nil
 }
 
@@ -35,7 +35,7 @@ func (r *mutationResolver) DictUpdate(ctx context.Context, id string, input lib.
 		return false, err
 	}
 	if ok {
-		go event.DictChangePush()
+		go event.DictChange()
 	}
 	return ok, err
 }
@@ -46,7 +46,7 @@ func (r *mutationResolver) DictRemoves(ctx context.Context, ids []string) (bool,
 		return false, err
 	}
 	if ok {
-		go event.DictChangePush()
+		go event.DictChange()
 	}
 	return ok, err
 }
@@ -56,7 +56,7 @@ func (r *mutationResolver) DictItemCreate(ctx context.Context, input lib.NewDict
 	if err != nil {
 		return false, err
 	}
-	go event.DictChangePush()
+	go event.DictChange()
 	return true, nil
 }
 
@@ -66,7 +66,7 @@ func (r *mutationResolver) DictItemUpdate(ctx context.Context, id string, input 
 		return false, err
 	}
 	if ok {
-		go event.DictChangePush()
+		go event.DictChange()
 	}
 	return ok, err
 }
@@ -77,7 +77,7 @@ func (r *mutationResolver) DictItemRemoves(ctx context.Context, ids []string) (b
 		return false, err
 	}
 	if ok {
-		go event.DictChangePush()
+		go event.DictChange()
 	}
 	return ok, err
 }

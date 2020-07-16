@@ -9,10 +9,12 @@ import (
 )
 
 type User struct {
-	User        *beans.User
-	Token       *beans.UserToken
+	User        beans.User
+	Token       beans.UserToken
 	PermObjects map[string]string
 	Perms       map[string][]string
+	Admin       bool
+	TokenString string
 }
 
 type userCache struct {
@@ -22,8 +24,8 @@ type userCache struct {
 }
 
 func (this *userCache) Set(token string, user User) {
-	this.data.Set(token, user, time.Now().Unix()+3600)
-	this.tokenmap.Set(*user.User.Id, *user.Token.Id, time.Now().Unix()+3600)
+	this.data.Set(token, user, time.Now().Unix()+7200)
+	this.tokenmap.Set(*user.User.Id, *user.Token.Id, time.Now().Unix()+7200)
 }
 
 func (this *userCache) Get(token string) (User, bool) {
@@ -67,7 +69,11 @@ func init() {
 			UserCache.RemoveByUser(*user.Id)
 		})
 
-		go event.UserLoginSubscribe(func(ty, user *beans.User) {
+		go event.UserLoginSubscribe(func(ty string, user *beans.User) {
+			UserCache.RemoveByUser(*user.Id)
+		})
+
+		go event.UserRoleChangeSubscribe(func(user *beans.User) {
 			UserCache.RemoveByUser(*user.Id)
 		})
 	})

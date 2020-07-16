@@ -33,44 +33,64 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 				}
 				*user.Token.Ops += 1
 				*user.Token.Expire = 7200
+				_, err := db.Table(user.Token).Where("id = ?", user.TokenString).Update(user.Token)
+				if err != nil{
+					return err,"[3] 未授权"
+				}
 				ca.UserCache.Set(tok, user)
 				c.Set("user_info", user)
 				return nil, ""
 			}
 
-			token := beans.UserToken{}
-			ok, err := db.Table(token).Where("id = ?", tok).Get(&token)
-			if err != nil {
-				return err.Error(), "[3] 未授权"
-			}
-			if !ok {
-				return nil, "[4] 未授权"
-			}
-			if token.Status == nil || *token.Status != 1 {
-				return nil, "[5] 未授权"
-			}
-			if time.Now().Unix() > *token.Updated+*token.Expire {
-				return nil, "[6] 未授权"
-			}
-			*token.Ops += 1
-			*token.Expire = 7200
-			_, err = db.Table(token).Where("id = ?", token.Id).Update(token)
-			if err != nil {
-				return err.Error(), "[7] 未授权"
+			user = ca.User{}
+			// token 验证
+			{
+				token := beans.UserToken{}
+				ok, err := db.Table(token).Where("id = ?", tok).Get(&token)
+				if err != nil {
+					return err.Error(), "[4] 未授权"
+				}
+				if !ok {
+					return nil, "[5] 未授权"
+				}
+				if token.Status == nil || *token.Status != 1 {
+					return nil, "[6] 未授权"
+				}
+				if time.Now().Unix() > *token.Updated+*token.Expire {
+					return nil, "[7] 未授权"
+				}
+				*token.Ops += 1
+				*token.Expire = 7200
+				_, err = db.Table(token).Where("id = ?", token.Id).Update(token)
+				if err != nil {
+					return err.Error(), "[8] 未授权"
+				}
+				user.Token = token
+				user.TokenString = *token.Id
 			}
 
-			u := beans.User{}
-			ok, err = db.Table(u).Where("id = ? and status = 1", *token.Uid).Get(&u)
-			if err != nil {
-				return err.Error(), "[10] 未授权"
+			// 用户验证
+			{
+				u := beans.User{}
+				ok, err := db.Table(u).Where("id = ? and status = 1", *user.Token.Uid).Get(&u)
+				if err != nil {
+					return err.Error(), "[9] 未授权"
+				}
+				if !ok {
+					return nil, "[10] 未授权"
+				}
+				user.User = u
 			}
 			// 是否为管理员用户
-			admin := true
-			if u.Admin == nil || *u.Admin == 0 {
-				admin = false
+			{
+				admin := true
+				if user.User.Admin == nil || *user.User.Admin == 0 {
+					admin = false
+				}
+				user.Admin = admin
 			}
 
-			if !admin {
+			if !user.Admin {
 				// 读取权限列表
 				myPerms := Perms{}
 				{
@@ -78,13 +98,13 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 						Type string `json:"type"`
 						Oid  string `json:"oid"`
 					}, 0)
-					err = dbs.SF(`
+					err := dbs.SF(`
 						select p.type,p.oid from user u 
 						join role_user ru on u.id = ru.uid
 						join perm p on p.role = ru.id
 					`).Find(&perms)
 					if err != nil {
-						return err.Error(), "[8] 未授权"
+						return err.Error(), "[11] 未授权"
 					}
 					// 去重
 					for _, p := range perms {
@@ -106,13 +126,13 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 						Object string `json:"object"`
 						Mask   string `json:"mask"`
 					}, 0)
-					err = dbs.SF(`
+					err := dbs.SF(`
 						select p.object,p.mask from user u 
 						join role_user ru on u.id = ru.uid
 						join perm_object p on p.role = ru.id
 					`).Find(&permObjects)
 					if err != nil {
-						return err.Error(), "[9] 未授权"
+						return err.Error(), "[12] 未授权"
 					}
 					for _, p := range permObjects {
 						if o, ok := myPermObj[p.Object]; ok {
@@ -136,15 +156,14 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 					}
 
 				}
-				c.Set("perms", myPerms)
-				c.Set("permobjs", myPermObj)
+
+				user.Perms = myPerms
+				user.PermObjects = myPermObj
 			}
 
-			c.Set("uid", *token.Uid)
-			c.Set("user", u)
-
-			c.Set("admin", admin)
-			c.SetCookie(GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
+			c.Set("user_info", user)
+			ca.UserCache.Set(user.TokenString, user)
+			c.SetCookie(GIN_TOKEN, user.TokenString, 2*60*60, "/", "", false, true)
 			c.Next()
 			return nil, ""
 		})

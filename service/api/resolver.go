@@ -38,7 +38,7 @@ func NewResolver(db *xorm.Engine) lib.Config {
 	return lib.Config{
 		Resolvers: resolver,
 		Directives: lib.DirectiveRoot{
-			Perm: directive.Perm(),
+			Perm: directive.Perm(db),
 		},
 	}
 }

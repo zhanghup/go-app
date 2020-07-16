@@ -117,7 +117,7 @@ func (r *mutationResolver) RoleToUser(ctx context.Context, uid string, roles []s
 		if err != nil {
 			tog.Error(err.Error())
 		}
-		event.UserCreate(user)
+		event.UserRoleChange(user)
 	}()
 	return true, nil
 }

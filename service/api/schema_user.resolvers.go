@@ -56,7 +56,7 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input lib.
 		if err != nil {
 			tog.Error(err.Error())
 		}
-		event.UserCreate(user)
+		event.UserUpdate(user)
 	}()
 
 	return ok, nil
@@ -78,7 +78,7 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 
 	go func() {
 		for _, user := range users {
-			event.UserCreate(&user)
+			event.UserRemove(&user)
 		}
 	}()
 

@@ -45,5 +45,4 @@ func main() {
 		api.Gin(g.Group("/"), e)
 		return nil
 	})
-
 }

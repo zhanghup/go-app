@@ -12,14 +12,14 @@ type CronLog struct {
 type OperateLog struct {
 	Bean `xorm:"extends"`
 
-	Type   *string `json:"type"`   // 操作的表名
-	Opt    *string `json:"opt"`    // 操作的动作 增/删/改/查
-	Oid    *string `json:"oid"`    // 操作对象的id
-	Uid    *string `json:"uid"`    // 操作的人员
-	Uname  *string `json:"uname"`  // 操作员名称
-	State  *int    `json:"state"`  // 操作的结果 0：失败，1：成功，-1：拒绝
-	Msg    *string `json:"msg"`    // 异常信息
-	Object *string `json:"object"` // 提交对象
+	Type         *string `json:"type"`          // 操作的表名
+	Opt          *string `json:"opt"`           // 操作的动作 增/删/改/查
+	Uid          *string `json:"uid"`           // 操作的人员
+	Uname        *string `json:"uname"`         // 操作员名称
+	State        *int    `json:"state"`         // 操作的结果 0：失败，1：成功，-1：拒绝
+	Msg          *string `json:"msg"`           // 异常信息
+	Gql          *string `json:"gql"`           // 输入
+	GqlVariables *string `json:"gql_variables"` // 输出
 }
 
 func log_tables() []interface{} {

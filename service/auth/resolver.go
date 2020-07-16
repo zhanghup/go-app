@@ -60,10 +60,10 @@ func (r *Resolver) Mutation() MutationResolver {
 type mutationResolver struct{ *Resolver }
 
 func (this mutationResolver) Logout(ctx context.Context) (bool, error) {
-	tok := this.Me(ctx).GinContext().GetHeader(directive.GIN_AUTHORIZATION)
+	tok := this.Me(ctx).Gin.GetHeader(directive.GIN_AUTHORIZATION)
 
 	if tok == "" {
-		tokk, err := this.Me(ctx).GinContext().Cookie(directive.GIN_TOKEN)
+		tokk, err := this.Me(ctx).Gin.Cookie(directive.GIN_TOKEN)
 		if err != nil {
 			return false, err
 		}
@@ -77,10 +77,10 @@ func (this mutationResolver) Logout(ctx context.Context) (bool, error) {
 }
 
 func (this mutationResolver) LoginStatus(ctx context.Context) (bool, error) {
-	tok := this.Me(ctx).GinContext().GetHeader(directive.GIN_AUTHORIZATION)
+	tok := this.Me(ctx).Gin.GetHeader(directive.GIN_AUTHORIZATION)
 
 	if tok == "" {
-		tokk, err := this.Me(ctx).GinContext().Cookie(directive.GIN_TOKEN)
+		tokk, err := this.Me(ctx).Gin.Cookie(directive.GIN_TOKEN)
 		if err != nil {
 			return false, err
 		}
@@ -149,14 +149,14 @@ func (this mutationResolver) Token(ctx context.Context, uid, ty string) (string,
 		token.Status = tools.Ptr.Int(1)
 		token.Uid = &uid
 		token.Type = tools.Ptr.String(string(ty))
-		token.Agent = tools.Ptr.String(this.Me(ctx).GinContext().Request.UserAgent())
+		token.Agent = tools.Ptr.String(this.Me(ctx).Gin.Request.UserAgent())
 		token.Expire = tools.Ptr.Int64(2 * 60 * 60)
 		token.Ops = tools.Ptr.Int64(0)
 		e = sess.Insert(token)
 		if e != nil {
 			return e
 		}
-		this.Me(ctx).GinContext().SetCookie(directive.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
+		this.Me(ctx).Gin.SetCookie(directive.GIN_TOKEN, *token.Id, 2*60*60, "/", "", false, true)
 		return nil
 
 	})
