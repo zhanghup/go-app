@@ -6,12 +6,12 @@ package api
 import (
 	"context"
 	"errors"
-	"github.com/zhanghup/go-app/service/event"
-	"github.com/zhanghup/go-tools/tog"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/lib"
+	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-tools/tog"
 )
 
 func (r *mutationResolver) UserCreate(ctx context.Context, input lib.NewUser) (bool, error) {
@@ -90,7 +90,8 @@ func (r *queryResolver) Users(ctx context.Context, query lib.QUser) (*lib.Users,
 	total, err := r.DBS.SF(`
 		select * from user u
 		where 1 = 1
-	`).Page2(query.Index, query.Size, query.Count, &users)
+		{{ if .keyword }} and u.name like concat("%",?keyword,"%") {{ end }}
+	`, map[string]interface{}{"keyword": query.Keyword}).Page2(query.Index, query.Size, query.Count, &users)
 	return &lib.Users{Data: users, Total: &total}, err
 }
 

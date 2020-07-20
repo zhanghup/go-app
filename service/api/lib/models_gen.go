@@ -6,11 +6,6 @@ import (
 	"github.com/zhanghup/go-app/beans"
 )
 
-type Dicts struct {
-	Total *int         `json:"total"`
-	Data  []beans.Dict `json:"data"`
-}
-
 type IPermObj struct {
 	// 对象
 	Object string `json:"object"`
@@ -91,22 +86,18 @@ type PermObj struct {
 	Mask string `json:"mask"`
 }
 
-type QDict struct {
-	Index *int  `json:"index"`
-	Size  *int  `json:"size"`
-	Count *bool `json:"count"`
-}
-
 type QRole struct {
-	Index *int  `json:"index"`
-	Size  *int  `json:"size"`
-	Count *bool `json:"count"`
+	Keyword *string `json:"keyword"`
+	Index   *int    `json:"index"`
+	Size    *int    `json:"size"`
+	Count   *bool   `json:"count"`
 }
 
 type QUser struct {
-	Index *int  `json:"index"`
-	Size  *int  `json:"size"`
-	Count *bool `json:"count"`
+	Keyword *string `json:"keyword"`
+	Index   *int    `json:"index"`
+	Size    *int    `json:"size"`
+	Count   *bool   `json:"count"`
 }
 
 type Roles struct {

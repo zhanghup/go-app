@@ -5,12 +5,12 @@ package api
 
 import (
 	"context"
-	"github.com/zhanghup/go-app/service/event"
-	"github.com/zhanghup/go-tools/tog"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/lib"
+	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-tools/tog"
 )
 
 func (r *mutationResolver) RoleCreate(ctx context.Context, input lib.NewRole) (bool, error) {
@@ -127,7 +127,8 @@ func (r *queryResolver) Roles(ctx context.Context, query lib.QRole) (*lib.Roles,
 	total, err := r.DBS.SF(`
 		select * from role u
 		where 1 = 1
-	`).Page2(query.Index, query.Size, query.Count, &roles)
+		{{ if .keyword }} and u.name like concat("%",?keyword,"%") {{ end }}
+	`, map[string]interface{}{"keyword": query.Keyword}).Page2(query.Index, query.Size, query.Count, &roles)
 	return &lib.Roles{Data: roles, Total: &total}, err
 }
 

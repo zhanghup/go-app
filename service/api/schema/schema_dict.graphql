@@ -21,16 +21,6 @@ extend type Mutation {
     dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict",perm: "D")
 }
 
-input QDict{
-    index: Int
-    size: Int
-    count: Boolean
-}
-
-type Dicts{
-    total: Int
-    data:[Dict!]
-}
 
 type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     id: String

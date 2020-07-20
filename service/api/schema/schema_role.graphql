@@ -39,6 +39,8 @@ type PermObj{
 }
 
 input QRole {
+    keyword: String
+
     index: Int
     size: Int
     count: Boolean

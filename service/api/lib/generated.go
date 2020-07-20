@@ -71,11 +71,6 @@ type ComplexityRoot struct {
 		Weight    func(childComplexity int) int
 	}
 
-	Dicts struct {
-		Data  func(childComplexity int) int
-		Total func(childComplexity int) int
-	}
-
 	Mutation struct {
 		DictCreate        func(childComplexity int, input NewDict) int
 		DictItemCreate    func(childComplexity int, input NewDictItem) int
@@ -333,20 +328,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DictItem.Weight(childComplexity), true
-
-	case "Dicts.data":
-		if e.complexity.Dicts.Data == nil {
-			break
-		}
-
-		return e.complexity.Dicts.Data(childComplexity), true
-
-	case "Dicts.total":
-		if e.complexity.Dicts.Total == nil {
-			break
-		}
-
-		return e.complexity.Dicts.Total(childComplexity), true
 
 	case "Mutation.dict_create":
 		if e.complexity.Mutation.DictCreate == nil {
@@ -976,16 +957,6 @@ extend type Mutation {
     dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict",perm: "D")
 }
 
-input QDict{
-    index: Int
-    size: Int
-    count: Boolean
-}
-
-type Dicts{
-    total: Int
-    data:[Dict!]
-}
 
 type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     id: String
@@ -1130,6 +1101,8 @@ type PermObj{
 }
 
 input QRole {
+    keyword: String
+
     index: Int
     size: Int
     count: Boolean
@@ -1200,6 +1173,8 @@ extend type Mutation {
 }
 
 input QUser{
+    keyword: String
+
     index: Int
     size: Int
     count: Boolean
@@ -2322,68 +2297,6 @@ func (ec *executionContext) _DictItem_status(ctx context.Context, field graphql.
 	res := resTmp.(*int)
 	fc.Result = res
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Dicts_total(ctx context.Context, field graphql.CollectedField, obj *Dicts) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Dicts",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Total, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Dicts_data(ctx context.Context, field graphql.CollectedField, obj *Dicts) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Dicts",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Data, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]beans.Dict)
-	fc.Result = res
-	return ec.marshalODict2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDictᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_world(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6328,42 +6241,18 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputQDict(ctx context.Context, obj interface{}) (QDict, error) {
-	var it QDict
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "index":
-			var err error
-			it.Index, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "size":
-			var err error
-			it.Size, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "count":
-			var err error
-			it.Count, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputQRole(ctx context.Context, obj interface{}) (QRole, error) {
 	var it QRole
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
 		switch k {
+		case "keyword":
+			var err error
+			it.Keyword, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "index":
 			var err error
 			it.Index, err = ec.unmarshalOInt2ᚖint(ctx, v)
@@ -6394,6 +6283,12 @@ func (ec *executionContext) unmarshalInputQUser(ctx context.Context, obj interfa
 
 	for k, v := range asMap {
 		switch k {
+		case "keyword":
+			var err error
+			it.Keyword, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "index":
 			var err error
 			it.Index, err = ec.unmarshalOInt2ᚖint(ctx, v)
@@ -6706,32 +6601,6 @@ func (ec *executionContext) _DictItem(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = ec._DictItem_weight(ctx, field, obj)
 		case "status":
 			out.Values[i] = ec._DictItem_status(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var dictsImplementors = []string{"Dicts"}
-
-func (ec *executionContext) _Dicts(ctx context.Context, sel ast.SelectionSet, obj *Dicts) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, dictsImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Dicts")
-		case "total":
-			out.Values[i] = ec._Dicts_total(ctx, field, obj)
-		case "data":
-			out.Values[i] = ec._Dicts_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

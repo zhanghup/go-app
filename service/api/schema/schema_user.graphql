@@ -15,6 +15,8 @@ extend type Mutation {
 }
 
 input QUser{
+    keyword: String
+
     index: Int
     size: Int
     count: Boolean
