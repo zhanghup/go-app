@@ -19,6 +19,8 @@ extend type Mutation {
     dict_item_update(id: String!,input:UpdDictItem!):Boolean!  @perm(entity: "dict",perm: "U")
     "字典项批量删除"
     dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict",perm: "D")
+    "字典项重新排序"
+    dict_item_sort(id: String!,items:[String!]): Boolean! @perm(entity: "dict",perm: "M")
 }
 
 

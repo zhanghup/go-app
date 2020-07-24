@@ -9,6 +9,7 @@ import (
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/lib"
 	"github.com/zhanghup/go-app/service/event"
+	"github.com/zhanghup/go-tools/database/txorm"
 )
 
 func (r *dictResolver) Values(ctx context.Context, obj *beans.Dict) ([]beans.DictItem, error) {
@@ -16,7 +17,7 @@ func (r *dictResolver) Values(ctx context.Context, obj *beans.Dict) ([]beans.Dic
 		return nil, nil
 	}
 	c := make([]beans.DictItem, 0)
-	err := r.Loader(ctx).Slice(c, "select * from dict_item where code in :keys", nil, "Code", "").Load(*obj.Id, &c)
+	err := r.Loader(ctx).Slice(c, "select * from dict_item where code in :keys order by weigh", nil, "Code", "").Load(*obj.Id, &c)
 	return c, err
 }
 
@@ -80,6 +81,19 @@ func (r *mutationResolver) DictItemRemoves(ctx context.Context, ids []string) (b
 		go event.DictChange()
 	}
 	return ok, err
+}
+
+func (r *mutationResolver) DictItemSort(ctx context.Context, id string, items []string) (bool, error) {
+	err := r.DBS.NewSession(ctx).TS(func(sess *txorm.Session) error {
+		for i, o := range items {
+			err := sess.SF(`update dict_item set weight = :weight where id = :id and code = :code`, map[string]interface{}{"weight": i, "id": o, "code": id}).Exec()
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return err == nil, err
 }
 
 func (r *queryResolver) Dicts(ctx context.Context) ([]beans.Dict, error) {
