@@ -29,6 +29,58 @@ type Uploader struct {
 	db *xorm.Engine
 }
 
+func (this *Uploader) UploadIO(read io.Reader, name, contentType string) (string, error) {
+	data, err := ioutil.ReadAll(read)
+	if err != nil {
+		return "[UploadIO] 读取文件失败【1】", err
+	}
+
+	md5 := tools.Crypto.MD5(data)
+	idx := strings.LastIndex(name, ".")
+	endStr := ""
+	if idx > -1 {
+		endStr = name[idx+1:]
+	}
+
+	old := beans.Resource{}
+	_, err = this.db.Table(old).Where("md5 = ?", md5).Get(&old)
+	if err != nil {
+		return "[UploadIO] 读取文件失败【2】", err
+	}
+
+	if old.Id == nil {
+		res := beans.Resource{
+			Bean: beans.Bean{
+				Id:     tools.Ptr.Uid(),
+				Status: tools.Ptr.Int(1),
+			},
+			ContentType: contentType,
+			MD5:         md5,
+			Name:        name,
+			Size:        int64(len(data)),
+			FileEnd:     endStr,
+		}
+		_, err = this.db.Insert(res)
+		if err != nil {
+			return "[UploadIO] 写入文件失败【1】", err
+		}
+		_ = os.MkdirAll(fmt.Sprintf("upload/%s", contentType), 0777)
+		f, err := os.Create(fmt.Sprintf("upload/%s/%s.%s", contentType, *res.Id, endStr))
+		if err != nil {
+			return "[UploadIO] 写入文件失败【2】", err
+		}
+		defer f.Close()
+		_, err = io.Copy(f, bytes.NewBuffer(data))
+		if err != nil {
+			return "[UploadIO] 写入文件失败【3】", err
+		}
+
+		return *res.Id, nil
+	} else {
+		return *old.Id, nil
+	}
+}
+
 func (this *Uploader) Upload() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		tgin.Do(c, func(c *gin.Context) (interface{}, string) {
@@ -42,56 +94,11 @@ func (this *Uploader) Upload() func(c *gin.Context) {
 				return err.Error(), "读取文件失败【2】"
 			}
 
-			data, err := ioutil.ReadAll(fd)
+			id, err := this.UploadIO(fd, hd.Filename, hd.Header.Get("Content-Type"))
 			if err != nil {
-				return err.Error(), "读取文件失败【3】"
+				return "", err.Error()
 			}
-
-			md5 := tools.Crypto.MD5(data)
-			idx := strings.LastIndex(hd.Filename, ".")
-			endStr := ""
-			if idx > -1 {
-				endStr = hd.Filename[idx+1:]
-			}
-
-			old := beans.Resource{}
-			_, err = this.db.Table(old).Where("md5 = ?", md5).Get(&old)
-			if err != nil {
-				return err.Error(), "读取文件失败【4】"
-			}
-			ct := hd.Header.Get("Content-Type")
-
-			if old.Id == nil {
-				res := beans.Resource{
-					Bean: beans.Bean{
-						Id:     tools.Ptr.Uid(),
-						Status: tools.Ptr.Int(1),
-					},
-					ContentType: ct,
-					MD5:         md5,
-					Name:        hd.Filename,
-					Size:        int64(len(data)),
-					FileEnd:     endStr,
-				}
-				_, err = this.db.Insert(res)
-				if err != nil {
-					return err.Error(), "写入文件失败【1】"
-				}
-				_ = os.MkdirAll(fmt.Sprintf("upload/%s", ct), 0777)
-				f, err := os.Create(fmt.Sprintf("upload/%s/%s.%s", ct, *res.Id, endStr))
-				if err != nil {
-					return err.Error(), "写入文件失败【2】"
-				}
-				defer f.Close()
-				_, err = io.Copy(f, bytes.NewBuffer(data))
-				if err != nil {
-					return err.Error(), "写入文件失败【3】"
-				}
-
-				return *res.Id, ""
-			} else {
-				return *old.Id, ""
-			}
+			return id, ""
 
 		})
 

@@ -14,6 +14,6 @@ require (
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/vektah/gqlparser v1.3.1
 	github.com/vektah/gqlparser/v2 v2.0.1
-	github.com/zhanghup/go-tools v1.3.6
+	github.com/zhanghup/go-tools v1.3.8
 	xorm.io/xorm v1.0.1
 )
