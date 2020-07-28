@@ -1,18 +1,8 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	rice "github.com/giter/go.rice"
-	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/cfg"
-	"github.com/zhanghup/go-app/initia"
-	"github.com/zhanghup/go-app/service/api"
-	"github.com/zhanghup/go-app/service/auth"
-	"github.com/zhanghup/go-app/service/event"
-	"github.com/zhanghup/go-app/service/file"
-	"github.com/zhanghup/go-tools/database/txorm"
-	"github.com/zhanghup/go-tools/tgin"
-	"github.com/zhanghup/go-tools/tog"
+	"github.com/zhanghup/go-app/boot"
 )
 
 func main() {
@@ -20,29 +10,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	// 初始化数据库
-	cfg.InitConfig(box)
-	e, err := txorm.NewXorm(cfg.DB)
-	e.ShowSQL(true)
-	if err != nil {
-		tog.Error(err.Error())
-		panic(err)
-	}
-	// 数据库初始化完成事件
-	event.XormDefaultInit(e)
-
-	//  同步表结构
-	beans.Sync(e)
-
-	// 初始化数据
-	initia.InitAction(e)
-
-	// http router
-	err = tgin.NewGin(cfg.Web, func(g *gin.Engine) error {
-		file.Gin(g.Group("/"), g.Group("/"), e)
-		auth.Gin(g.Group("/"), e)
-		api.Gin(g.Group("/"), e)
-		return nil
-	})
+	_ = boot.Boot(box).
+		EnableXorm().
+		SyncTables().
+		InitDatas().
+		RouterFile().
+		RouterAuth().
+		RouterApi().
+		StartRouter()
 }
