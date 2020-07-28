@@ -61,12 +61,11 @@ func (this *dictCache) init() error {
 }
 
 func (this *dictCache) Get(dict string) (*beans.Dict, []beans.DictItem, bool) {
-	v := dictcacheinfo{}
-
-	ok := this.data.Get(dict, &v)
-	if !ok {
+	o := this.data.Get(dict)
+	if o == nil {
 		return nil, nil, false
 	}
+	v := o.(dictcacheinfo)
 	return &v.Dict, v.DictItem, true
 }
 

@@ -29,26 +29,29 @@ func (this *userCache) Set(token string, user User) {
 }
 
 func (this *userCache) Get(token string) (User, bool) {
-	u := User{}
-	ok := this.data.Get(token, &u)
-	return u, ok
+	o := this.data.Get(token)
+	if o == nil {
+		return User{}, false
+	} else {
+		return o.(User), true
+	}
 }
 
 func (this *userCache) RemoveByToken(token string) {
-	user := User{}
-	ok := this.data.Get(token, &user)
-	if ok {
+	o := this.data.Get(token)
+	if o != nil {
+		user := o.(User)
 		this.tokenmap.Delete(*user.User.Id)
 	}
 	this.data.Delete(token)
 }
 func (this *userCache) RemoveByUser(user string) {
-	token := ""
-	ok := this.tokenmap.Get(user, &token)
-	if ok {
+	o := this.tokenmap.Get(user)
+	if o != nil {
+		token := o.(string)
 		this.data.Delete(token)
 	}
-	this.tokenmap.Delete(token)
+	this.tokenmap.Delete(user)
 }
 
 var UserCache *userCache
