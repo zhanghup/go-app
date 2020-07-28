@@ -21,30 +21,24 @@ import (
 	"xorm.io/xorm"
 )
 
-func NewResolver(db *xorm.Engine) lib.Config {
+func NewResolver(db *xorm.Engine) *Resolver {
 
-	//cache, err := directive.NewDictCache(db)
-	//if err != nil {
-	//	panic(err)
-	//}
-
-	resolver := &Resolver{
+	return &Resolver{
 		DB:     db,
 		DBS:    txorm.NewEngine(db),
 		Loader: tgql.DataLoaden,
 		Me:     directive.MyInfo,
 	}
+}
 
-	return lib.Config{
-		Resolvers: resolver,
+func ggin(db *xorm.Engine) func(c *gin.Context) {
+	config := lib.Config{
+		Resolvers: NewResolver(db),
 		Directives: lib.DirectiveRoot{
 			Perm: directive.Perm(db),
 		},
 	}
-}
-
-func ggin(db *xorm.Engine) func(c *gin.Context) {
-	srv := handler.New(lib.NewExecutableSchema(NewResolver(db)))
+	srv := handler.New(lib.NewExecutableSchema(config))
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.Websocket{
 		KeepAlivePingInterval: 10 * time.Second,
