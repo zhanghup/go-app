@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	rice "github.com/giter/go.rice"
 	"github.com/zhanghup/go-app/boot"
 )
@@ -11,9 +12,13 @@ func main() {
 		panic(err)
 	}
 	_ = boot.Boot(box).
-		EnableXorm().
 		SyncTables().
 		InitDatas().
+		JobsInit().
+		Jobs("测试", "* * * * * * ", func() error {
+			fmt.Println("22222222222222222222")
+			return nil
+		}).
 		RouterFile().
 		RouterAuth().
 		RouterApi().

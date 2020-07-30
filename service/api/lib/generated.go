@@ -89,9 +89,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CronRun           func(childComplexity int, id *string) int
-		CronStart         func(childComplexity int, id *string) int
-		CronStop          func(childComplexity int, id *string) int
+		CronRun           func(childComplexity int, id string) int
+		CronStart         func(childComplexity int, id string) int
+		CronStop          func(childComplexity int, id string) int
 		DictCreate        func(childComplexity int, input NewDict) int
 		DictItemCreate    func(childComplexity int, input NewDictItem) int
 		DictItemRemoves   func(childComplexity int, ids []string) int
@@ -179,9 +179,9 @@ type DictResolver interface {
 }
 type MutationResolver interface {
 	World(ctx context.Context) (*string, error)
-	CronStop(ctx context.Context, id *string) (bool, error)
-	CronStart(ctx context.Context, id *string) (bool, error)
-	CronRun(ctx context.Context, id *string) (bool, error)
+	CronStop(ctx context.Context, id string) (bool, error)
+	CronStart(ctx context.Context, id string) (bool, error)
+	CronRun(ctx context.Context, id string) (bool, error)
 	DictCreate(ctx context.Context, input NewDict) (bool, error)
 	DictUpdate(ctx context.Context, id string, input UpdDict) (bool, error)
 	DictRemoves(ctx context.Context, ids []string) (bool, error)
@@ -445,7 +445,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CronRun(childComplexity, args["id"].(*string)), true
+		return e.complexity.Mutation.CronRun(childComplexity, args["id"].(string)), true
 
 	case "Mutation.cron_start":
 		if e.complexity.Mutation.CronStart == nil {
@@ -457,7 +457,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CronStart(childComplexity, args["id"].(*string)), true
+		return e.complexity.Mutation.CronStart(childComplexity, args["id"].(string)), true
 
 	case "Mutation.cron_stop":
 		if e.complexity.Mutation.CronStop == nil {
@@ -469,7 +469,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CronStop(childComplexity, args["id"].(*string)), true
+		return e.complexity.Mutation.CronStop(childComplexity, args["id"].(string)), true
 
 	case "Mutation.dict_create":
 		if e.complexity.Mutation.DictCreate == nil {
@@ -1120,9 +1120,9 @@ type Subscription {
 }
 
 extend type Mutation {
-    cron_stop(id: String):Boolean! @perm(entity: "cron",perm: "M")
-    cron_start(id: String):Boolean! @perm(entity: "cron",perm: "M")
-    cron_run(id: String):Boolean! @perm(entity: "cron",perm: "M")
+    cron_stop(id: String!):Boolean! @perm(entity: "cron",perm: "M")
+    cron_start(id: String!):Boolean! @perm(entity: "cron",perm: "M")
+    cron_run(id: String!):Boolean! @perm(entity: "cron",perm: "M")
 }
 
 input QCron{
@@ -1543,9 +1543,9 @@ func (ec *executionContext) dir_perm_args(ctx context.Context, rawArgs map[strin
 func (ec *executionContext) field_Mutation_cron_run_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
+	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1557,9 +1557,9 @@ func (ec *executionContext) field_Mutation_cron_run_args(ctx context.Context, ra
 func (ec *executionContext) field_Mutation_cron_start_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
+	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1571,9 +1571,9 @@ func (ec *executionContext) field_Mutation_cron_start_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_cron_stop_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
+	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3017,7 +3017,7 @@ func (ec *executionContext) _Mutation_cron_stop(ctx context.Context, field graph
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().CronStop(rctx, args["id"].(*string))
+			return ec.resolvers.Mutation().CronStop(rctx, args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			entity, err := ec.unmarshalNString2string(ctx, "cron")
@@ -3086,7 +3086,7 @@ func (ec *executionContext) _Mutation_cron_start(ctx context.Context, field grap
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().CronStart(rctx, args["id"].(*string))
+			return ec.resolvers.Mutation().CronStart(rctx, args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			entity, err := ec.unmarshalNString2string(ctx, "cron")
@@ -3155,7 +3155,7 @@ func (ec *executionContext) _Mutation_cron_run(ctx context.Context, field graphq
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().CronRun(rctx, args["id"].(*string))
+			return ec.resolvers.Mutation().CronRun(rctx, args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			entity, err := ec.unmarshalNString2string(ctx, "cron")

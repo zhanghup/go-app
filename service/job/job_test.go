@@ -88,25 +88,25 @@ func TestJob(t *testing.T) {
 		time.Sleep(time.Second * 1)
 		switch time.Now().Unix() % 10 {
 		case 0:
-			job.Remove("203ad5ffa1d7c650ad681fdff3965cd2")
+			job.Stop("203ad5ffa1d7c650ad681fdff3965cd2")
 		case 1:
-			job.Remove("6e809cbda0732ac4845916a59016f954")
+			job.Stop("6e809cbda0732ac4845916a59016f954")
 		case 2:
-			job.Remove("7ce8be0fa3932e840f6a19c2b83e11ae")
+			job.Stop("7ce8be0fa3932e840f6a19c2b83e11ae")
 		case 3:
-			job.Remove("a75f2192bae11cb76cdcdada9332bab6")
+			job.Stop("a75f2192bae11cb76cdcdada9332bab6")
 		case 4:
-			job.Remove("ebde9cc9540087b9688fdb470fa20f17")
+			job.Stop("ebde9cc9540087b9688fdb470fa20f17")
 		case 5:
-			job.Remove("5726012822477f24fe999a1f7223c82a")
+			job.Stop("5726012822477f24fe999a1f7223c82a")
 		case 6:
-			job.Remove("2b4c43e3b1102b2e8492eebd97c06c58")
+			job.Stop("2b4c43e3b1102b2e8492eebd97c06c58")
 		case 7:
-			job.Remove("f70109ba33bf1860001f89998581df2a")
+			job.Stop("f70109ba33bf1860001f89998581df2a")
 		case 8:
-			job.Remove("1c52d3d0503eca3c4a6db73af6d428f1")
+			job.Stop("1c52d3d0503eca3c4a6db73af6d428f1")
 		case 9:
-			job.Remove("4f6d054536d6613a91472139cc60f072")
+			job.Stop("4f6d054536d6613a91472139cc60f072")
 		}
 	}
 

@@ -27,3 +27,9 @@ func (this *Resolver) UserLoader(ctx context.Context, id string) (*beans.User, e
 	err := this.Loader(ctx).Object(result, "select * from user where id in :keys", nil, "Id", "").Load(id, result)
 	return result, err
 }
+
+func (this *Resolver) CronLoader(ctx context.Context, id string) (*beans.Cron, error) {
+	result := new(beans.Cron)
+	err := this.Loader(ctx).Object(result, "select * from cron where id in :keys", nil, "Id", "").Load(id, result)
+	return result, err
+}

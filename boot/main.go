@@ -23,14 +23,17 @@ type Struct struct {
 	routerfns []func(g *gin.Engine)
 }
 
-func Boot(box *rice.Box) *Struct {
+func Boot(box *rice.Box, initdb ...bool) *Struct {
 	cfg.InitConfig(box)
-	s := Struct{box: box}
-	return &s
+	s := &Struct{box: box}
+	if len(initdb) > 0 && !initdb[0] {
+		return s
+	}
+	return s.enableXorm()
 }
 
 // 初始化数据库
-func (this *Struct) EnableXorm() *Struct {
+func (this *Struct) enableXorm() *Struct {
 	if this.db != nil {
 		return this
 	}
@@ -94,6 +97,13 @@ func (this *Struct) RouterApi() *Struct {
 }
 
 // 初始化定时任务
+func (this *Struct) JobsInit() *Struct {
+	err := job.InitJobs(this.db)
+	if err != nil {
+		panic(err)
+	}
+	return this
+}
 func (this *Struct) Jobs(name, spec string, fn func() error, flag ...bool) *Struct {
 	err := job.AddJob(name, spec, fn, flag...)
 	if err != nil {

@@ -85,41 +85,40 @@ func AddJob(name, spec string, action func() error, flag ...bool) error {
 			f = true
 		}
 
-		entityId, err := job.job.AddFunc(spec, run(name, action))
+		job.data.Set(id, jobitem{0, name, spec, action, f, true, model})
+
+		err = addJob(id)
 		if err != nil {
 			return err
 		}
 
 		if f {
-			run(name, action)()
+			Run(id)()
 		}
-
-		job.data.Set(id, jobitem{entityId, name, spec, action, f, true, model})
 	} else {
 		ji := job.data.Get(id).(jobitem)
 		if ji.fn == nil {
 			// 刚启动的任务
 			ji.fn = action
+			job.data.Set(id, ji)
+
 			if ji.cron.State != nil && *ji.cron.State == 1 {
-				entityId, err := job.job.AddFunc(ji.spec, run(ji.name, ji.fn))
+				err := addJob(id)
 				if err != nil {
 					return err
 				}
-				ji.id = entityId
 			}
-			ji.isRun = false
+
+			if ji.flag {
+				Run(id)()
+			}
 		} else {
-			job.job.Remove(ji.id)
-			entityId, err := job.job.AddFunc(ji.spec, run(ji.name, ji.fn))
+			err := addJob(id)
 			if err != nil {
 				return err
 			}
-
-			ji.id = entityId
-			ji.isRun = true
 		}
 
-		job.data.Set(id, ji)
 	}
 
 	job.job.Start()
@@ -141,13 +140,19 @@ func checkJob(id string) (jobitem, error) {
 	return ji, nil
 }
 
-func Remove(id string) error {
+func Stop(id string) error {
 	ji, err := checkJob(id)
 	if err != nil {
 		return err
 	}
 	if !ji.isRun {
 		return nil
+	}
+	_, err = job.db.Table(beans.Cron{}).Where("id = ?", id).Update(map[string]interface{}{
+		"state": 0,
+	})
+	if err != nil {
+		return err
 	}
 	job.job.Remove(ji.id)
 	ji.isRun = false
@@ -163,18 +168,26 @@ func Start(id string) error {
 	if ji.isRun {
 		return nil
 	}
+	_, err = job.db.Table(beans.Cron{}).Where("id = ?", id).Update(map[string]interface{}{
+		"state": 1,
+	})
+	if err != nil {
+		return err
+	}
 	return AddJob(ji.name, ji.spec, ji.fn, ji.flag)
 }
 
 func Restart(id string) error {
-	err := Remove(id)
+	err := Stop(id)
 	if err != nil {
 		return err
 	}
 	return Start(id)
 }
 
-func run(name string, fn func() error) func() {
+func Run(id string) func() {
+	ji := job.data.Get(id).(jobitem)
+
 	return func() {
 		defer func() {
 			if obj := recover(); obj != nil {
@@ -183,55 +196,65 @@ func run(name string, fn func() error) func() {
 		}()
 
 		l1 := time.Now().UnixNano()
-		err := fn()
+		err := ji.fn()
 		l2 := time.Now().UnixNano()
 
-		go tools.Run(func() {
-			last := float64(l2-l1) / float64(time.Second)
-			message := "ok"
-			status := 1
-			if err != nil {
-				message = err.Error()
-				status = 0
-			}
+		last := float64(l2-l1) / float64(time.Second)
+		message := "ok"
+		status := 1
+		if err != nil {
+			message = err.Error()
+			status = 0
+		}
 
-			id := tools.Crypto.MD5([]byte(name))
+		model := beans.Cron{}
+		ok, err := job.db.Where("id = ?", id).Get(&model)
+		if err != nil {
+			tog.Error(err.Error())
+			return
+		}
+		if !ok {
+			return
+		}
 
-			model := beans.Cron{}
-			ok, err := job.db.Where("id = ?", id).Get(&model)
-			if err != nil {
-				tog.Error(err.Error())
-				return
-			}
-			if !ok {
-				return
-			}
+		model.Status = &status
+		model.Last = &last
+		model.Message = &message
+		model.Previous = model.Updated
 
-			model.Status = &status
-			model.Last = &last
-			model.Message = &message
-			model.Previous = model.Updated
-
-			_, err = job.db.Table(beans.Cron{}).Where("id = ?", id).Cols("last", "message", "previous", "updated", "status").Update(model)
-			if err != nil {
-				tog.Error(err.Error())
-				return
-			}
-			lg := beans.CronLog{
-				Bean: beans.Bean{
-					Id:     tools.Ptr.Uid(),
-					Status: &status,
-				},
-				Cron:    &id,
-				Message: &message,
-				Start:   tools.Ptr.Int64(l1 / int64(time.Second)),
-				End:     tools.Ptr.Int64(l2 / int64(time.Second)),
-			}
-			_, err = job.db.Insert(lg)
-			if err != nil {
-				tog.Error(err.Error())
-				return
-			}
-		})
+		_, err = job.db.Table(beans.Cron{}).Where("id = ?", id).Cols("last", "message", "previous", "updated", "status").Update(model)
+		if err != nil {
+			tog.Error(err.Error())
+			return
+		}
+		lg := beans.CronLog{
+			Bean: beans.Bean{
+				Id:     tools.Ptr.Uid(),
+				Status: &status,
+			},
+			Cron:    &id,
+			Message: &message,
+			Start:   tools.Ptr.Int64(l1 / int64(time.Second)),
+			End:     tools.Ptr.Int64(l2 / int64(time.Second)),
+		}
+		_, err = job.db.Insert(lg)
+		if err != nil {
+			tog.Error(err.Error())
+			return
+		}
 	}
+}
+
+func addJob(id string) error {
+	ji := job.data.Get(id).(jobitem)
+	job.job.Remove(ji.id)
+	entityId, err := job.job.AddFunc(ji.spec, Run(id))
+	if err != nil {
+		return err
+	}
+
+	ji.id = entityId
+	ji.isRun = true
+	job.data.Set(id, ji)
+	return nil
 }

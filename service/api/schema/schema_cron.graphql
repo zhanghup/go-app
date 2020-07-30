@@ -6,9 +6,9 @@ extend type Query{
 }
 
 extend type Mutation {
-    cron_stop(id: String):Boolean! @perm(entity: "cron",perm: "M")
-    cron_start(id: String):Boolean! @perm(entity: "cron",perm: "M")
-    cron_run(id: String):Boolean! @perm(entity: "cron",perm: "M")
+    cron_stop(id: String!):Boolean! @perm(entity: "cron",perm: "M")
+    cron_start(id: String!):Boolean! @perm(entity: "cron",perm: "M")
+    cron_run(id: String!):Boolean! @perm(entity: "cron",perm: "M")
 }
 
 input QCron{

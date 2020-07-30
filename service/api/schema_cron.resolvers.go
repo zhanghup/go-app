@@ -5,28 +5,47 @@ package api
 
 import (
 	"context"
-	"fmt"
+	"github.com/zhanghup/go-app/service/job"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/lib"
 )
 
-func (r *mutationResolver) CronStop(ctx context.Context, id *string) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) CronStop(ctx context.Context, id string) (bool, error) {
+	err := job.Stop(id)
+	return err == nil, err
 }
 
-func (r *mutationResolver) CronStart(ctx context.Context, id *string) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) CronStart(ctx context.Context, id string) (bool, error) {
+	err := job.CheckJob(id)
+	if err != nil{
+		return false,err
+	}
+
+	err = job.Start(id)
+	return err == nil, err
 }
 
-func (r *mutationResolver) CronRun(ctx context.Context, id *string) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) CronRun(ctx context.Context, id string) (bool, error) {
+	err := job.CheckJob(id)
+	if err != nil{
+		return false,err
+	}
+
+	job.Run(id)()
+	return true, nil
 }
 
 func (r *queryResolver) Crons(ctx context.Context, query lib.QCron) (*lib.Crons, error) {
-	panic(fmt.Errorf("not implemented"))
+	users := make([]beans.Cron, 0)
+	total, err := r.DBS.SF(`
+		select * from cron u
+		where 1 = 1
+		{{ if .keyword }} and u.name like concat("%",?keyword,"%") {{ end }}
+	`, map[string]interface{}{"keyword": query.Keyword}).Page2(query.Index, query.Size, query.Count, &users)
+	return &lib.Crons{Data: users, Total: &total}, err
 }
 
 func (r *queryResolver) Cron(ctx context.Context, id string) (*beans.Cron, error) {
-	panic(fmt.Errorf("not implemented"))
+	return r.CronLoader(ctx, id)
 }
