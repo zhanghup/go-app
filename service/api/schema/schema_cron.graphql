@@ -1,0 +1,48 @@
+extend type Query{
+    "用户列表（分页）"
+    crons(query:QCron!):Crons  @perm(entity: "cron",perm: "R")
+    "用户获取单个"
+    cron(id: String!):Cron  @perm(entity: "cron",perm: "R")
+}
+
+extend type Mutation {
+    cron_stop(id: String):Boolean! @perm(entity: "cron",perm: "M")
+    cron_start(id: String):Boolean! @perm(entity: "cron",perm: "M")
+    cron_run(id: String):Boolean! @perm(entity: "cron",perm: "M")
+}
+
+input QCron{
+    keyword: String
+
+    index: Int
+    size: Int
+    count: Boolean
+}
+
+type Crons{
+    total: Int
+    data:[Cron!]
+}
+
+type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
+    id: String
+
+    "任务名称"
+    name: String
+    "任务表达式"
+    expression: String
+    "是否启动定时任务[0:启动,1:停止]"
+    state: Int
+    "上一次执行时间"
+    previous: Int
+    "任务持续时间（秒）"
+    last: Float
+    "任务结果"
+    message: String
+
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
+
+}

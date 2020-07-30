@@ -6,6 +6,11 @@ import (
 	"github.com/zhanghup/go-app/beans"
 )
 
+type Crons struct {
+	Total *int         `json:"total"`
+	Data  []beans.Cron `json:"data"`
+}
+
 type IPermObj struct {
 	// 对象
 	Object string `json:"object"`
@@ -84,6 +89,13 @@ type PermObj struct {
 	Object string `json:"object"`
 	// 操作权限
 	Mask string `json:"mask"`
+}
+
+type QCron struct {
+	Keyword *string `json:"keyword"`
+	Index   *int    `json:"index"`
+	Size    *int    `json:"size"`
+	Count   *bool   `json:"count"`
 }
 
 type QRole struct {

@@ -10,6 +10,7 @@ import (
 	"github.com/zhanghup/go-app/service/auth"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-app/service/file"
+	"github.com/zhanghup/go-app/service/job"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
 	"github.com/zhanghup/go-tools/tog"
@@ -22,26 +23,17 @@ type Struct struct {
 	routerfns []func(g *gin.Engine)
 }
 
-var defaultStruct *Struct
-
-func DefaultStruct() *Struct {
-	if defaultStruct != nil {
-		return defaultStruct
-	}
-	panic("boot 未初始化完成")
-}
-
 func Boot(box *rice.Box) *Struct {
 	cfg.InitConfig(box)
 	s := Struct{box: box}
-	if defaultStruct == nil {
-		defaultStruct = &s
-	}
 	return &s
 }
 
 // 初始化数据库
 func (this *Struct) EnableXorm() *Struct {
+	if this.db != nil {
+		return this
+	}
 	e, err := txorm.NewXorm(cfg.DB)
 	e.ShowSQL(true)
 	if err != nil {
@@ -98,6 +90,15 @@ func (this *Struct) RouterApi() *Struct {
 	this.routerfns = append(this.routerfns, func(g *gin.Engine) {
 		api.Gin(g.Group("/"), this.db)
 	})
+	return this
+}
+
+// 初始化定时任务
+func (this *Struct) Jobs(name, spec string, fn func() error, flag ...bool) *Struct {
+	err := job.AddJob(name, spec, fn, flag...)
+	if err != nil {
+		tog.Error(err.Error())
+	}
 	return this
 }
 

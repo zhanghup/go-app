@@ -126,6 +126,7 @@ type Resource struct {
 type Cron struct {
 	Bean `xorm:"extends"`
 
+	State      *int     `json:"state"`               // 是否启动定时任务
 	Name       *string  `json:"name"`                // 任务名称
 	Expression *string  `json:"expression"`          // 任务表达式
 	Previous   *int64   `json:"previous"`            // 上一次执行时间
