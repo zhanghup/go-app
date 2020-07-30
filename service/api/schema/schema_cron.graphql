@@ -3,6 +3,8 @@ extend type Query{
     crons(query:QCron!):Crons  @perm(entity: "cron",perm: "R")
     "用户获取单个"
     cron(id: String!):Cron  @perm(entity: "cron",perm: "R")
+    "历史记录"
+    cron_logs(query:QCronLog!):CronLogs  @perm(entity: "cron",perm: "R")
 }
 
 extend type Mutation {
@@ -25,6 +27,42 @@ type Crons{
 }
 
 type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
+    id: String
+
+    "任务名称"
+    name: String
+    "任务表达式"
+    expression: String
+    "是否启动定时任务[0:启动,1:停止]"
+    state: Int
+    "上一次执行时间"
+    previous: Int
+    "任务持续时间（秒）"
+    last: Float
+    "任务结果"
+    message: String
+
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
+
+}
+
+input QCronLog{
+    keyword: String
+
+    index: Int
+    size: Int
+    count: Boolean
+}
+
+type CronLogs{
+    total: Int
+    data:[CronLog!]
+}
+
+type CronLog @goModel(model:"github.com/zhanghup/go-app/beans.CronLog")  {
     id: String
 
     "任务名称"

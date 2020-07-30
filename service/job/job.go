@@ -232,10 +232,12 @@ func Run(id string) func() {
 				Id:     tools.Ptr.Uid(),
 				Status: &status,
 			},
-			Cron:    &id,
-			Message: &message,
-			Start:   tools.Ptr.Int64(l1 / int64(time.Second)),
-			End:     tools.Ptr.Int64(l2 / int64(time.Second)),
+			Name:       &ji.name,
+			Expression: &ji.spec,
+			Cron:       &id,
+			Message:    &message,
+			Start:      tools.Ptr.Int64(l1 / int64(time.Second)),
+			End:        tools.Ptr.Int64(l2 / int64(time.Second)),
 		}
 		_, err = job.db.Insert(lg)
 		if err != nil {

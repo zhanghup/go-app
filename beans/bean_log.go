@@ -3,10 +3,12 @@ package beans
 type CronLog struct {
 	Bean `xorm:"extends"`
 
-	Cron    *string `json:"cron" xorm:"index"`   // 作业id
-	Start   *int64  `json:"start" `              // 开始时间
-	End     *int64  `json:"end"`                 // 结束时间
-	Message *string `json:"message" xorm:"text"` // 错误信息
+	Cron       *string `json:"cron" xorm:"index"`   // 作业id
+	Name       *string `json:"name"`                // 任务名称
+	Expression *string `json:"expression"`          // 任务表达式
+	Start      *int64  `json:"start"`              // 开始时间
+	End        *int64  `json:"end"`                 // 结束时间
+	Message    *string `json:"message" xorm:"text"` // 错误信息
 }
 
 type OperateLog struct {

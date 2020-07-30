@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
 	rice "github.com/giter/go.rice"
+	"github.com/pkg/errors"
 	"github.com/zhanghup/go-app/boot"
+	"time"
 )
 
 func main() {
@@ -16,7 +17,9 @@ func main() {
 		InitDatas().
 		JobsInit().
 		Jobs("测试", "* * * * * * ", func() error {
-			fmt.Println("22222222222222222222")
+			if time.Now().Unix()%2 == 0 {
+				return errors.New("测试错误")
+			}
 			return nil
 		}).
 		RouterFile().
