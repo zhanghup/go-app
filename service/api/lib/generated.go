@@ -1273,6 +1273,7 @@ type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
 }
 
 input QCronLog{
+    cron: String
     keyword: String
 
     index: Int
@@ -7920,6 +7921,12 @@ func (ec *executionContext) unmarshalInputQCronLog(ctx context.Context, obj inte
 
 	for k, v := range asMap {
 		switch k {
+		case "cron":
+			var err error
+			it.Cron, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "keyword":
 			var err error
 			it.Keyword, err = ec.unmarshalOString2ᚖstring(ctx, v)

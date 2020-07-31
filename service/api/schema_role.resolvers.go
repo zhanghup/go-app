@@ -127,7 +127,7 @@ func (r *queryResolver) Roles(ctx context.Context, query lib.QRole) (*lib.Roles,
 	total, err := r.DBS.SF(`
 		select * from role u
 		where 1 = 1
-		{{ if .keyword }} and u.name like concat("%",?keyword,"%") {{ end }}
+		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
 	`, map[string]interface{}{"keyword": query.Keyword}).Page2(query.Index, query.Size, query.Count, &roles)
 	return &lib.Roles{Data: roles, Total: &total}, err
 }

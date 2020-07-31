@@ -50,6 +50,7 @@ type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
 }
 
 input QCronLog{
+    cron: String
     keyword: String
 
     index: Int

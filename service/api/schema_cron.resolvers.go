@@ -41,7 +41,7 @@ func (r *queryResolver) Crons(ctx context.Context, query lib.QCron) (*lib.Crons,
 	total, err := r.DBS.SF(`
 		select * from cron u
 		where 1 = 1
-		{{ if .keyword }} and u.name like concat("%",?keyword,"%") {{ end }}
+		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
 	`, map[string]interface{}{"keyword": query.Keyword}).Page2(query.Index, query.Size, query.Count, &users)
 	return &lib.Crons{Data: users, Total: &total}, err
 }
@@ -55,7 +55,9 @@ func (r *queryResolver) CronLogs(ctx context.Context, query lib.QCronLog) (*lib.
 	total, err := r.DBS.SF(`
 		select * from cron_log u
 		where 1 = 1
-		{{ if .keyword }} and u.name like concat("%",?keyword,"%") {{ end }}
-	`, map[string]interface{}{"keyword": query.Keyword}).Page2(query.Index, query.Size, query.Count, &users)
+		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
+		{{ if .cron }} and u.cron = :cron {{ end }}
+		order by u.created desc
+	`, map[string]interface{}{"keyword": query.Keyword, "cron": query.Cron}).Page2(query.Index, query.Size, query.Count, &users)
 	return &lib.CronLogs{Data: users, Total: &total}, err
 }

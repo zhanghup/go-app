@@ -90,7 +90,7 @@ func (r *queryResolver) Users(ctx context.Context, query lib.QUser) (*lib.Users,
 	total, err := r.DBS.SF(`
 		select * from user u
 		where 1 = 1
-		{{ if .keyword }} and u.name like concat("%",?keyword,"%") {{ end }}
+		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
 	`, map[string]interface{}{"keyword": query.Keyword}).Page2(query.Index, query.Size, query.Count, &users)
 	return &lib.Users{Data: users, Total: &total}, err
 }

@@ -104,6 +104,7 @@ type QCron struct {
 }
 
 type QCronLog struct {
+	Cron    *string `json:"cron"`
 	Keyword *string `json:"keyword"`
 	Index   *int    `json:"index"`
 	Size    *int    `json:"size"`
