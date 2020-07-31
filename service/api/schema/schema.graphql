@@ -1,4 +1,5 @@
 scalar Any
+scalar Int64
 
 "数据操作权限"
 directive @perm(entity:String!, perm: String!,remark:String) on FIELD_DEFINITION

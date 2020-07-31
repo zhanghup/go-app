@@ -5,10 +5,10 @@ package api
 
 import (
 	"context"
-	"github.com/zhanghup/go-app/service/job"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/lib"
+	"github.com/zhanghup/go-app/service/job"
 )
 
 func (r *mutationResolver) CronStop(ctx context.Context, id string) (bool, error) {
@@ -18,8 +18,8 @@ func (r *mutationResolver) CronStop(ctx context.Context, id string) (bool, error
 
 func (r *mutationResolver) CronStart(ctx context.Context, id string) (bool, error) {
 	err := job.CheckJob(id)
-	if err != nil{
-		return false,err
+	if err != nil {
+		return false, err
 	}
 
 	err = job.Start(id)
@@ -28,8 +28,8 @@ func (r *mutationResolver) CronStart(ctx context.Context, id string) (bool, erro
 
 func (r *mutationResolver) CronRun(ctx context.Context, id string) (bool, error) {
 	err := job.CheckJob(id)
-	if err != nil{
-		return false,err
+	if err != nil {
+		return false, err
 	}
 
 	job.Run(id)()
@@ -48,4 +48,14 @@ func (r *queryResolver) Crons(ctx context.Context, query lib.QCron) (*lib.Crons,
 
 func (r *queryResolver) Cron(ctx context.Context, id string) (*beans.Cron, error) {
 	return r.CronLoader(ctx, id)
+}
+
+func (r *queryResolver) CronLogs(ctx context.Context, query lib.QCronLog) (*lib.CronLogs, error) {
+	users := make([]beans.CronLog, 0)
+	total, err := r.DBS.SF(`
+		select * from cron_log u
+		where 1 = 1
+		{{ if .keyword }} and u.name like concat("%",?keyword,"%") {{ end }}
+	`, map[string]interface{}{"keyword": query.Keyword}).Page2(query.Index, query.Size, query.Count, &users)
+	return &lib.CronLogs{Data: users, Total: &total}, err
 }

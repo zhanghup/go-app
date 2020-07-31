@@ -6,6 +6,11 @@ import (
 	"github.com/zhanghup/go-app/beans"
 )
 
+type CronLogs struct {
+	Total *int            `json:"total"`
+	Data  []beans.CronLog `json:"data"`
+}
+
 type Crons struct {
 	Total *int         `json:"total"`
 	Data  []beans.Cron `json:"data"`
@@ -92,6 +97,13 @@ type PermObj struct {
 }
 
 type QCron struct {
+	Keyword *string `json:"keyword"`
+	Index   *int    `json:"index"`
+	Size    *int    `json:"size"`
+	Count   *bool   `json:"count"`
+}
+
+type QCronLog struct {
 	Keyword *string `json:"keyword"`
 	Index   *int    `json:"index"`
 	Size    *int    `json:"size"`

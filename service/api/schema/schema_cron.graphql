@@ -36,7 +36,7 @@ type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
     "是否启动定时任务[0:启动,1:停止]"
     state: Int
     "上一次执行时间"
-    previous: Int
+    previous: Int64
     "任务持续时间（秒）"
     last: Float
     "任务结果"
@@ -65,16 +65,16 @@ type CronLogs{
 type CronLog @goModel(model:"github.com/zhanghup/go-app/beans.CronLog")  {
     id: String
 
+    "任务id"
+    cron: String
     "任务名称"
     name: String
     "任务表达式"
     expression: String
-    "是否启动定时任务[0:启动,1:停止]"
-    state: Int
-    "上一次执行时间"
-    previous: Int
-    "任务持续时间（秒）"
-    last: Float
+    "开始时间"
+    start: Int
+    "结束时间"
+    end:Int
     "任务结果"
     message: String
 

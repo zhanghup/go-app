@@ -59,6 +59,23 @@ type ComplexityRoot struct {
 		Weight     func(childComplexity int) int
 	}
 
+	CronLog struct {
+		Cron       func(childComplexity int) int
+		End        func(childComplexity int) int
+		Expression func(childComplexity int) int
+		Id         func(childComplexity int) int
+		Message    func(childComplexity int) int
+		Name       func(childComplexity int) int
+		Start      func(childComplexity int) int
+		Status     func(childComplexity int) int
+		Weight     func(childComplexity int) int
+	}
+
+	CronLogs struct {
+		Data  func(childComplexity int) int
+		Total func(childComplexity int) int
+	}
+
 	Crons struct {
 		Data  func(childComplexity int) int
 		Total func(childComplexity int) int
@@ -118,6 +135,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Cron            func(childComplexity int, id string) int
+		CronLogs        func(childComplexity int, query QCronLog) int
 		Crons           func(childComplexity int, query QCron) int
 		Dict            func(childComplexity int, id string) int
 		Dicts           func(childComplexity int) int
@@ -204,6 +222,7 @@ type QueryResolver interface {
 	Hello(ctx context.Context) (*string, error)
 	Crons(ctx context.Context, query QCron) (*Crons, error)
 	Cron(ctx context.Context, id string) (*beans.Cron, error)
+	CronLogs(ctx context.Context, query QCronLog) (*CronLogs, error)
 	Dicts(ctx context.Context) ([]beans.Dict, error)
 	Dict(ctx context.Context, id string) (*beans.Dict, error)
 	Roles(ctx context.Context, query QRole) (*Roles, error)
@@ -294,6 +313,83 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Cron.Weight(childComplexity), true
+
+	case "CronLog.cron":
+		if e.complexity.CronLog.Cron == nil {
+			break
+		}
+
+		return e.complexity.CronLog.Cron(childComplexity), true
+
+	case "CronLog.end":
+		if e.complexity.CronLog.End == nil {
+			break
+		}
+
+		return e.complexity.CronLog.End(childComplexity), true
+
+	case "CronLog.expression":
+		if e.complexity.CronLog.Expression == nil {
+			break
+		}
+
+		return e.complexity.CronLog.Expression(childComplexity), true
+
+	case "CronLog.id":
+		if e.complexity.CronLog.Id == nil {
+			break
+		}
+
+		return e.complexity.CronLog.Id(childComplexity), true
+
+	case "CronLog.message":
+		if e.complexity.CronLog.Message == nil {
+			break
+		}
+
+		return e.complexity.CronLog.Message(childComplexity), true
+
+	case "CronLog.name":
+		if e.complexity.CronLog.Name == nil {
+			break
+		}
+
+		return e.complexity.CronLog.Name(childComplexity), true
+
+	case "CronLog.start":
+		if e.complexity.CronLog.Start == nil {
+			break
+		}
+
+		return e.complexity.CronLog.Start(childComplexity), true
+
+	case "CronLog.status":
+		if e.complexity.CronLog.Status == nil {
+			break
+		}
+
+		return e.complexity.CronLog.Status(childComplexity), true
+
+	case "CronLog.weight":
+		if e.complexity.CronLog.Weight == nil {
+			break
+		}
+
+		return e.complexity.CronLog.Weight(childComplexity), true
+
+	case "CronLogs.data":
+		if e.complexity.CronLogs.Data == nil {
+			break
+		}
+
+		return e.complexity.CronLogs.Data(childComplexity), true
+
+	case "CronLogs.total":
+		if e.complexity.CronLogs.Total == nil {
+			break
+		}
+
+		return e.complexity.CronLogs.Total(childComplexity), true
 
 	case "Crons.data":
 		if e.complexity.Crons.Data == nil {
@@ -696,6 +792,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Cron(childComplexity, args["id"].(string)), true
 
+	case "Query.cron_logs":
+		if e.complexity.Query.CronLogs == nil {
+			break
+		}
+
+		args, err := ec.field_Query_cron_logs_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CronLogs(childComplexity, args["query"].(QCronLog)), true
+
 	case "Query.crons":
 		if e.complexity.Query.Crons == nil {
 			break
@@ -1084,6 +1192,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	&ast.Source{Name: "schema/schema.graphql", Input: `scalar Any
+scalar Int64
 
 "数据操作权限"
 directive @perm(entity:String!, perm: String!,remark:String) on FIELD_DEFINITION
@@ -1117,6 +1226,8 @@ type Subscription {
     crons(query:QCron!):Crons  @perm(entity: "cron",perm: "R")
     "用户获取单个"
     cron(id: String!):Cron  @perm(entity: "cron",perm: "R")
+    "历史记录"
+    cron_logs(query:QCronLog!):CronLogs  @perm(entity: "cron",perm: "R")
 }
 
 extend type Mutation {
@@ -1148,7 +1259,7 @@ type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
     "是否启动定时任务[0:启动,1:停止]"
     state: Int
     "上一次执行时间"
-    previous: Int
+    previous: Int64
     "任务持续时间（秒）"
     last: Float
     "任务结果"
@@ -1160,7 +1271,42 @@ type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
     status: Int
 
 }
-`, BuiltIn: false},
+
+input QCronLog{
+    keyword: String
+
+    index: Int
+    size: Int
+    count: Boolean
+}
+
+type CronLogs{
+    total: Int
+    data:[CronLog!]
+}
+
+type CronLog @goModel(model:"github.com/zhanghup/go-app/beans.CronLog")  {
+    id: String
+
+    "任务id"
+    cron: String
+    "任务名称"
+    name: String
+    "任务表达式"
+    expression: String
+    "开始时间"
+    start: Int
+    "结束时间"
+    end:Int
+    "任务结果"
+    message: String
+
+    "排序"
+    weight: Int
+    "状态[dict:STA0001]"
+    status: Int
+
+}`, BuiltIn: false},
 	&ast.Source{Name: "schema/schema_dict.graphql", Input: `extend type Query{
     "字典列表（分页）"
     dicts:[Dict!] @perm(entity: "dict",perm: "R")
@@ -1906,6 +2052,20 @@ func (ec *executionContext) field_Query_cron_args(ctx context.Context, rawArgs m
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_cron_logs_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 QCronLog
+	if tmp, ok := rawArgs["query"]; ok {
+		arg0, err = ec.unmarshalNQCronLog2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐQCronLog(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["query"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_crons_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2214,7 +2374,7 @@ func (ec *executionContext) _Cron_previous(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*int64)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
+	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Cron_last(ctx context.Context, field graphql.CollectedField, obj *beans.Cron) (ret graphql.Marshaler) {
@@ -2339,6 +2499,347 @@ func (ec *executionContext) _Cron_status(ctx context.Context, field graphql.Coll
 	res := resTmp.(*int)
 	fc.Result = res
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CronLog_id(ctx context.Context, field graphql.CollectedField, obj *beans.CronLog) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CronLog",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Id, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CronLog_cron(ctx context.Context, field graphql.CollectedField, obj *beans.CronLog) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CronLog",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cron, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CronLog_name(ctx context.Context, field graphql.CollectedField, obj *beans.CronLog) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CronLog",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CronLog_expression(ctx context.Context, field graphql.CollectedField, obj *beans.CronLog) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CronLog",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Expression, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CronLog_start(ctx context.Context, field graphql.CollectedField, obj *beans.CronLog) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CronLog",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Start, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CronLog_end(ctx context.Context, field graphql.CollectedField, obj *beans.CronLog) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CronLog",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.End, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CronLog_message(ctx context.Context, field graphql.CollectedField, obj *beans.CronLog) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CronLog",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CronLog_weight(ctx context.Context, field graphql.CollectedField, obj *beans.CronLog) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CronLog",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Weight, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CronLog_status(ctx context.Context, field graphql.CollectedField, obj *beans.CronLog) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CronLog",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CronLogs_total(ctx context.Context, field graphql.CollectedField, obj *CronLogs) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CronLogs",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CronLogs_data(ctx context.Context, field graphql.CollectedField, obj *CronLogs) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CronLogs",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Data, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]beans.CronLog)
+	fc.Result = res
+	return ec.marshalOCronLog2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐCronLogᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Crons_total(ctx context.Context, field graphql.CollectedField, obj *Crons) (ret graphql.Marshaler) {
@@ -4575,6 +5076,72 @@ func (ec *executionContext) _Query_cron(ctx context.Context, field graphql.Colle
 	res := resTmp.(*beans.Cron)
 	fc.Result = res
 	return ec.marshalOCron2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐCron(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_cron_logs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_cron_logs_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().CronLogs(rctx, args["query"].(QCronLog))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "cron")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*CronLogs); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/lib.CronLogs`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*CronLogs)
+	fc.Result = res
+	return ec.marshalOCronLogs2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐCronLogs(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_dicts(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7347,6 +7914,42 @@ func (ec *executionContext) unmarshalInputQCron(ctx context.Context, obj interfa
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputQCronLog(ctx context.Context, obj interface{}) (QCronLog, error) {
+	var it QCronLog
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "keyword":
+			var err error
+			it.Keyword, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "index":
+			var err error
+			it.Index, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "size":
+			var err error
+			it.Size, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "count":
+			var err error
+			it.Count, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputQRole(ctx context.Context, obj interface{}) (QRole, error) {
 	var it QRole
 	var asMap = obj.(map[string]interface{})
@@ -7658,6 +8261,72 @@ func (ec *executionContext) _Cron(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Cron_weight(ctx, field, obj)
 		case "status":
 			out.Values[i] = ec._Cron_status(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var cronLogImplementors = []string{"CronLog"}
+
+func (ec *executionContext) _CronLog(ctx context.Context, sel ast.SelectionSet, obj *beans.CronLog) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cronLogImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CronLog")
+		case "id":
+			out.Values[i] = ec._CronLog_id(ctx, field, obj)
+		case "cron":
+			out.Values[i] = ec._CronLog_cron(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._CronLog_name(ctx, field, obj)
+		case "expression":
+			out.Values[i] = ec._CronLog_expression(ctx, field, obj)
+		case "start":
+			out.Values[i] = ec._CronLog_start(ctx, field, obj)
+		case "end":
+			out.Values[i] = ec._CronLog_end(ctx, field, obj)
+		case "message":
+			out.Values[i] = ec._CronLog_message(ctx, field, obj)
+		case "weight":
+			out.Values[i] = ec._CronLog_weight(ctx, field, obj)
+		case "status":
+			out.Values[i] = ec._CronLog_status(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var cronLogsImplementors = []string{"CronLogs"}
+
+func (ec *executionContext) _CronLogs(ctx context.Context, sel ast.SelectionSet, obj *CronLogs) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cronLogsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CronLogs")
+		case "total":
+			out.Values[i] = ec._CronLogs_total(ctx, field, obj)
+		case "data":
+			out.Values[i] = ec._CronLogs_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7996,6 +8665,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_cron(ctx, field)
+				return res
+			})
+		case "cron_logs":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_cron_logs(ctx, field)
 				return res
 			})
 		case "dicts":
@@ -8524,6 +9204,10 @@ func (ec *executionContext) marshalNCron2githubᚗcomᚋzhanghupᚋgoᚑappᚋbe
 	return ec._Cron(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNCronLog2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐCronLog(ctx context.Context, sel ast.SelectionSet, v beans.CronLog) graphql.Marshaler {
+	return ec._CronLog(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNDict2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDict(ctx context.Context, sel ast.SelectionSet, v beans.Dict) graphql.Marshaler {
 	return ec._Dict(ctx, sel, &v)
 }
@@ -8578,6 +9262,10 @@ func (ec *executionContext) marshalNPermObj2githubᚗcomᚋzhanghupᚋgoᚑapp�
 
 func (ec *executionContext) unmarshalNQCron2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐQCron(ctx context.Context, v interface{}) (QCron, error) {
 	return ec.unmarshalInputQCron(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNQCronLog2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐQCronLog(ctx context.Context, v interface{}) (QCronLog, error) {
+	return ec.unmarshalInputQCronLog(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNQRole2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐQRole(ctx context.Context, v interface{}) (QRole, error) {
@@ -8969,6 +9657,57 @@ func (ec *executionContext) marshalOCron2ᚖgithubᚗcomᚋzhanghupᚋgoᚑapp�
 	return ec._Cron(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOCronLog2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐCronLogᚄ(ctx context.Context, sel ast.SelectionSet, v []beans.CronLog) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCronLog2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐCronLog(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOCronLogs2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐCronLogs(ctx context.Context, sel ast.SelectionSet, v CronLogs) graphql.Marshaler {
+	return ec._CronLogs(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOCronLogs2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐCronLogs(ctx context.Context, sel ast.SelectionSet, v *CronLogs) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CronLogs(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOCrons2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐCrons(ctx context.Context, sel ast.SelectionSet, v Crons) graphql.Marshaler {
 	return ec._Crons(ctx, sel, &v)
 }
@@ -9138,6 +9877,29 @@ func (ec *executionContext) marshalOInt2ᚖint64(ctx context.Context, sel ast.Se
 		return graphql.Null
 	}
 	return ec.marshalOInt2int64(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalOInt642int64(ctx context.Context, v interface{}) (int64, error) {
+	return graphql.UnmarshalInt64(v)
+}
+
+func (ec *executionContext) marshalOInt642int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
+	return graphql.MarshalInt64(v)
+}
+
+func (ec *executionContext) unmarshalOInt642ᚖint64(ctx context.Context, v interface{}) (*int64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOInt642int64(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOInt642ᚖint64(ctx context.Context, sel ast.SelectionSet, v *int64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOInt642int64(ctx, sel, *v)
 }
 
 func (ec *executionContext) marshalOPermObj2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐPermObjᚄ(ctx context.Context, sel ast.SelectionSet, v []PermObj) graphql.Marshaler {
