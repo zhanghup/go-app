@@ -13,13 +13,14 @@ directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITI
 
 type Query {
   hello: String
+  "登录状态查询"
+  login_status: Boolean!
 }
 
 type Mutation {
   "用户登录"
   login(account:String!,password:String!): String!
-  "登录状态查询"
-  login_status: Boolean!
+
   "登出"
   logout:Boolean!
 }

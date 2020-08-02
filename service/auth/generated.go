@@ -8,6 +8,7 @@ import (
 	"errors"
 	"strconv"
 	"sync"
+	"sync/atomic"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -43,23 +44,23 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		Login       func(childComplexity int, account string, password string) int
-		LoginStatus func(childComplexity int) int
-		Logout      func(childComplexity int) int
+		Login  func(childComplexity int, account string, password string) int
+		Logout func(childComplexity int) int
 	}
 
 	Query struct {
-		Hello func(childComplexity int) int
+		Hello       func(childComplexity int) int
+		LoginStatus func(childComplexity int) int
 	}
 }
 
 type MutationResolver interface {
 	Login(ctx context.Context, account string, password string) (string, error)
-	LoginStatus(ctx context.Context) (bool, error)
 	Logout(ctx context.Context) (bool, error)
 }
 type QueryResolver interface {
 	Hello(ctx context.Context) (*string, error)
+	LoginStatus(ctx context.Context) (bool, error)
 }
 
 type executableSchema struct {
@@ -89,13 +90,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.Login(childComplexity, args["account"].(string), args["password"].(string)), true
 
-	case "Mutation.login_status":
-		if e.complexity.Mutation.LoginStatus == nil {
-			break
-		}
-
-		return e.complexity.Mutation.LoginStatus(childComplexity), true
-
 	case "Mutation.logout":
 		if e.complexity.Mutation.Logout == nil {
 			break
@@ -109,6 +103,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Hello(childComplexity), true
+
+	case "Query.login_status":
+		if e.complexity.Query.LoginStatus == nil {
+			break
+		}
+
+		return e.complexity.Query.LoginStatus(childComplexity), true
 
 	}
 	return 0, false
@@ -189,13 +190,14 @@ directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITI
 
 type Query {
   hello: String
+  "登录状态查询"
+  login_status: Boolean!
 }
 
 type Mutation {
   "用户登录"
   login(account:String!,password:String!): String!
-  "登录状态查询"
-  login_status: Boolean!
+
   "登出"
   logout:Boolean!
 }
@@ -342,40 +344,6 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_login_status(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mutation",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().LoginStatus(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Mutation_logout(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -439,6 +407,40 @@ func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.Coll
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_login_status(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().LoginStatus(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1593,11 +1595,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "login_status":
-			out.Values[i] = ec._Mutation_login_status(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "logout":
 			out.Values[i] = ec._Mutation_logout(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -1638,6 +1635,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_hello(ctx, field)
+				return res
+			})
+		case "login_status":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_login_status(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "__type":

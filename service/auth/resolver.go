@@ -80,7 +80,7 @@ func (this mutationResolver) Logout(ctx context.Context) (bool, error) {
 	return err == nil, err
 }
 
-func (this mutationResolver) LoginStatus(ctx context.Context) (bool, error) {
+func (this queryResolver) LoginStatus(ctx context.Context) (bool, error) {
 	tok := this.Gin(ctx).GetHeader(directive.GIN_AUTHORIZATION)
 
 	if tok == "" {
