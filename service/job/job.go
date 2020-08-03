@@ -102,6 +102,13 @@ func AddJob(name, spec string, action func() error, flag ...bool) error {
 			ji.fn = action
 			job.data.Set(id, ji)
 
+			_, err := job.db.Where("id = ?", id).Update(map[string]interface{}{
+				"expression": spec,
+			})
+			if err != nil {
+				return err
+			}
+
 			if ji.cron.State != nil && *ji.cron.State == 1 {
 				err := addJob(id)
 				if err != nil {
