@@ -32,6 +32,11 @@ func Boot(box *rice.Box, initdb ...bool) *Struct {
 	return s.enableXorm()
 }
 
+func (this *Struct) Init(fn func()) *Struct {
+	fn()
+	return this
+}
+
 // 初始化数据库
 func (this *Struct) enableXorm() *Struct {
 	if this.db != nil {
