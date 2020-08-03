@@ -8,8 +8,9 @@ import (
 )
 
 type config struct {
+	box      *rice.Box
 	Database txorm.Config `yaml:"database"`
-	Web      tgin.Config `yaml:"web"`
+	Web      tgin.Config  `yaml:"web"`
 }
 
 var DB txorm.Config
@@ -21,6 +22,7 @@ func InitConfig(box *rice.Box) *config {
 		return Config
 	}
 	cc := new(config)
+	cc.box = box
 	err := tools.Conf(box, cc)
 	if err != nil {
 		panic(err)
@@ -29,4 +31,12 @@ func InitConfig(box *rice.Box) *config {
 	DB = cc.Database
 	Web = cc.Web
 	return Config
+}
+
+func ConfigOf(conf interface{}) error {
+	if Config == nil {
+		panic("配置文件尚未初始化")
+	}
+	err := tools.Conf(Config.box, conf)
+	return err
 }
