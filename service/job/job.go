@@ -102,7 +102,7 @@ func AddJob(name, spec string, action func() error, flag ...bool) error {
 			ji.fn = action
 			job.data.Set(id, ji)
 
-			_, err := job.db.Where("id = ?", id).Update(map[string]interface{}{
+			_, err := job.db.Table(beans.Cron{}).Where("id = ?", id).Update(map[string]interface{}{
 				"expression": spec,
 			})
 			if err != nil {
