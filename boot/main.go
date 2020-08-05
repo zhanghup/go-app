@@ -20,7 +20,7 @@ import (
 type Struct struct {
 	box       *rice.Box
 	db        *xorm.Engine
-	routerfns []func(g *gin.Engine)
+	routerfns []func(g *gin.Engine,db *xorm.Engine)
 }
 
 func Boot(box *rice.Box, initdb ...bool) *Struct {
@@ -32,8 +32,8 @@ func Boot(box *rice.Box, initdb ...bool) *Struct {
 	return s.enableXorm()
 }
 
-func (this *Struct) Init(fn func()) *Struct {
-	fn()
+func (this *Struct) Init(fn func(db *xorm.Engine)) *Struct {
+	fn(this.db)
 	return this
 }
 
@@ -79,15 +79,15 @@ func (this *Struct) InitDatas(fn ...func(db *xorm.Engine)) *Struct {
 
 // 文件操作接口
 func (this *Struct) RouterFile() *Struct {
-	this.routerfns = append(this.routerfns, func(g *gin.Engine) {
-		file.Gin(g.Group("/"), g.Group("/"), this.db)
+	this.routerfns = append(this.routerfns, func(g *gin.Engine,db *xorm.Engine) {
+		file.Gin(g.Group("/"), g.Group("/"), db)
 	})
 	return this
 }
 
 // 登录登出等接口
 func (this *Struct) RouterAuth() *Struct {
-	this.routerfns = append(this.routerfns, func(g *gin.Engine) {
+	this.routerfns = append(this.routerfns, func(g *gin.Engine,db *xorm.Engine) {
 		auth.Gin(g.Group("/"), this.db)
 	})
 	return this
@@ -95,7 +95,7 @@ func (this *Struct) RouterAuth() *Struct {
 
 // 内置api接口
 func (this *Struct) RouterApi() *Struct {
-	this.routerfns = append(this.routerfns, func(g *gin.Engine) {
+	this.routerfns = append(this.routerfns, func(g *gin.Engine,db *xorm.Engine) {
 		api.Gin(g.Group("/"), this.db)
 	})
 	return this
@@ -118,7 +118,7 @@ func (this *Struct) Jobs(name, spec string, fn func() error, flag ...bool) *Stru
 }
 
 // 自定义接口
-func (this *Struct) RouterOther(fn ...func(g *gin.Engine)) *Struct {
+func (this *Struct) RouterOther(fn ...func(g *gin.Engine,db *xorm.Engine)) *Struct {
 	this.routerfns = append(this.routerfns, fn...)
 	return this
 }
