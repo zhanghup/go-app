@@ -16,7 +16,7 @@ func main() {
 		SyncTables().
 		InitDatas().
 		JobsInit().
-		Jobs("测试", "* * * * * * ", func() error {
+		Jobs("测试", "0 * * * * * ", func() error {
 			if time.Now().Unix()%2 == 0 {
 				return errors.New("测试错误")
 			}

@@ -3,96 +3,125 @@ package initia
 import (
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-tools/database/txorm"
+	"github.com/zhanghup/go-tools/tog"
 	"xorm.io/xorm"
 )
 
-func NewDict(db *xorm.Engine) *Dict {
-	return &Dict{db}
+type DictInfo struct {
+	Code string
+	Name string
+
+	Children []DictInfoItem
 }
 
-type Dict struct {
-	DB *xorm.Engine
+type DictInfoItem struct {
+	Name      string
+	Value     string
+	Extension string
+	Disable   int
 }
 
-func (this *Dict) initDictCode(dict beans.Dict, dictitems []beans.DictItem) {
-	hisDict := beans.Dict{}
-	ok, err := this.DB.Table(hisDict).Where("code = ?", dict.Code).Get(&hisDict)
-	if err != nil {
-		panic(err)
-	}
-
-	// 若不存在当前字典项，则新增
-	if !ok {
-		dict.Id = tools.Ptr.Uid()
-		dict.Status = tools.Ptr.Int(1)
-		_, err = this.DB.Table(dict).Insert(dict)
+func InitDictCode(db *xorm.Engine, ty string, dicts []DictInfo) {
+	for ii, dict := range dicts {
+		hisDict := beans.Dict{}
+		ok, err := db.Table(hisDict).Where("code = ?", dict.Code).Get(&hisDict)
 		if err != nil {
 			panic(err)
 		}
-	} else {
-		return
-	}
 
-	// 只有不存在字典项的时候，新增字典项，然后增加具体条目
-	if len(dictitems) > 0 {
-		for i, o := range dictitems {
-			o.Weight = &i
-			o.Status = tools.Ptr.Int(1)
-			o.Id = tools.Ptr.Uid()
-			o.Code = dict.Id
-			_, err = this.DB.Table(o).Insert(o)
+		// 若不存在当前字典项，则新增
+		if !ok {
+			_, err = db.Table(hisDict).Insert(beans.Dict{
+				Bean: beans.Bean{
+					Id:     tools.Ptr.Uid(),
+					Weight: &ii,
+					Status: tools.Ptr.Int(1),
+				},
+				Code: tools.Ptr.String(ty + dict.Code),
+				Name: &dict.Name,
+				Type: &ty,
+			})
 			if err != nil {
 				panic(err)
+			}
+		} else {
+			return
+		}
+
+		// 只有不存在字典项的时候，新增字典项，然后增加具体条目
+		if len(dict.Children) > 0 {
+			for i, o := range dict.Children {
+				_, err = db.Table(beans.DictItem{}).Insert(beans.DictItem{
+					Bean: beans.Bean{
+						Id:     tools.Ptr.Uid(),
+						Weight: &i,
+						Status: tools.Ptr.Int(1),
+					},
+					Code:      tools.Ptr.String(ty + dict.Code),
+					Name:      &o.Name,
+					Value:     &o.Value,
+					Disable:   &o.Disable,
+					Extension: &o.Extension,
+				})
+				if err != nil {
+					panic(err)
+				}
 			}
 		}
 	}
 }
 
-func (this *Dict) InitDict() {
-	this.initDictSys()
-	this.initDictSta()
+func InitDict(db *xorm.Engine) {
+	initDictSys(db)
+	initDictSta(db)
 }
 
-func (this *Dict) initDictSys() {
-	this.initDictCode(beans.Dict{Code: tools.Ptr.String("SYS0001"), Name: tools.Ptr.String("用户类型")}, []beans.DictItem{
-		{Name: tools.Ptr.String("平台用户"), Value: tools.Ptr.String("0")},
+func initDictSys(db *xorm.Engine) {
+	err := txorm.NewEngine(db).SF(`delete from dict_item where code in (select code from dict where type = 'SYS')`).Exec()
+	if err != nil {
+		tog.Error(err.Error())
+	}
+	err = txorm.NewEngine(db).SF(`delete from dict where type = 'SYS'`).Exec()
+	if err != nil {
+		tog.Error(err.Error())
+	}
+	InitDictCode(db, "SYS", []DictInfo{
+		{Code: "0000", Name: "字典类型", Children: []DictInfoItem{
+			{Name: "系统类型", Value: "SYS", Disable: 1},
+			{Name: "系统状态", Value: "STA", Disable: 1},
+			{Name: "系统映射", Value: "AUT", Disable: 1},
+		}},
+		{Code: "0001", Name: "用户类型", Children: []DictInfoItem{
+			{Name: "平台用户", Value: "0", Disable: 1},
+		}},
+		{Code: "0002", Name: "对象权限", Children: []DictInfoItem{
+			{Name: "新增", Value: "C", Disable: 1},
+			{Name: "查询", Value: "R", Disable: 1},
+			{Name: "编辑", Value: "U", Disable: 1},
+			{Name: "删除", Value: "D", Disable: 1},
+			{Name: "管理", Value: "M", Disable: 1},
+		}},
+		{Code: "0003", Name: "对象列表", Children: []DictInfoItem{
+			{Name: "用户", Value: "user", Disable: 1},
+			{Name: "数据字典", Value: "dict", Disable: 1},
+		},},
 	})
-
-	this.initDictCode(beans.Dict{Code: tools.Ptr.String("SYS0002"), Name: tools.Ptr.String("对象权限")}, []beans.DictItem{
-		{Name: tools.Ptr.String("新增"), Value: tools.Ptr.String("C")}, // 就是root用户
-		{Name: tools.Ptr.String("查询"), Value: tools.Ptr.String("R")},
-		{Name: tools.Ptr.String("编辑"), Value: tools.Ptr.String("U")},
-		{Name: tools.Ptr.String("删除"), Value: tools.Ptr.String("D")},
-		{Name: tools.Ptr.String("管理"), Value: tools.Ptr.String("M")},
-	})
-
-	this.initDictCode(beans.Dict{Code: tools.Ptr.String("SYS0003"), Name: tools.Ptr.String("对象列表")}, []beans.DictItem{
-		{Name: tools.Ptr.String("用户"), Value: tools.Ptr.String("user")},
-		{Name: tools.Ptr.String("数据字典"), Value: tools.Ptr.String("dict")},
-	})
-
-	this.initDictCode(beans.Dict{Code: tools.Ptr.String("SYS0004"), Name: tools.Ptr.String("表单字段类型")}, []beans.DictItem{
-		{Name: tools.Ptr.String("隐藏域"), Value: tools.Ptr.String("hide")},
-		{Name: tools.Ptr.String("字符串"), Value: tools.Ptr.String("string")},
-		{Name: tools.Ptr.String("数字"), Value: tools.Ptr.String("number")},
-		{Name: tools.Ptr.String("时间"), Value: tools.Ptr.String("date")},
-		{Name: tools.Ptr.String("时间范围"), Value: tools.Ptr.String("date-range")},
-		{Name: tools.Ptr.String("经纬度"), Value: tools.Ptr.String("position")},
-		{Name: tools.Ptr.String("当前时间"), Value: tools.Ptr.String("current-time")},
-		{Name: tools.Ptr.String("当前人员"), Value: tools.Ptr.String("current-user")},
-	})
-
 }
 
-func (this *Dict) initDictSta() {
-	this.initDictCode(beans.Dict{Code: tools.Ptr.String("STA0001"), Name: tools.Ptr.String("数据状态")}, []beans.DictItem{
-		{Name: tools.Ptr.String("启用"), Value: tools.Ptr.String("1")},
-		{Name: tools.Ptr.String("禁用"), Value: tools.Ptr.String("0")},
-	})
-
-	this.initDictCode(beans.Dict{Code: tools.Ptr.String("STA0002"), Name: tools.Ptr.String("人物性别")}, []beans.DictItem{
-		{Name: tools.Ptr.String("未知"), Value: tools.Ptr.String("0")},
-		{Name: tools.Ptr.String("男"), Value: tools.Ptr.String("1")},
-		{Name: tools.Ptr.String("女"), Value: tools.Ptr.String("2")},
+func initDictSta(db *xorm.Engine) {
+	err := txorm.NewEngine(db).SF(`delete from dict_item where code in (select code from dict where type = 'STA')`).Exec()
+	if err != nil {
+		tog.Error(err.Error())
+	}
+	err = txorm.NewEngine(db).SF(`delete from dict where type = 'STA'`).Exec()
+	if err != nil {
+		tog.Error(err.Error())
+	}
+	InitDictCode(db, "STA", []DictInfo{
+		{Code: "0001", Name: "数据状态", Children: []DictInfoItem{
+			{Name: "启用", Value: "1", Disable: 1},
+			{Name: "禁用", Value: "0", Disable: 1,},
+		}},
 	})
 }

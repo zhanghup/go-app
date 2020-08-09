@@ -96,6 +96,7 @@ type ComplexityRoot struct {
 	DictItem struct {
 		Code      func(childComplexity int) int
 		Created   func(childComplexity int) int
+		Disable   func(childComplexity int) int
 		Extension func(childComplexity int) int
 		Id        func(childComplexity int) int
 		Name      func(childComplexity int) int
@@ -481,6 +482,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DictItem.Created(childComplexity), true
+
+	case "DictItem.disable":
+		if e.complexity.DictItem.Disable == nil {
+			break
+		}
+
+		return e.complexity.DictItem.Disable(childComplexity), true
 
 	case "DictItem.extension":
 		if e.complexity.DictItem.Extension == nil {
@@ -1395,6 +1403,8 @@ type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
     value: String
     "扩展"
     extension: String
+    "禁止操作"
+    disable: Int
 
     "创建时间"
     created: Int
@@ -1416,6 +1426,8 @@ input NewDictItem{
     value: String
     "扩展"
     extension: String
+    "禁止操作"
+    disable: Int
 
     "排序"
     weight: Int
@@ -1430,6 +1442,8 @@ input UpdDictItem{
     value: String
     "扩展"
     extension: String
+    "禁止操作"
+    disable: Int
 
     "排序"
     weight: Int
@@ -3337,6 +3351,37 @@ func (ec *executionContext) _DictItem_extension(ctx context.Context, field graph
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DictItem_disable(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DictItem",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Disable, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DictItem_created(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
@@ -7741,6 +7786,12 @@ func (ec *executionContext) unmarshalInputNewDictItem(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
+		case "disable":
+			var err error
+			it.Disable, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "weight":
 			var err error
 			it.Weight, err = ec.unmarshalOInt2ᚖint(ctx, v)
@@ -8086,6 +8137,12 @@ func (ec *executionContext) unmarshalInputUpdDictItem(ctx context.Context, obj i
 		case "extension":
 			var err error
 			it.Extension, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "disable":
+			var err error
+			it.Disable, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8441,6 +8498,8 @@ func (ec *executionContext) _DictItem(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = ec._DictItem_value(ctx, field, obj)
 		case "extension":
 			out.Values[i] = ec._DictItem_extension(ctx, field, obj)
+		case "disable":
+			out.Values[i] = ec._DictItem_disable(ctx, field, obj)
 		case "created":
 			out.Values[i] = ec._DictItem_created(ctx, field, obj)
 		case "updated":

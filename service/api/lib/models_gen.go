@@ -45,6 +45,8 @@ type NewDictItem struct {
 	Value *string `json:"value"`
 	// 扩展
 	Extension *string `json:"extension"`
+	// 禁止操作
+	Disable *int `json:"disable"`
 	// 排序
 	Weight *int `json:"weight"`
 	// 状态[dict:STA0001]
@@ -148,6 +150,8 @@ type UpdDictItem struct {
 	Value *string `json:"value"`
 	// 扩展
 	Extension *string `json:"extension"`
+	// 禁止操作
+	Disable *int `json:"disable"`
 	// 排序
 	Weight *int `json:"weight"`
 	// 状态[dict:STA0001]

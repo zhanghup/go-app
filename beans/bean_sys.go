@@ -34,6 +34,7 @@ type Dict struct {
 
 	Code   *string `json:"code" xorm:"unique"`
 	Name   *string `json:"name"`
+	Type   *string `json:"type"`
 	Remark *string `json:"remark"`
 }
 type DictItem struct {

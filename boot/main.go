@@ -68,12 +68,17 @@ func (this *Struct) SyncTables(fn ...func(db *xorm.Engine)) *Struct {
 
 // 初始化数据
 func (this *Struct) InitDatas(fn ...func(db *xorm.Engine)) *Struct {
-	initia.InitAction(this.db)
+	initia.InitDict(this.db)
+	initia.InitUser(this.db)
 	if len(fn) > 0 {
 		for _, f := range fn {
 			f(this.db)
 		}
 	}
+	return this
+}
+func (this *Struct) InitDict(ty string, dicts []initia.DictInfo) *Struct {
+	initia.InitDictCode(this.db, ty, dicts)
 	return this
 }
 
