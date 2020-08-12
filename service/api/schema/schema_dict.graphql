@@ -1,6 +1,6 @@
 extend type Query{
     "字典列表（分页）"
-    dicts:[Dict!] @perm(entity: "dict",perm: "R")
+    dicts(query:QDict):[Dict!] @perm(entity: "dict",perm: "R")
     "字典单个对象"
     dict(id: String!):Dict @perm(entity: "dict",perm: "R")
 }
@@ -23,6 +23,10 @@ extend type Mutation {
     dict_item_sort(id: String!,items:[String!]): Boolean! @perm(entity: "dict",perm: "M")
 }
 
+input QDict{
+    "字典类型"
+    type: String
+}
 
 type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     id: String

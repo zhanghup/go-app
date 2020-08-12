@@ -139,7 +139,7 @@ type ComplexityRoot struct {
 		CronLogs        func(childComplexity int, query QCronLog) int
 		Crons           func(childComplexity int, query QCron) int
 		Dict            func(childComplexity int, id string) int
-		Dicts           func(childComplexity int) int
+		Dicts           func(childComplexity int, query *QDict) int
 		Hello           func(childComplexity int) int
 		Role            func(childComplexity int, id string) int
 		RolePermObjects func(childComplexity int, id string) int
@@ -224,7 +224,7 @@ type QueryResolver interface {
 	Crons(ctx context.Context, query QCron) (*Crons, error)
 	Cron(ctx context.Context, id string) (*beans.Cron, error)
 	CronLogs(ctx context.Context, query QCronLog) (*CronLogs, error)
-	Dicts(ctx context.Context) ([]beans.Dict, error)
+	Dicts(ctx context.Context, query *QDict) ([]beans.Dict, error)
 	Dict(ctx context.Context, id string) (*beans.Dict, error)
 	Roles(ctx context.Context, query QRole) (*Roles, error)
 	Role(ctx context.Context, id string) (*beans.Role, error)
@@ -841,7 +841,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Dicts(childComplexity), true
+		args, err := ec.field_Query_dicts_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Dicts(childComplexity, args["query"].(*QDict)), true
 
 	case "Query.hello":
 		if e.complexity.Query.Hello == nil {
@@ -1318,7 +1323,7 @@ type CronLog @goModel(model:"github.com/zhanghup/go-app/beans.CronLog")  {
 }`, BuiltIn: false},
 	&ast.Source{Name: "schema/schema_dict.graphql", Input: `extend type Query{
     "字典列表（分页）"
-    dicts:[Dict!] @perm(entity: "dict",perm: "R")
+    dicts(query:QDict):[Dict!] @perm(entity: "dict",perm: "R")
     "字典单个对象"
     dict(id: String!):Dict @perm(entity: "dict",perm: "R")
 }
@@ -1341,6 +1346,10 @@ extend type Mutation {
     dict_item_sort(id: String!,items:[String!]): Boolean! @perm(entity: "dict",perm: "M")
 }
 
+input QDict{
+    "字典类型"
+    type: String
+}
 
 type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     id: String
@@ -2106,6 +2115,20 @@ func (ec *executionContext) field_Query_dict_args(ctx context.Context, rawArgs m
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_dicts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *QDict
+	if tmp, ok := rawArgs["query"]; ok {
+		arg0, err = ec.unmarshalOQDict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐQDict(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["query"] = arg0
 	return args, nil
 }
 
@@ -5205,10 +5228,17 @@ func (ec *executionContext) _Query_dicts(ctx context.Context, field graphql.Coll
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_dicts_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Dicts(rctx)
+			return ec.resolvers.Query().Dicts(rctx, args["query"].(*QDict))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			entity, err := ec.unmarshalNString2string(ctx, "dict")
@@ -8008,6 +8038,24 @@ func (ec *executionContext) unmarshalInputQCronLog(ctx context.Context, obj inte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputQDict(ctx context.Context, obj interface{}) (QDict, error) {
+	var it QDict
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "type":
+			var err error
+			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputQRole(ctx context.Context, obj interface{}) (QRole, error) {
 	var it QRole
 	var asMap = obj.(map[string]interface{})
@@ -10006,6 +10054,18 @@ func (ec *executionContext) marshalOPermObj2ᚕgithubᚗcomᚋzhanghupᚋgoᚑap
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) unmarshalOQDict2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐQDict(ctx context.Context, v interface{}) (QDict, error) {
+	return ec.unmarshalInputQDict(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOQDict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐQDict(ctx context.Context, v interface{}) (*QDict, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOQDict2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋlibᚐQDict(ctx, v)
+	return &res, err
 }
 
 func (ec *executionContext) marshalORole2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐRole(ctx context.Context, sel ast.SelectionSet, v beans.Role) graphql.Marshaler {

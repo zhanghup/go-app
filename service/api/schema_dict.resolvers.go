@@ -96,9 +96,15 @@ func (r *mutationResolver) DictItemSort(ctx context.Context, id string, items []
 	return err == nil, err
 }
 
-func (r *queryResolver) Dicts(ctx context.Context) ([]beans.Dict, error) {
+func (r *queryResolver) Dicts(ctx context.Context, query *lib.QDict) ([]beans.Dict, error) {
+	if query == nil{
+		query = &lib.QDict{}
+	}
 	dicts := make([]beans.Dict, 0)
-	err := r.DBS.SF(` select * from dict u where 1 = 1 order by u.code`).Find(&dicts)
+	err := r.DBS.SF(` select * from dict u where 1 = 1 {{ if .type }} and u.type = :type {{ end }} order by u.code`,
+		map[string]interface{}{
+			"type": query.Type,
+		}).Find(&dicts)
 	return dicts, err
 }
 

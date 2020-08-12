@@ -113,6 +113,11 @@ type QCronLog struct {
 	Count   *bool   `json:"count"`
 }
 
+type QDict struct {
+	// 字典类型
+	Type *string `json:"type"`
+}
+
 type QRole struct {
 	Keyword *string `json:"keyword"`
 	Index   *int    `json:"index"`
