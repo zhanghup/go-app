@@ -113,7 +113,7 @@ type ComplexityRoot struct {
 		DictCreate        func(childComplexity int, input NewDict) int
 		DictItemCreate    func(childComplexity int, input NewDictItem) int
 		DictItemRemoves   func(childComplexity int, ids []string) int
-		DictItemSort      func(childComplexity int, id string, items []string) int
+		DictItemSort      func(childComplexity int, code string, items []string) int
 		DictItemUpdate    func(childComplexity int, id string, input UpdDictItem) int
 		DictRemoves       func(childComplexity int, ids []string) int
 		DictUpdate        func(childComplexity int, id string, input UpdDict) int
@@ -207,7 +207,7 @@ type MutationResolver interface {
 	DictItemCreate(ctx context.Context, input NewDictItem) (bool, error)
 	DictItemUpdate(ctx context.Context, id string, input UpdDictItem) (bool, error)
 	DictItemRemoves(ctx context.Context, ids []string) (bool, error)
-	DictItemSort(ctx context.Context, id string, items []string) (bool, error)
+	DictItemSort(ctx context.Context, code string, items []string) (bool, error)
 	RoleCreate(ctx context.Context, input NewRole) (bool, error)
 	RoleUpdate(ctx context.Context, id string, input UpdRole) (bool, error)
 	RoleRemoves(ctx context.Context, ids []string) (bool, error)
@@ -621,7 +621,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DictItemSort(childComplexity, args["id"].(string), args["items"].([]string)), true
+		return e.complexity.Mutation.DictItemSort(childComplexity, args["code"].(string), args["items"].([]string)), true
 
 	case "Mutation.dict_item_update":
 		if e.complexity.Mutation.DictItemUpdate == nil {
@@ -1343,7 +1343,7 @@ extend type Mutation {
     "字典项批量删除"
     dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict",perm: "D")
     "字典项重新排序"
-    dict_item_sort(id: String!,items:[String!]): Boolean! @perm(entity: "dict",perm: "M")
+    dict_item_sort(code: String!,items:[String!]): Boolean! @perm(entity: "dict",perm: "M")
 }
 
 input QDict{
@@ -1798,13 +1798,13 @@ func (ec *executionContext) field_Mutation_dict_item_sort_args(ctx context.Conte
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
+	if tmp, ok := rawArgs["code"]; ok {
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["id"] = arg0
+	args["code"] = arg0
 	var arg1 []string
 	if tmp, ok := rawArgs["items"]; ok {
 		arg1, err = ec.unmarshalOString2ᚕstringᚄ(ctx, tmp)
@@ -4208,7 +4208,7 @@ func (ec *executionContext) _Mutation_dict_item_sort(ctx context.Context, field 
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().DictItemSort(rctx, args["id"].(string), args["items"].([]string))
+			return ec.resolvers.Mutation().DictItemSort(rctx, args["code"].(string), args["items"].([]string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			entity, err := ec.unmarshalNString2string(ctx, "dict")
