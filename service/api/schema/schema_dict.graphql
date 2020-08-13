@@ -31,6 +31,8 @@ input QDict{
 type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     id: String
 
+    "字典类型"
+    type: String
     "字典编码"
     code: String
     "字典名称"
@@ -53,6 +55,8 @@ type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
 }
 
 input NewDict {
+    "字典类型"
+    type: String
     "字典编码"
     code: String
     "字典名称"
@@ -67,6 +71,8 @@ input NewDict {
 }
 
 input UpdDict {
+    "字典类型"
+    type: String
     "字典名称"
     name: String
     "备注"

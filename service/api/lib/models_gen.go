@@ -24,6 +24,8 @@ type IPermObj struct {
 }
 
 type NewDict struct {
+	// 字典类型
+	Type *string `json:"type"`
 	// 字典编码
 	Code *string `json:"code"`
 	// 字典名称
@@ -138,6 +140,8 @@ type Roles struct {
 }
 
 type UpdDict struct {
+	// 字典类型
+	Type *string `json:"type"`
 	// 字典名称
 	Name *string `json:"name"`
 	// 备注

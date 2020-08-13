@@ -88,6 +88,7 @@ type ComplexityRoot struct {
 		Name    func(childComplexity int) int
 		Remark  func(childComplexity int) int
 		Status  func(childComplexity int) int
+		Type    func(childComplexity int) int
 		Updated func(childComplexity int) int
 		Values  func(childComplexity int) int
 		Weight  func(childComplexity int) int
@@ -447,6 +448,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Dict.Status(childComplexity), true
+
+	case "Dict.type":
+		if e.complexity.Dict.Type == nil {
+			break
+		}
+
+		return e.complexity.Dict.Type(childComplexity), true
 
 	case "Dict.updated":
 		if e.complexity.Dict.Updated == nil {
@@ -1354,6 +1362,8 @@ input QDict{
 type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     id: String
 
+    "字典类型"
+    type: String
     "字典编码"
     code: String
     "字典名称"
@@ -1376,6 +1386,8 @@ type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
 }
 
 input NewDict {
+    "字典类型"
+    type: String
     "字典编码"
     code: String
     "字典名称"
@@ -1390,6 +1402,8 @@ input NewDict {
 }
 
 input UpdDict {
+    "字典类型"
+    type: String
     "字典名称"
     name: String
     "备注"
@@ -2960,6 +2974,37 @@ func (ec *executionContext) _Dict_id(ctx context.Context, field graphql.Collecte
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Id, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Dict_type(ctx context.Context, field graphql.CollectedField, obj *beans.Dict) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Dict",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7750,6 +7795,12 @@ func (ec *executionContext) unmarshalInputNewDict(ctx context.Context, obj inter
 
 	for k, v := range asMap {
 		switch k {
+		case "type":
+			var err error
+			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "code":
 			var err error
 			it.Code, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -8134,6 +8185,12 @@ func (ec *executionContext) unmarshalInputUpdDict(ctx context.Context, obj inter
 
 	for k, v := range asMap {
 		switch k {
+		case "type":
+			var err error
+			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "name":
 			var err error
 			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -8489,6 +8546,8 @@ func (ec *executionContext) _Dict(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = graphql.MarshalString("Dict")
 		case "id":
 			out.Values[i] = ec._Dict_id(ctx, field, obj)
+		case "type":
+			out.Values[i] = ec._Dict_type(ctx, field, obj)
 		case "code":
 			out.Values[i] = ec._Dict_code(ctx, field, obj)
 		case "name":
