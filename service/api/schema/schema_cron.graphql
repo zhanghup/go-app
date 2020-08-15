@@ -41,10 +41,12 @@ type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
     last: Float
     "任务结果"
     message: String
+    "对应字典项"
+    dict: String
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 
 }
@@ -81,7 +83,7 @@ type CronLog @goModel(model:"github.com/zhanghup/go-app/beans.CronLog")  {
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 
 }

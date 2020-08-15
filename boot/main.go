@@ -115,7 +115,14 @@ func (this *Struct) JobsInit() *Struct {
 	return this
 }
 func (this *Struct) Jobs(name, spec string, fn func() error, flag ...bool) *Struct {
-	err := job.AddJob(name, spec, fn, flag...)
+	err := job.AddJob("", name, spec, fn, flag...)
+	if err != nil {
+		tog.Error(err.Error())
+	}
+	return this
+}
+func (this *Struct) JobWithDict(dict, name, spec string, fn func() error, flag ...bool) *Struct {
+	err := job.AddJob(dict, name, spec, fn, flag...)
 	if err != nil {
 		tog.Error(err.Error())
 	}

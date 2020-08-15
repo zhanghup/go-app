@@ -46,7 +46,7 @@ type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     updated: Int
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 
     "选项列表"
@@ -66,7 +66,7 @@ input NewDict {
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 }
 
@@ -80,7 +80,7 @@ input UpdDict {
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 }
 
@@ -104,7 +104,7 @@ type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
     updated: Int
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 
 }
@@ -123,7 +123,7 @@ input NewDictItem{
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 }
 
@@ -139,6 +139,6 @@ input UpdDictItem{
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 }

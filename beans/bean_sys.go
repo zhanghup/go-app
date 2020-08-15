@@ -75,15 +75,15 @@ type PermObject struct {
 	Bean `xorm:"extends"`
 
 	Role   *string `json:"role"`   // 角色ID
-	Object *string `json:"object"` // 表类型（user/dict等）SYS0003
-	Mask   *string `json:"mask"`   // 权限（C/R/U/D）等组成的字符串 SYS0002
+	Object *string `json:"object"` // 表类型（user/dict等）SYS003
+	Mask   *string `json:"mask"`   // 权限（C/R/U/D）等组成的字符串 SYS002
 }
 
 // 用户
 type User struct {
 	Bean `xorm:"extends"`
 
-	Type     *string `json:"type"` // 字典SYS0001 用户类型
+	Type     *string `json:"type"` // 字典SYS001 用户类型
 	Account  *string `json:"account" xorm:"unique"`
 	Password *string `json:"password"`
 	Salt     *string `json:"-" xorm:"salt"`
@@ -91,9 +91,10 @@ type User struct {
 	Avatar   *string `json:"avatar"`
 	ICard    *string `json:"i_card"`
 	Birth    *int64  `json:"birth"`
-	Sex      *int    `json:"sex"`    // 字典STA0002 人物性别
+	Sex      *int    `json:"sex"`    // 字典STA002 人物性别
 	Mobile   *string `json:"mobile"` // 联系电话
 	Admin    *int    `json:"admin"`
+	Remark   *string `json:"remark"`
 }
 
 // 菜单
@@ -133,6 +134,7 @@ type Cron struct {
 	Previous   *int64   `json:"previous"`            // 上一次执行时间
 	Last       *float64 `json:"last"`                // 任务持续时间（秒）
 	Message    *string  `json:"message" xorm:"text"` // 任务结果
+	Dict       *string  `json:"dict"`
 }
 
 func sys_tables() []interface{} {

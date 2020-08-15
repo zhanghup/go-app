@@ -34,7 +34,7 @@ type NewDict struct {
 	Remark *string `json:"remark"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA0001]
+	// 状态[dict:STA001]
 	Status *int `json:"status"`
 }
 
@@ -51,7 +51,7 @@ type NewDictItem struct {
 	Disable *int `json:"disable"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA0001]
+	// 状态[dict:STA001]
 	Status *int `json:"status"`
 }
 
@@ -62,12 +62,12 @@ type NewRole struct {
 	Desc *string `json:"desc"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA0001]
+	// 状态[dict:STA001]
 	Status *int `json:"status"`
 }
 
 type NewUser struct {
-	// 用户类型[dict:SYS0001]
+	// 用户类型[dict:SYS001]
 	Type string `json:"type"`
 	// 账户
 	Account string `json:"account"`
@@ -81,7 +81,7 @@ type NewUser struct {
 	ICard *string `json:"i_card"`
 	// 出生年月
 	Birth *int `json:"birth"`
-	// 性别[dict:STA0002]
+	// 性别[dict:STA002]
 	Sex *int `json:"sex"`
 	// 移动电话
 	Mobile *string `json:"mobile"`
@@ -89,8 +89,10 @@ type NewUser struct {
 	Admin *int `json:"admin"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA0001]
+	// 状态[dict:STA001]
 	Status *int `json:"status"`
+	// 备注
+	Remark *string `json:"remark"`
 }
 
 type PermObj struct {
@@ -148,7 +150,7 @@ type UpdDict struct {
 	Remark *string `json:"remark"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA0001]
+	// 状态[dict:STA001]
 	Status *int `json:"status"`
 }
 
@@ -163,7 +165,7 @@ type UpdDictItem struct {
 	Disable *int `json:"disable"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA0001]
+	// 状态[dict:STA001]
 	Status *int `json:"status"`
 }
 
@@ -174,12 +176,12 @@ type UpdRole struct {
 	Desc *string `json:"desc"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA0001]
+	// 状态[dict:STA001]
 	Status *int `json:"status"`
 }
 
 type UpdUser struct {
-	// 用户类型[dict:SYS0001]
+	// 用户类型[dict:SYS001]
 	Type string `json:"type"`
 	// 账户
 	Account string `json:"account"`
@@ -193,7 +195,7 @@ type UpdUser struct {
 	ICard *string `json:"i_card"`
 	// 出生年月
 	Birth *int `json:"birth"`
-	// 性别[dict:STA0002]
+	// 性别[dict:STA002]
 	Sex *int `json:"sex"`
 	// 移动电话
 	Mobile *string `json:"mobile"`
@@ -201,8 +203,10 @@ type UpdUser struct {
 	Admin *int `json:"admin"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA0001]
+	// 状态[dict:STA001]
 	Status *int `json:"status"`
+	// 备注
+	Remark *string `json:"remark"`
 }
 
 type Users struct {

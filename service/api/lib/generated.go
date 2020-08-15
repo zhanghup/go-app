@@ -48,6 +48,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Cron struct {
+		Dict       func(childComplexity int) int
 		Expression func(childComplexity int) int
 		Id         func(childComplexity int) int
 		Last       func(childComplexity int) int
@@ -181,6 +182,7 @@ type ComplexityRoot struct {
 		Mobile   func(childComplexity int) int
 		Name     func(childComplexity int) int
 		Password func(childComplexity int) int
+		Remark   func(childComplexity int) int
 		Sex      func(childComplexity int) int
 		Status   func(childComplexity int) int
 		Type     func(childComplexity int) int
@@ -252,6 +254,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Cron.dict":
+		if e.complexity.Cron.Dict == nil {
+			break
+		}
+
+		return e.complexity.Cron.Dict(childComplexity), true
 
 	case "Cron.expression":
 		if e.complexity.Cron.Expression == nil {
@@ -1082,6 +1091,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Password(childComplexity), true
 
+	case "User.remark":
+		if e.complexity.User.Remark == nil {
+			break
+		}
+
+		return e.complexity.User.Remark(childComplexity), true
+
 	case "User.sex":
 		if e.complexity.User.Sex == nil {
 			break
@@ -1285,10 +1301,12 @@ type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
     last: Float
     "任务结果"
     message: String
+    "对应字典项"
+    dict: String
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 
 }
@@ -1325,7 +1343,7 @@ type CronLog @goModel(model:"github.com/zhanghup/go-app/beans.CronLog")  {
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 
 }`, BuiltIn: false},
@@ -1377,7 +1395,7 @@ type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     updated: Int
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 
     "选项列表"
@@ -1397,7 +1415,7 @@ input NewDict {
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 }
 
@@ -1411,7 +1429,7 @@ input UpdDict {
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 }
 
@@ -1435,7 +1453,7 @@ type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
     updated: Int
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 
 }
@@ -1454,7 +1472,7 @@ input NewDictItem{
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 }
 
@@ -1470,7 +1488,7 @@ input UpdDictItem{
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 }`, BuiltIn: false},
 	&ast.Source{Name: "schema/schema_role.graphql", Input: `extend type Query {
@@ -1540,7 +1558,7 @@ type Role @goModel(model: "github.com/zhanghup/go-app/beans.Role") {
     updated: Int
     "排序"
     weight: Int
-    "状态[fmt:STA0001]"
+    "状态[fmt:STA001]"
     status: Int
 }
 
@@ -1552,7 +1570,7 @@ input NewRole {
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
 }
 
@@ -1564,7 +1582,7 @@ input UpdRole {
 
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int = 1
 }
 `, BuiltIn: false},
@@ -1601,7 +1619,7 @@ type Users{
 type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     id: String
 
-    "用户类型[dict:SYS0001]"
+    "用户类型[dict:SYS001]"
     type: String
     "账户"
     account: String
@@ -1615,7 +1633,7 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     i_card: String
     "出生年月"
     birth: Int
-    "性别[dict:STA0002]"
+    "性别[dict:STA002]"
     sex: Int
     "移动电话"
     mobile: String
@@ -1627,13 +1645,15 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     updated: Int
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
+    "备注"
+    remark: String
 
 }
 
 input NewUser {
-    "用户类型[dict:SYS0001]"
+    "用户类型[dict:SYS001]"
     type: String!
     "账户"
     account: String!
@@ -1647,7 +1667,7 @@ input NewUser {
     i_card: String
     "出生年月"
     birth: Int
-    "性别[dict:STA0002]"
+    "性别[dict:STA002]"
     sex: Int
     "移动电话"
     mobile: String
@@ -1655,12 +1675,14 @@ input NewUser {
     admin: Int
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
+    "备注"
+    remark: String
 }
 
 input UpdUser {
-    "用户类型[dict:SYS0001]"
+    "用户类型[dict:SYS001]"
     type: String!
     "账户"
     account: String!
@@ -1674,7 +1696,7 @@ input UpdUser {
     i_card: String
     "出生年月"
     birth: Int
-    "性别[dict:STA0002]"
+    "性别[dict:STA002]"
     sex: Int
     "移动电话"
     mobile: String
@@ -1682,8 +1704,10 @@ input UpdUser {
     admin: Int
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
+    "备注"
+    remark: String
 }
 
 `, BuiltIn: false},
@@ -2478,6 +2502,37 @@ func (ec *executionContext) _Cron_message(ctx context.Context, field graphql.Col
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Cron_dict(ctx context.Context, field graphql.CollectedField, obj *beans.Cron) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Cron",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Dict, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6648,6 +6703,37 @@ func (ec *executionContext) _User_status(ctx context.Context, field graphql.Coll
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _User_remark(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "User",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Remark, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Users_total(ctx context.Context, field graphql.CollectedField, obj *Users) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8005,6 +8091,12 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
+		case "remark":
+			var err error
+			it.Remark, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -8387,6 +8479,12 @@ func (ec *executionContext) unmarshalInputUpdUser(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
+		case "remark":
+			var err error
+			it.Remark, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -8426,6 +8524,8 @@ func (ec *executionContext) _Cron(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Cron_last(ctx, field, obj)
 		case "message":
 			out.Values[i] = ec._Cron_message(ctx, field, obj)
+		case "dict":
+			out.Values[i] = ec._Cron_dict(ctx, field, obj)
 		case "weight":
 			out.Values[i] = ec._Cron_weight(ctx, field, obj)
 		case "status":
@@ -9077,6 +9177,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_weight(ctx, field, obj)
 		case "status":
 			out.Values[i] = ec._User_status(ctx, field, obj)
+		case "remark":
+			out.Values[i] = ec._User_remark(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

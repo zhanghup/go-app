@@ -87,22 +87,22 @@ func initDictSys(db *xorm.Engine) {
 		tog.Error(err.Error())
 	}
 	InitDictCode(db, "SYS", []DictInfo{
-		{Code: "0000", Name: "字典类型", Children: []DictInfoItem{
+		{Code: "000", Name: "字典类型", Children: []DictInfoItem{
 			{Name: "系统类型", Value: "SYS", Disable: 1},
 			{Name: "系统状态", Value: "STA", Disable: 1},
 			{Name: "系统映射", Value: "AUT", Disable: 1},
 		}},
-		{Code: "0001", Name: "用户类型", Children: []DictInfoItem{
+		{Code: "001", Name: "用户类型", Children: []DictInfoItem{
 			{Name: "平台用户", Value: "0", Disable: 1},
 		}},
-		{Code: "0002", Name: "对象权限", Children: []DictInfoItem{
+		{Code: "002", Name: "对象权限", Children: []DictInfoItem{
 			{Name: "新增", Value: "C", Disable: 1},
 			{Name: "查询", Value: "R", Disable: 1},
 			{Name: "编辑", Value: "U", Disable: 1},
 			{Name: "删除", Value: "D", Disable: 1},
 			{Name: "管理", Value: "M", Disable: 1},
 		}},
-		{Code: "0003", Name: "对象列表", Children: []DictInfoItem{
+		{Code: "003", Name: "对象列表", Children: []DictInfoItem{
 			{Name: "用户", Value: "user", Disable: 1},
 			{Name: "数据字典", Value: "dict", Disable: 1},
 		},},
@@ -119,7 +119,7 @@ func initDictSta(db *xorm.Engine) {
 		tog.Error(err.Error())
 	}
 	InitDictCode(db, "STA", []DictInfo{
-		{Code: "0001", Name: "数据状态", Children: []DictInfoItem{
+		{Code: "001", Name: "数据状态", Children: []DictInfoItem{
 			{Name: "启用", Value: "1", Disable: 1},
 			{Name: "禁用", Value: "0", Disable: 1,},
 		}},

@@ -30,7 +30,7 @@ type Users{
 type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     id: String
 
-    "用户类型[dict:SYS0001]"
+    "用户类型[dict:SYS001]"
     type: String
     "账户"
     account: String
@@ -44,7 +44,7 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     i_card: String
     "出生年月"
     birth: Int
-    "性别[dict:STA0002]"
+    "性别[dict:STA002]"
     sex: Int
     "移动电话"
     mobile: String
@@ -56,13 +56,15 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     updated: Int
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
+    "备注"
+    remark: String
 
 }
 
 input NewUser {
-    "用户类型[dict:SYS0001]"
+    "用户类型[dict:SYS001]"
     type: String!
     "账户"
     account: String!
@@ -76,7 +78,7 @@ input NewUser {
     i_card: String
     "出生年月"
     birth: Int
-    "性别[dict:STA0002]"
+    "性别[dict:STA002]"
     sex: Int
     "移动电话"
     mobile: String
@@ -84,12 +86,14 @@ input NewUser {
     admin: Int
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
+    "备注"
+    remark: String
 }
 
 input UpdUser {
-    "用户类型[dict:SYS0001]"
+    "用户类型[dict:SYS001]"
     type: String!
     "账户"
     account: String!
@@ -103,7 +107,7 @@ input UpdUser {
     i_card: String
     "出生年月"
     birth: Int
-    "性别[dict:STA0002]"
+    "性别[dict:STA002]"
     sex: Int
     "移动电话"
     mobile: String
@@ -111,7 +115,9 @@ input UpdUser {
     admin: Int
     "排序"
     weight: Int
-    "状态[dict:STA0001]"
+    "状态[dict:STA001]"
     status: Int
+    "备注"
+    remark: String
 }
 
