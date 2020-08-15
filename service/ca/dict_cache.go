@@ -65,7 +65,7 @@ func (this *dictCache) Get(dict string) (*beans.Dict, []beans.DictItem, bool) {
 	if o == nil {
 		return nil, nil, false
 	}
-	v := o.(dictcacheinfo)
+	v := o.(*dictcacheinfo)
 	return &v.Dict, v.DictItem, true
 }
 

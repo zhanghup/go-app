@@ -25,7 +25,7 @@ type DictInfoItem struct {
 func InitDictCode(db *xorm.Engine, ty string, dicts []DictInfo) {
 	for ii, dict := range dicts {
 		hisDict := beans.Dict{}
-		ok, err := db.Table(hisDict).Where("code = ?", dict.Code).Get(&hisDict)
+		ok, err := db.Table(hisDict).Where("code = ?", ty+dict.Code).Get(&hisDict)
 		if err != nil {
 			panic(err)
 		}
