@@ -48,7 +48,6 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Cron struct {
-		Dict       func(childComplexity int) int
 		Expression func(childComplexity int) int
 		Id         func(childComplexity int) int
 		Last       func(childComplexity int) int
@@ -254,13 +253,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
-
-	case "Cron.dict":
-		if e.complexity.Cron.Dict == nil {
-			break
-		}
-
-		return e.complexity.Cron.Dict(childComplexity), true
 
 	case "Cron.expression":
 		if e.complexity.Cron.Expression == nil {
@@ -1301,8 +1293,6 @@ type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
     last: Float
     "任务结果"
     message: String
-    "对应字典项"
-    dict: String
 
     "排序"
     weight: Int
@@ -2502,37 +2492,6 @@ func (ec *executionContext) _Cron_message(ctx context.Context, field graphql.Col
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Cron_dict(ctx context.Context, field graphql.CollectedField, obj *beans.Cron) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Cron",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Dict, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8524,8 +8483,6 @@ func (ec *executionContext) _Cron(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Cron_last(ctx, field, obj)
 		case "message":
 			out.Values[i] = ec._Cron_message(ctx, field, obj)
-		case "dict":
-			out.Values[i] = ec._Cron_dict(ctx, field, obj)
 		case "weight":
 			out.Values[i] = ec._Cron_weight(ctx, field, obj)
 		case "status":
