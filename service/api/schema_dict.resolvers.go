@@ -101,7 +101,7 @@ func (r *queryResolver) Dicts(ctx context.Context, query *lib.QDict) ([]beans.Di
 		query = &lib.QDict{}
 	}
 	dicts := make([]beans.Dict, 0)
-	err := r.DBS.SF(` select * from dict u where 1 = 1 {{ if .type }} and u.type = :type {{ end }} order by u.code`,
+	err := r.DBS.SF(`select * from dict u where 1 = 1 {{ if .type }} and u.type = :type {{ end }} order by u.code`,
 		map[string]interface{}{
 			"type": query.Type,
 		}).Find(&dicts)
