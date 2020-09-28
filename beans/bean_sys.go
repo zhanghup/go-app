@@ -1,23 +1,5 @@
 package beans
 
-type PageResult struct {
-	Total int64       `json:"total"`
-	Datas interface{} `json:"datas"`
-}
-type PageParam struct {
-	Index int  `json:"index"`
-	Size  int  `json:"size"`
-	Count bool `json:"count"`
-}
-
-type Bean struct {
-	Id      *string `json:"id" xorm:"Varchar(128) pk"`
-	Created *int64  `json:"created" xorm:"created Int(14)"`
-	Updated *int64  `json:"updated" xorm:"updated  Int(14)"`
-	Weight  *int    `json:"weight" xorm:"weight  Int(9)"`
-	Status  *int    `json:"status" xorm:"status  Int(1)"`
-}
-
 // 授权
 type UserToken struct {
 	Bean   `xorm:"extends"`
@@ -126,7 +108,8 @@ type Resource struct {
 
 // 定时任务
 type Cron struct {
-	Bean `xorm:"extends"`
+	Bean     `xorm:"extends"`
+	BeanDict `xorm:"extends"`
 
 	State      *int     `json:"state"`               // 是否启动定时任务
 	Name       *string  `json:"name"`                // 任务名称
