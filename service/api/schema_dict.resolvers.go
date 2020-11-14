@@ -7,7 +7,7 @@ import (
 	"context"
 
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/service/api/lib"
+	"github.com/zhanghup/go-app/service/api/source"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools/database/txorm"
 )
@@ -21,7 +21,7 @@ func (r *dictResolver) Values(ctx context.Context, obj *beans.Dict) ([]beans.Dic
 	return c, err
 }
 
-func (r *mutationResolver) DictCreate(ctx context.Context, input lib.NewDict) (bool, error) {
+func (r *mutationResolver) DictCreate(ctx context.Context, input source.NewDict) (bool, error) {
 	_, err := r.Create(ctx, new(beans.Dict), input)
 	if err != nil {
 		return false, err
@@ -30,7 +30,7 @@ func (r *mutationResolver) DictCreate(ctx context.Context, input lib.NewDict) (b
 	return true, nil
 }
 
-func (r *mutationResolver) DictUpdate(ctx context.Context, id string, input lib.UpdDict) (bool, error) {
+func (r *mutationResolver) DictUpdate(ctx context.Context, id string, input source.UpdDict) (bool, error) {
 	ok, err := r.Update(ctx, new(beans.Dict), id, input)
 	if err != nil {
 		return false, err
@@ -52,7 +52,7 @@ func (r *mutationResolver) DictRemoves(ctx context.Context, ids []string) (bool,
 	return ok, err
 }
 
-func (r *mutationResolver) DictItemCreate(ctx context.Context, input lib.NewDictItem) (bool, error) {
+func (r *mutationResolver) DictItemCreate(ctx context.Context, input source.NewDictItem) (bool, error) {
 	_, err := r.Create(ctx, new(beans.DictItem), input)
 	if err != nil {
 		return false, err
@@ -61,7 +61,7 @@ func (r *mutationResolver) DictItemCreate(ctx context.Context, input lib.NewDict
 	return true, nil
 }
 
-func (r *mutationResolver) DictItemUpdate(ctx context.Context, id string, input lib.UpdDictItem) (bool, error) {
+func (r *mutationResolver) DictItemUpdate(ctx context.Context, id string, input source.UpdDictItem) (bool, error) {
 	ok, err := r.Update(ctx, new(beans.DictItem), id, input)
 	if err != nil {
 		return false, err
@@ -96,9 +96,9 @@ func (r *mutationResolver) DictItemSort(ctx context.Context, code string, items 
 	return err == nil, err
 }
 
-func (r *queryResolver) Dicts(ctx context.Context, query *lib.QDict) ([]beans.Dict, error) {
+func (r *queryResolver) Dicts(ctx context.Context, query *source.QDict) ([]beans.Dict, error) {
 	if query == nil {
-		query = &lib.QDict{}
+		query = &source.QDict{}
 	}
 	dicts := make([]beans.Dict, 0)
 	err := r.DBS.SF(` select * from dict u where 1 = 1 {{ if .type }} and u.type = :type {{ end }} order by u.code`,
@@ -112,7 +112,7 @@ func (r *queryResolver) Dict(ctx context.Context, id string) (*beans.Dict, error
 	return r.DictLoader(ctx, id)
 }
 
-// Dict returns lib.DictResolver implementation.
-func (r *Resolver) Dict() lib.DictResolver { return &dictResolver{r} }
+// Dict returns source.DictResolver implementation.
+func (r *Resolver) Dict() source.DictResolver { return &dictResolver{r} }
 
 type dictResolver struct{ *Resolver }

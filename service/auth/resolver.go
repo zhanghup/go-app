@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/service/auth/source"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-app/service/gs"
@@ -21,7 +22,7 @@ import (
 )
 
 func ggin(db *xorm.Engine) func(c *gin.Context) {
-	c := Config{Resolvers: &Resolver{
+	c := source.Config{Resolvers: &Resolver{
 		DB:  db,
 		DBS: txorm.NewEngine(db),
 		Gin: func(g context.Context) *gin.Context {
@@ -31,7 +32,7 @@ func ggin(db *xorm.Engine) func(c *gin.Context) {
 		},
 	}}
 
-	srv := handler.New(NewExecutableSchema(c))
+	srv := handler.New(source.NewExecutableSchema(c))
 	srv.AddTransport(transport.POST{})
 
 	srv.Use(extension.Introspection{})
@@ -57,7 +58,7 @@ type Resolver struct {
 	Gin func(g context.Context) *gin.Context
 }
 
-func (r *Resolver) Mutation() MutationResolver {
+func (r *Resolver) Mutation() source.MutationResolver {
 	return &mutationResolver{r}
 }
 
@@ -174,6 +175,6 @@ func (q queryResolver) Hello(ctx context.Context) (*string, error) {
 	panic("implement me")
 }
 
-func (this *Resolver) Query() QueryResolver {
+func (this *Resolver) Query() source.QueryResolver {
 	return &queryResolver{this}
 }

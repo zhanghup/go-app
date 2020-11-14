@@ -1,9 +1,11 @@
 schema:
   - schema.graphql
 exec:
-  filename: generated.go
+  filename: source/generated.go
+  package: source
 model:
-  filename: models_gen.go
+  filename: source/models_gen.go
+  package: source
 resolver:
   filename: resolver.go
   type: Resolver

@@ -7,13 +7,13 @@ import (
 	"context"
 
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/service/api/lib"
+	"github.com/zhanghup/go-app/service/api/source"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/tog"
 )
 
-func (r *mutationResolver) RoleCreate(ctx context.Context, input lib.NewRole) (bool, error) {
+func (r *mutationResolver) RoleCreate(ctx context.Context, input source.NewRole) (bool, error) {
 	_, err := r.Create(ctx, new(beans.Role), input)
 	if err != nil {
 		return false, err
@@ -21,7 +21,7 @@ func (r *mutationResolver) RoleCreate(ctx context.Context, input lib.NewRole) (b
 	return true, nil
 }
 
-func (r *mutationResolver) RoleUpdate(ctx context.Context, id string, input lib.UpdRole) (bool, error) {
+func (r *mutationResolver) RoleUpdate(ctx context.Context, id string, input source.UpdRole) (bool, error) {
 	return r.Update(ctx, new(beans.Role), id, input)
 }
 
@@ -58,7 +58,7 @@ func (r *mutationResolver) RolePermCreate(ctx context.Context, id string, typeAr
 	return true, nil
 }
 
-func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, perms []lib.IPermObj) (bool, error) {
+func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, perms []source.IPermObj) (bool, error) {
 	sess := r.DBS.NewSession(ctx)
 
 	err := sess.SF(`delete from perm_object where role = :id`, map[string]interface{}{
@@ -122,14 +122,14 @@ func (r *mutationResolver) RoleToUser(ctx context.Context, uid string, roles []s
 	return true, nil
 }
 
-func (r *queryResolver) Roles(ctx context.Context, query lib.QRole) (*lib.Roles, error) {
+func (r *queryResolver) Roles(ctx context.Context, query source.QRole) (*source.Roles, error) {
 	roles := make([]beans.Role, 0)
 	total, err := r.DBS.SF(`
 		select * from role u
 		where 1 = 1
 		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
 	`, map[string]interface{}{"keyword": query.Keyword}).Page2(query.Index, query.Size, query.Count, &roles)
-	return &lib.Roles{Data: roles, Total: &total}, err
+	return &source.Roles{Data: roles, Total: &total}, err
 }
 
 func (r *queryResolver) Role(ctx context.Context, id string) (*beans.Role, error) {
@@ -148,8 +148,8 @@ func (r *queryResolver) RolePerms(ctx context.Context, id string, typeArg *strin
 	return result, err
 }
 
-func (r *queryResolver) RolePermObjects(ctx context.Context, id string) ([]lib.PermObj, error) {
-	result := make([]lib.PermObj, 0)
+func (r *queryResolver) RolePermObjects(ctx context.Context, id string) ([]source.PermObj, error) {
+	result := make([]source.PermObj, 0)
 	err := r.DBS.SF(`
 		select object,mask from perm_object where role = :role 
 	`, map[string]interface{}{

@@ -7,7 +7,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/zhanghup/go-app/service/api/lib"
+	"github.com/zhanghup/go-app/service/api/source"
 	"github.com/zhanghup/go-tools"
 )
 
@@ -31,14 +31,14 @@ func (r *subscriptionResolver) Hello(ctx context.Context) (<-chan *string, error
 	return c, nil
 }
 
-// Mutation returns lib.MutationResolver implementation.
-func (r *Resolver) Mutation() lib.MutationResolver { return &mutationResolver{r} }
+// Mutation returns source.MutationResolver implementation.
+func (r *Resolver) Mutation() source.MutationResolver { return &mutationResolver{r} }
 
-// Query returns lib.QueryResolver implementation.
-func (r *Resolver) Query() lib.QueryResolver { return &queryResolver{r} }
+// Query returns source.QueryResolver implementation.
+func (r *Resolver) Query() source.QueryResolver { return &queryResolver{r} }
 
-// Subscription returns lib.SubscriptionResolver implementation.
-func (r *Resolver) Subscription() lib.SubscriptionResolver { return &subscriptionResolver{r} }
+// Subscription returns source.SubscriptionResolver implementation.
+func (r *Resolver) Subscription() source.SubscriptionResolver { return &subscriptionResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

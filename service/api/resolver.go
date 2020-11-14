@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/service/api/lib"
+	"github.com/zhanghup/go-app/service/api/source"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-tools/database/txorm"
@@ -32,13 +32,13 @@ func NewResolver(db *xorm.Engine) *Resolver {
 }
 
 func ggin(db *xorm.Engine) func(c *gin.Context) {
-	config := lib.Config{
+	config := source.Config{
 		Resolvers: NewResolver(db),
-		Directives: lib.DirectiveRoot{
+		Directives: source.DirectiveRoot{
 			Perm: directive.Perm(db),
 		},
 	}
-	srv := handler.New(lib.NewExecutableSchema(config))
+	srv := handler.New(source.NewExecutableSchema(config))
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.Websocket{
 		KeepAlivePingInterval: 10 * time.Second,

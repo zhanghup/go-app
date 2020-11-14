@@ -6,11 +6,11 @@
 schema:
   - schema/schema*.graphql
 exec:
-  filename: lib/generated.go
-  package: lib
+  filename: source/generated.go
+  package: source
 model:
-  filename: lib/models_gen.go
-  package: lib
+  filename: source/models_gen.go
+  package: source
 resolver:
   layout: follow-schema
   dir: .
