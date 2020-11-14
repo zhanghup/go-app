@@ -13,7 +13,7 @@ import (
 	"github.com/zhanghup/go-tools/tog"
 )
 
-func (r mutationResolver) RoleCreate(ctx context.Context, input source.NewRole) (bool, error) {
+func (r *mutationResolver) RoleCreate(ctx context.Context, input source.NewRole) (bool, error) {
 	_, err := r.Create(ctx, new(beans.Role), input)
 	if err != nil {
 		return false, err
@@ -21,15 +21,15 @@ func (r mutationResolver) RoleCreate(ctx context.Context, input source.NewRole) 
 	return true, nil
 }
 
-func (r mutationResolver) RoleUpdate(ctx context.Context, id string, input source.UpdRole) (bool, error) {
+func (r *mutationResolver) RoleUpdate(ctx context.Context, id string, input source.UpdRole) (bool, error) {
 	return r.Update(ctx, new(beans.Role), id, input)
 }
 
-func (r mutationResolver) RoleRemoves(ctx context.Context, ids []string) (bool, error) {
+func (r *mutationResolver) RoleRemoves(ctx context.Context, ids []string) (bool, error) {
 	return r.Removes(ctx, new(beans.Role), ids)
 }
 
-func (r mutationResolver) RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error) {
+func (r *mutationResolver) RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error) {
 	sess := r.DBS.NewSession(ctx)
 
 	err := sess.SF(`delete from perm where role = :id and type = :type`, map[string]interface{}{
@@ -58,7 +58,7 @@ func (r mutationResolver) RolePermCreate(ctx context.Context, id string, typeArg
 	return true, nil
 }
 
-func (r mutationResolver) RolePermObjCreate(ctx context.Context, id string, perms []source.IPermObj) (bool, error) {
+func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, perms []source.IPermObj) (bool, error) {
 	sess := r.DBS.NewSession(ctx)
 
 	err := sess.SF(`delete from perm_object where role = :id`, map[string]interface{}{
@@ -87,7 +87,7 @@ func (r mutationResolver) RolePermObjCreate(ctx context.Context, id string, perm
 	return true, nil
 }
 
-func (r mutationResolver) RoleToUser(ctx context.Context, uid string, roles []string) (bool, error) {
+func (r *mutationResolver) RoleToUser(ctx context.Context, uid string, roles []string) (bool, error) {
 	sess := r.DBS.NewSession(ctx)
 	err := sess.SF(`delete from role_user where uid = :uid`, map[string]interface{}{
 		"uid": uid,
@@ -122,7 +122,7 @@ func (r mutationResolver) RoleToUser(ctx context.Context, uid string, roles []st
 	return true, nil
 }
 
-func (r queryResolver) Roles(ctx context.Context, query source.QRole) (*source.Roles, error) {
+func (r *queryResolver) Roles(ctx context.Context, query source.QRole) (*source.Roles, error) {
 	roles := make([]beans.Role, 0)
 	total, err := r.DBS.SF(`
 		select * from role u
@@ -132,11 +132,11 @@ func (r queryResolver) Roles(ctx context.Context, query source.QRole) (*source.R
 	return &source.Roles{Data: roles, Total: &total}, err
 }
 
-func (r queryResolver) Role(ctx context.Context, id string) (*beans.Role, error) {
+func (r *queryResolver) Role(ctx context.Context, id string) (*beans.Role, error) {
 	return r.RoleLoader(ctx, id)
 }
 
-func (r queryResolver) RolePerms(ctx context.Context, id string, typeArg *string) ([]string, error) {
+func (r *queryResolver) RolePerms(ctx context.Context, id string, typeArg *string) ([]string, error) {
 	result := make([]string, 0)
 	err := r.DBS.SF(`
 		select oid from perm where role = :role 
@@ -148,7 +148,7 @@ func (r queryResolver) RolePerms(ctx context.Context, id string, typeArg *string
 	return result, err
 }
 
-func (r queryResolver) RolePermObjects(ctx context.Context, id string) ([]source.PermObj, error) {
+func (r *queryResolver) RolePermObjects(ctx context.Context, id string) ([]source.PermObj, error) {
 	result := make([]source.PermObj, 0)
 	err := r.DBS.SF(`
 		select object,mask from perm_object where role = :role 

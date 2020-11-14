@@ -12,7 +12,7 @@ import (
 	"github.com/zhanghup/go-tools/database/txorm"
 )
 
-func (r dictResolver) Values(ctx context.Context, obj *beans.Dict) ([]beans.DictItem, error) {
+func (r *dictResolver) Values(ctx context.Context, obj *beans.Dict) ([]beans.DictItem, error) {
 	if obj.Id == nil {
 		return nil, nil
 	}
@@ -21,7 +21,7 @@ func (r dictResolver) Values(ctx context.Context, obj *beans.Dict) ([]beans.Dict
 	return c, err
 }
 
-func (r mutationResolver) DictCreate(ctx context.Context, input source.NewDict) (bool, error) {
+func (r *mutationResolver) DictCreate(ctx context.Context, input source.NewDict) (bool, error) {
 	_, err := r.Create(ctx, new(beans.Dict), input)
 	if err != nil {
 		return false, err
@@ -30,7 +30,7 @@ func (r mutationResolver) DictCreate(ctx context.Context, input source.NewDict) 
 	return true, nil
 }
 
-func (r mutationResolver) DictUpdate(ctx context.Context, id string, input source.UpdDict) (bool, error) {
+func (r *mutationResolver) DictUpdate(ctx context.Context, id string, input source.UpdDict) (bool, error) {
 	ok, err := r.Update(ctx, new(beans.Dict), id, input)
 	if err != nil {
 		return false, err
@@ -41,7 +41,7 @@ func (r mutationResolver) DictUpdate(ctx context.Context, id string, input sourc
 	return ok, err
 }
 
-func (r mutationResolver) DictRemoves(ctx context.Context, ids []string) (bool, error) {
+func (r *mutationResolver) DictRemoves(ctx context.Context, ids []string) (bool, error) {
 	ok, err := r.Removes(ctx, new(beans.Dict), ids)
 	if err != nil {
 		return false, err
@@ -52,7 +52,7 @@ func (r mutationResolver) DictRemoves(ctx context.Context, ids []string) (bool, 
 	return ok, err
 }
 
-func (r mutationResolver) DictItemCreate(ctx context.Context, input source.NewDictItem) (bool, error) {
+func (r *mutationResolver) DictItemCreate(ctx context.Context, input source.NewDictItem) (bool, error) {
 	_, err := r.Create(ctx, new(beans.DictItem), input)
 	if err != nil {
 		return false, err
@@ -61,7 +61,7 @@ func (r mutationResolver) DictItemCreate(ctx context.Context, input source.NewDi
 	return true, nil
 }
 
-func (r mutationResolver) DictItemUpdate(ctx context.Context, id string, input source.UpdDictItem) (bool, error) {
+func (r *mutationResolver) DictItemUpdate(ctx context.Context, id string, input source.UpdDictItem) (bool, error) {
 	ok, err := r.Update(ctx, new(beans.DictItem), id, input)
 	if err != nil {
 		return false, err
@@ -72,7 +72,7 @@ func (r mutationResolver) DictItemUpdate(ctx context.Context, id string, input s
 	return ok, err
 }
 
-func (r mutationResolver) DictItemRemoves(ctx context.Context, ids []string) (bool, error) {
+func (r *mutationResolver) DictItemRemoves(ctx context.Context, ids []string) (bool, error) {
 	ok, err := r.Removes(ctx, new(beans.DictItem), ids)
 	if err != nil {
 		return false, err
@@ -83,7 +83,7 @@ func (r mutationResolver) DictItemRemoves(ctx context.Context, ids []string) (bo
 	return ok, err
 }
 
-func (r mutationResolver) DictItemSort(ctx context.Context, code string, items []string) (bool, error) {
+func (r *mutationResolver) DictItemSort(ctx context.Context, code string, items []string) (bool, error) {
 	err := r.DBS.NewSession(ctx).TS(func(sess *txorm.Session) error {
 		for i, o := range items {
 			err := sess.SF(`update dict_item set weight = :weight where id = :id and code = :code`, map[string]interface{}{"weight": i, "id": o, "code": code}).Exec()
@@ -96,7 +96,7 @@ func (r mutationResolver) DictItemSort(ctx context.Context, code string, items [
 	return err == nil, err
 }
 
-func (r queryResolver) Dicts(ctx context.Context, query *source.QDict) ([]beans.Dict, error) {
+func (r *queryResolver) Dicts(ctx context.Context, query *source.QDict) ([]beans.Dict, error) {
 	if query == nil {
 		query = &source.QDict{}
 	}
@@ -108,7 +108,7 @@ func (r queryResolver) Dicts(ctx context.Context, query *source.QDict) ([]beans.
 	return dicts, err
 }
 
-func (r queryResolver) Dict(ctx context.Context, id string) (*beans.Dict, error) {
+func (r *queryResolver) Dict(ctx context.Context, id string) (*beans.Dict, error) {
 	return r.DictLoader(ctx, id)
 }
 

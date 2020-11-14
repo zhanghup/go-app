@@ -14,7 +14,7 @@ import (
 	"github.com/zhanghup/go-tools/tog"
 )
 
-func (r mutationResolver) UserCreate(ctx context.Context, input source.NewUser) (bool, error) {
+func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser) (bool, error) {
 	user := &beans.User{
 		Salt: tools.Ptr.String(tools.Str.RandString(10)),
 	}
@@ -34,7 +34,7 @@ func (r mutationResolver) UserCreate(ctx context.Context, input source.NewUser) 
 	return err == nil, err
 }
 
-func (r mutationResolver) UserUpdate(ctx context.Context, id string, input source.UpdUser) (bool, error) {
+func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input source.UpdUser) (bool, error) {
 	user, err := r.UserLoader(ctx, id)
 	if err != nil {
 		return false, err
@@ -62,7 +62,7 @@ func (r mutationResolver) UserUpdate(ctx context.Context, id string, input sourc
 	return ok, nil
 }
 
-func (r mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool, error) {
+func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool, error) {
 	if tools.Str.Contains(ids, "root") {
 		return false, errors.New("root用户无法删除")
 	}
@@ -85,7 +85,7 @@ func (r mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool, 
 	return true, nil
 }
 
-func (r queryResolver) Users(ctx context.Context, query source.QUser) (*source.Users, error) {
+func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.Users, error) {
 	users := make([]beans.User, 0)
 	total, err := r.DBS.SF(`
 		select * from user u
@@ -95,6 +95,6 @@ func (r queryResolver) Users(ctx context.Context, query source.QUser) (*source.U
 	return &source.Users{Data: users, Total: &total}, err
 }
 
-func (r queryResolver) User(ctx context.Context, id string) (*beans.User, error) {
+func (r *queryResolver) User(ctx context.Context, id string) (*beans.User, error) {
 	return r.UserLoader(ctx, id)
 }

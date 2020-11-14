@@ -64,7 +64,7 @@ func (r *Resolver) Mutation() source.MutationResolver {
 
 type mutationResolver struct{ *Resolver }
 
-func (this mutationResolver) Logout(ctx context.Context) (bool, error) {
+func (this *mutationResolver) Logout(ctx context.Context) (bool, error) {
 	tok := this.Gin(ctx).GetHeader(directive.GIN_AUTHORIZATION)
 
 	if tok == "" {
@@ -81,7 +81,7 @@ func (this mutationResolver) Logout(ctx context.Context) (bool, error) {
 	return err == nil, err
 }
 
-func (this queryResolver) LoginStatus(ctx context.Context) (bool, error) {
+func (this *queryResolver) LoginStatus(ctx context.Context) (bool, error) {
 	tok := this.Gin(ctx).GetHeader(directive.GIN_AUTHORIZATION)
 
 	if tok == "" {
@@ -108,7 +108,7 @@ func (this queryResolver) LoginStatus(ctx context.Context) (bool, error) {
 	return true, nil
 }
 
-func (this mutationResolver) Login(ctx context.Context, account string, password string) (string, error) {
+func (this *mutationResolver) Login(ctx context.Context, account string, password string) (string, error) {
 	user := beans.User{}
 	ok, err := this.DB.Where("account = ? and status = 1", account).Get(&user)
 	if err != nil {
@@ -140,7 +140,7 @@ func (this mutationResolver) Login(ctx context.Context, account string, password
 	return tok, nil
 }
 
-func (this mutationResolver) Token(ctx context.Context, uid, ty string) (string, error) {
+func (this *mutationResolver) Token(ctx context.Context, uid, ty string) (string, error) {
 	token := new(beans.UserToken)
 	err := this.DBS.TS(func(sess *txorm.Session) error {
 		e := sess.SF(`update user_token set status = 0 where uid = :uid and type = :type`, map[string]interface{}{
@@ -171,7 +171,7 @@ func (this mutationResolver) Token(ctx context.Context, uid, ty string) (string,
 
 type queryResolver struct{ *Resolver }
 
-func (q queryResolver) Hello(ctx context.Context) (*string, error) {
+func (q *queryResolver) Hello(ctx context.Context) (*string, error) {
 	panic("implement me")
 }
 

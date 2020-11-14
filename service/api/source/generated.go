@@ -2576,10 +2576,11 @@ func (ec *executionContext) _Cron_dict(ctx context.Context, field graphql.Collec
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:   "Cron",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
+		Object:     "Cron",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
