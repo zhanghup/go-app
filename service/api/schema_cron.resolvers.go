@@ -11,12 +11,12 @@ import (
 	"github.com/zhanghup/go-app/service/job"
 )
 
-func (r *mutationResolver) CronStop(ctx context.Context, id string) (bool, error) {
+func (r mutationResolver) CronStop(ctx context.Context, id string) (bool, error) {
 	err := job.Stop(id)
 	return err == nil, err
 }
 
-func (r *mutationResolver) CronStart(ctx context.Context, id string) (bool, error) {
+func (r mutationResolver) CronStart(ctx context.Context, id string) (bool, error) {
 	err := job.CheckJob(id)
 	if err != nil {
 		return false, err
@@ -26,7 +26,7 @@ func (r *mutationResolver) CronStart(ctx context.Context, id string) (bool, erro
 	return err == nil, err
 }
 
-func (r *mutationResolver) CronRun(ctx context.Context, id string) (bool, error) {
+func (r mutationResolver) CronRun(ctx context.Context, id string) (bool, error) {
 	err := job.CheckJob(id)
 	if err != nil {
 		return false, err
@@ -36,7 +36,7 @@ func (r *mutationResolver) CronRun(ctx context.Context, id string) (bool, error)
 	return true, nil
 }
 
-func (r *queryResolver) Crons(ctx context.Context, query source.QCron) (*source.Crons, error) {
+func (r queryResolver) Crons(ctx context.Context, query source.QCron) (*source.Crons, error) {
 	users := make([]beans.Cron, 0)
 	total, err := r.DBS.SF(`
 		select * from cron u
@@ -46,11 +46,11 @@ func (r *queryResolver) Crons(ctx context.Context, query source.QCron) (*source.
 	return &source.Crons{Data: users, Total: &total}, err
 }
 
-func (r *queryResolver) Cron(ctx context.Context, id string) (*beans.Cron, error) {
+func (r queryResolver) Cron(ctx context.Context, id string) (*beans.Cron, error) {
 	return r.CronLoader(ctx, id)
 }
 
-func (r *queryResolver) CronLogs(ctx context.Context, query source.QCronLog) (*source.CronLogs, error) {
+func (r queryResolver) CronLogs(ctx context.Context, query source.QCronLog) (*source.CronLogs, error) {
 	users := make([]beans.CronLog, 0)
 	total, err := r.DBS.SF(`
 		select * from cron_log u

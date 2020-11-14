@@ -11,15 +11,15 @@ import (
 	"github.com/zhanghup/go-tools"
 )
 
-func (r *mutationResolver) World(ctx context.Context) (*string, error) {
+func (r mutationResolver) World(ctx context.Context) (*string, error) {
 	return tools.Ptr.String("world"), nil
 }
 
-func (r *queryResolver) Stat(ctx context.Context) (interface{}, error) {
+func (r queryResolver) Stat(ctx context.Context) (interface{}, error) {
 	return statsReport(), nil
 }
 
-func (r *queryResolver) Hello(ctx context.Context) (*string, error) {
+func (r queryResolver) Hello(ctx context.Context) (*string, error) {
 	return tools.Ptr.String("hello"), nil
 }
 
