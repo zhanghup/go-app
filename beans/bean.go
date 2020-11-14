@@ -4,6 +4,28 @@ import (
 	"xorm.io/xorm"
 )
 
+type PageResult struct {
+	Total int64       `json:"total"`
+	Datas interface{} `json:"datas"`
+}
+type PageParam struct {
+	Index int  `json:"index"`
+	Size  int  `json:"size"`
+	Count bool `json:"count"`
+}
+
+type Bean struct {
+	Id      *string `json:"id" xorm:"Varchar(128) pk"`
+	Created *int64  `json:"created" xorm:"created Int(14)"`
+	Updated *int64  `json:"updated" xorm:"updated  Int(14)"`
+	Weight  *int    `json:"weight" xorm:"weight  Int(9)"`
+	Status  *int    `json:"status" xorm:"status  Int(1)"`
+}
+
+type BeanDict struct {
+	Dict *string `json:"dict" xorm:"dict Varchar(6)"`
+}
+
 func Sync(db *xorm.Engine) {
 	err := db.Sync2(sys_tables()...)
 	if err != nil {

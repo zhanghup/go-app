@@ -43,11 +43,11 @@ func (this *Struct) enableXorm() *Struct {
 		return this
 	}
 	e, err := txorm.NewXorm(cfg.DB)
-	e.ShowSQL(true)
 	if err != nil {
 		tog.Error(err.Error())
 		panic(err)
 	}
+	e.ShowSQL(true)
 	this.db = e
 
 	// 数据库初始化完成事件
