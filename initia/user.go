@@ -38,6 +38,7 @@ func InitUser(db *xorm.Engine) {
 				Status: tools.Ptr.Int(1),
 				Weight: tools.Ptr.Int(0),
 			},
+			Uid:      user.Id,
 			Username: tools.Ptr.String("root"),
 			Password: &password,
 			Salt:     &salt,
