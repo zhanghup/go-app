@@ -22,10 +22,6 @@ type Bean struct {
 	Status  *int    `json:"status" xorm:"status  Int(1)"`
 }
 
-type BeanDict struct {
-	Dict *string `json:"dict" xorm:"dict Varchar(6)"`
-}
-
 func Sync(db *xorm.Engine) {
 	err := db.Sync2(sys_tables()...)
 	if err != nil {

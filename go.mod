@@ -13,6 +13,6 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/vektah/gqlparser/v2 v2.1.0
-	github.com/zhanghup/go-tools v1.3.8
-	xorm.io/xorm v1.0.1
+	github.com/zhanghup/go-tools v1.3.10
+	xorm.io/xorm v1.0.4
 )
