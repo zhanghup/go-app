@@ -21,7 +21,7 @@ func InitUser(db *xorm.Engine) {
 		user := beans.User{
 			Bean: beans.Bean{
 				Id:     tools.Ptr.String("root"),
-				Status: tools.Ptr.Int(1),
+				Status: tools.Ptr.String("1"),
 				Weight: tools.Ptr.Int(0),
 			},
 		}
@@ -35,9 +35,10 @@ func InitUser(db *xorm.Engine) {
 		err = sess.Insert(beans.Account{
 			Bean: beans.Bean{
 				Id:     tools.Ptr.String("root"),
-				Status: tools.Ptr.Int(1),
+				Status: tools.Ptr.String("1"),
 				Weight: tools.Ptr.Int(0),
 			},
+			Type:     tools.Ptr.String("password"),
 			Uid:      user.Id,
 			Username: tools.Ptr.String("root"),
 			Password: &password,

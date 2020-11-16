@@ -1,9 +1,9 @@
 extend type Query{
-    "用户列表（分页）"
+    "任务列表（分页）"
     crons(query:QCron!):Crons  @perm(entity: "cron",perm: "R")
-    "用户获取单个"
+    "任务单个"
     cron(id: String!):Cron  @perm(entity: "cron",perm: "R")
-    "历史记录"
+    "历史执行记录"
     cron_logs(query:QCronLog!):CronLogs  @perm(entity: "cron",perm: "R")
 }
 
@@ -29,8 +29,8 @@ type Crons{
 type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
     id: String
 
-    "是否启动定时任务[0:启动,1:停止]"
-    state: Int
+    "是否启动定时任务{dict:STA003}"
+    state: String
     "任务名称"
     name: String
     "任务表达式"
@@ -41,18 +41,18 @@ type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
     last: Int64
     "任务结果"
     message: String
-    "任务结果状态"
+    "任务结果状态{dict:STA004}"
     result: String
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 
 }
 
 input QCronLog{
-    cron: String
+    cron: String!
     keyword: String
 
     index: Int
@@ -80,12 +80,12 @@ type CronLog @goModel(model:"github.com/zhanghup/go-app/beans.CronLog")  {
     end:Int
     "任务结果"
     message: String
-    "任务结果状态"
+    "任务结果状态{dict:STA004}"
     result: String
 
     "排序"
     weight: Int
     "状态[dict:STA001]"
-    status: Int
+    status: String
 
 }

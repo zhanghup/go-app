@@ -43,7 +43,7 @@ func (r *mutationResolver) RolePermCreate(ctx context.Context, id string, typeAr
 		p := beans.Perm{
 			Bean: beans.Bean{
 				Id:     tools.Ptr.Uid(),
-				Status: tools.Ptr.Int(1),
+				Status: tools.Ptr.String("1"),
 				Weight: &i,
 			},
 			Type: &typeArg,
@@ -72,7 +72,7 @@ func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, per
 		p := beans.PermObject{
 			Bean: beans.Bean{
 				Id:     tools.Ptr.Uid(),
-				Status: tools.Ptr.Int(1),
+				Status: tools.Ptr.String("1"),
 				Weight: &i,
 			},
 			Role:   &id,
@@ -99,7 +99,7 @@ func (r *mutationResolver) RoleToUser(ctx context.Context, uid string, roles []s
 		p := beans.RoleUser{
 			Bean: beans.Bean{
 				Id:     tools.Ptr.Uid(),
-				Status: tools.Ptr.Int(1),
+				Status: tools.Ptr.String("1"),
 				Weight: &i,
 			},
 			Role: &o,

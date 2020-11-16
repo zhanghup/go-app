@@ -41,7 +41,7 @@
 #
 #    "排序"
 #    weight: Int
-#    "状态[dict:STA001]"
+#    "状态{dict:STA001}"
 #    status: Int
 #}
 #
@@ -49,7 +49,7 @@
 #
 #    "排序"
 #    weight: Int
-#    "状态[dict:STA001]"
+#    "状态{dict:STA001}"
 #    status: Int
 #}
 #

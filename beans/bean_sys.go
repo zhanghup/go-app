@@ -128,6 +128,8 @@ type Cron struct {
 
 func sys_tables() []interface{} {
 	return []interface{}{
+		new(Dept),
+		new(Account),
 		new(Token),
 		new(Dict),
 		new(DictItem),

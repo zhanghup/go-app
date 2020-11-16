@@ -48,13 +48,13 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Cron struct {
-		Dict       func(childComplexity int) int
 		Expression func(childComplexity int) int
 		Id         func(childComplexity int) int
 		Last       func(childComplexity int) int
 		Message    func(childComplexity int) int
 		Name       func(childComplexity int) int
 		Previous   func(childComplexity int) int
+		Result     func(childComplexity int) int
 		State      func(childComplexity int) int
 		Status     func(childComplexity int) int
 		Weight     func(childComplexity int) int
@@ -67,6 +67,7 @@ type ComplexityRoot struct {
 		Id         func(childComplexity int) int
 		Message    func(childComplexity int) int
 		Name       func(childComplexity int) int
+		Result     func(childComplexity int) int
 		Start      func(childComplexity int) int
 		Status     func(childComplexity int) int
 		Weight     func(childComplexity int) int
@@ -96,16 +97,16 @@ type ComplexityRoot struct {
 	}
 
 	DictItem struct {
-		Code      func(childComplexity int) int
-		Created   func(childComplexity int) int
-		Disable   func(childComplexity int) int
-		Extension func(childComplexity int) int
-		Id        func(childComplexity int) int
-		Name      func(childComplexity int) int
-		Status    func(childComplexity int) int
-		Updated   func(childComplexity int) int
-		Value     func(childComplexity int) int
-		Weight    func(childComplexity int) int
+		Code     func(childComplexity int) int
+		Created  func(childComplexity int) int
+		Disabled func(childComplexity int) int
+		Ext      func(childComplexity int) int
+		Id       func(childComplexity int) int
+		Name     func(childComplexity int) int
+		Status   func(childComplexity int) int
+		Updated  func(childComplexity int) int
+		Value    func(childComplexity int) int
+		Weight   func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -172,22 +173,19 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		Account  func(childComplexity int) int
-		Admin    func(childComplexity int) int
-		Avatar   func(childComplexity int) int
-		Birth    func(childComplexity int) int
-		Created  func(childComplexity int) int
-		ICard    func(childComplexity int) int
-		Id       func(childComplexity int) int
-		Mobile   func(childComplexity int) int
-		Name     func(childComplexity int) int
-		Password func(childComplexity int) int
-		Remark   func(childComplexity int) int
-		Sex      func(childComplexity int) int
-		Status   func(childComplexity int) int
-		Type     func(childComplexity int) int
-		Updated  func(childComplexity int) int
-		Weight   func(childComplexity int) int
+		Avatar  func(childComplexity int) int
+		Birth   func(childComplexity int) int
+		Created func(childComplexity int) int
+		Id      func(childComplexity int) int
+		IdCard  func(childComplexity int) int
+		Mobile  func(childComplexity int) int
+		Name    func(childComplexity int) int
+		Remark  func(childComplexity int) int
+		Sex     func(childComplexity int) int
+		Status  func(childComplexity int) int
+		Type    func(childComplexity int) int
+		Updated func(childComplexity int) int
+		Weight  func(childComplexity int) int
 	}
 
 	Users struct {
@@ -255,13 +253,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Cron.dict":
-		if e.complexity.Cron.Dict == nil {
-			break
-		}
-
-		return e.complexity.Cron.Dict(childComplexity), true
-
 	case "Cron.expression":
 		if e.complexity.Cron.Expression == nil {
 			break
@@ -303,6 +294,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Cron.Previous(childComplexity), true
+
+	case "Cron.result":
+		if e.complexity.Cron.Result == nil {
+			break
+		}
+
+		return e.complexity.Cron.Result(childComplexity), true
 
 	case "Cron.state":
 		if e.complexity.Cron.State == nil {
@@ -366,6 +364,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CronLog.Name(childComplexity), true
+
+	case "CronLog.result":
+		if e.complexity.CronLog.Result == nil {
+			break
+		}
+
+		return e.complexity.CronLog.Result(childComplexity), true
 
 	case "CronLog.start":
 		if e.complexity.CronLog.Start == nil {
@@ -500,19 +505,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DictItem.Created(childComplexity), true
 
-	case "DictItem.disable":
-		if e.complexity.DictItem.Disable == nil {
+	case "DictItem.disabled":
+		if e.complexity.DictItem.Disabled == nil {
 			break
 		}
 
-		return e.complexity.DictItem.Disable(childComplexity), true
+		return e.complexity.DictItem.Disabled(childComplexity), true
 
-	case "DictItem.extension":
-		if e.complexity.DictItem.Extension == nil {
+	case "DictItem.ext":
+		if e.complexity.DictItem.Ext == nil {
 			break
 		}
 
-		return e.complexity.DictItem.Extension(childComplexity), true
+		return e.complexity.DictItem.Ext(childComplexity), true
 
 	case "DictItem.id":
 		if e.complexity.DictItem.Id == nil {
@@ -1021,20 +1026,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subscription.Hello(childComplexity), true
 
-	case "User.account":
-		if e.complexity.User.Account == nil {
-			break
-		}
-
-		return e.complexity.User.Account(childComplexity), true
-
-	case "User.admin":
-		if e.complexity.User.Admin == nil {
-			break
-		}
-
-		return e.complexity.User.Admin(childComplexity), true
-
 	case "User.avatar":
 		if e.complexity.User.Avatar == nil {
 			break
@@ -1056,19 +1047,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Created(childComplexity), true
 
-	case "User.i_card":
-		if e.complexity.User.ICard == nil {
-			break
-		}
-
-		return e.complexity.User.ICard(childComplexity), true
-
 	case "User.id":
 		if e.complexity.User.Id == nil {
 			break
 		}
 
 		return e.complexity.User.Id(childComplexity), true
+
+	case "User.id_card":
+		if e.complexity.User.IdCard == nil {
+			break
+		}
+
+		return e.complexity.User.IdCard(childComplexity), true
 
 	case "User.mobile":
 		if e.complexity.User.Mobile == nil {
@@ -1083,13 +1074,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Name(childComplexity), true
-
-	case "User.password":
-		if e.complexity.User.Password == nil {
-			break
-		}
-
-		return e.complexity.User.Password(childComplexity), true
 
 	case "User.remark":
 		if e.complexity.User.Remark == nil {
@@ -1259,11 +1243,11 @@ type Subscription {
 }
 `, BuiltIn: false},
 	{Name: "schema/schema_cron.graphql", Input: `extend type Query{
-    "用户列表（分页）"
+    "任务列表（分页）"
     crons(query:QCron!):Crons  @perm(entity: "cron",perm: "R")
-    "用户获取单个"
+    "任务单个"
     cron(id: String!):Cron  @perm(entity: "cron",perm: "R")
-    "历史记录"
+    "历史执行记录"
     cron_logs(query:QCronLog!):CronLogs  @perm(entity: "cron",perm: "R")
 }
 
@@ -1289,30 +1273,30 @@ type Crons{
 type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
     id: String
 
+    "是否启动定时任务{dict:STA003}"
+    state: String
     "任务名称"
     name: String
     "任务表达式"
     expression: String
-    "是否启动定时任务[0:启动,1:停止]"
-    state: Int
     "上一次执行时间"
     previous: Int64
     "任务持续时间（秒）"
-    last: Float
+    last: Int64
     "任务结果"
     message: String
-    "字典项"
-    dict: String
+    "任务结果状态{dict:STA004}"
+    result: String
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 
 }
 
 input QCronLog{
-    cron: String
+    cron: String!
     keyword: String
 
     index: Int
@@ -1340,11 +1324,13 @@ type CronLog @goModel(model:"github.com/zhanghup/go-app/beans.CronLog")  {
     end:Int
     "任务结果"
     message: String
+    "任务结果状态{dict:STA004}"
+    result: String
 
     "排序"
     weight: Int
     "状态[dict:STA001]"
-    status: Int
+    status: String
 
 }`, BuiltIn: false},
 	{Name: "schema/schema_dict.graphql", Input: `extend type Query{
@@ -1380,7 +1366,7 @@ input QDict{
 type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     id: String
 
-    "字典类型"
+    "字典类型{dict:SYS001}"
     type: String
     "字典编码"
     code: String
@@ -1395,8 +1381,8 @@ type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     updated: Int
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 
     "选项列表"
     values: [DictItem!]
@@ -1404,7 +1390,7 @@ type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
 }
 
 input NewDict {
-    "字典类型"
+    "字典类型{dict:SYS001}"
     type: String
     "字典编码"
     code: String
@@ -1415,12 +1401,12 @@ input NewDict {
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 }
 
 input UpdDict {
-    "字典类型"
+    "字典类型{dict:SYS001}"
     type: String
     "字典名称"
     name: String
@@ -1429,8 +1415,8 @@ input UpdDict {
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 }
 
 type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
@@ -1443,9 +1429,9 @@ type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
     "值"
     value: String
     "扩展"
-    extension: String
+    ext: String
     "禁止操作"
-    disable: Int
+    disabled: Int
 
     "创建时间"
     created: Int
@@ -1453,8 +1439,8 @@ type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
     updated: Int
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 
 }
 
@@ -1466,14 +1452,12 @@ input NewDictItem{
     "值"
     value: String
     "扩展"
-    extension: String
-    "禁止操作"
-    disable: Int
+    ext: String
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 }
 
 input UpdDictItem{
@@ -1482,14 +1466,12 @@ input UpdDictItem{
     "值"
     value: String
     "扩展"
-    extension: String
-    "禁止操作"
-    disable: Int
+    ext: String
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 }`, BuiltIn: false},
 	{Name: "schema/schema_role.graphql", Input: `extend type Query {
     "角色列表（分页）"
@@ -1552,14 +1534,14 @@ type Role @goModel(model: "github.com/zhanghup/go-app/beans.Role") {
     "角色名称"
     desc: String
 
-    "创建时间[fmt:YYYY-MM-DD HH:mm,sort:'order:[created]']"
+    "创建时间"
     created: Int
-    "更新时间[fmt:YYYY-MM-DD HH:mm],sort:true"
+    "更新时间"
     updated: Int
     "排序"
     weight: Int
-    "状态[fmt:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 }
 
 input NewRole {
@@ -1570,8 +1552,8 @@ input NewRole {
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 }
 
 input UpdRole {
@@ -1582,8 +1564,8 @@ input UpdRole {
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int = 1
+    "状态{dict:STA001}"
+    status: String
 }
 `, BuiltIn: false},
 	{Name: "schema/schema_subscribe.graphql", Input: ``, BuiltIn: false},
@@ -1619,93 +1601,75 @@ type Users{
 type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     id: String
 
-    "用户类型[dict:SYS001]"
+    "用户类型{dict:BUS002}"
     type: String
-    "账户"
-    account: String
-    "密码"
-    password: String
     "用户名称"
     name: String
     "头像"
     avatar: String
     "身份证"
-    i_card: String
+    id_card: String
     "出生年月"
     birth: Int
-    "性别[dict:STA002]"
-    sex: Int
+    "性别{dict:STA002}"
+    sex: String
     "移动电话"
     mobile: String
-    "是否为管理员[0: 否,1: 是]"
-    admin: Int
     "创建时间"
     created: Int
     "更新时间"
     updated: Int
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
     "备注"
     remark: String
 
 }
 
 input NewUser {
-    "用户类型[dict:SYS001]"
-    type: String!
-    "账户"
-    account: String!
-    "密码"
-    password: String!
+    "用户类型{dict:BUS002}"
+    type: String
     "用户名称"
-    name: String!
+    name: String
     "头像"
     avatar: String
     "身份证"
-    i_card: String
+    id_card: String
     "出生年月"
     birth: Int
-    "性别[dict:STA002]"
-    sex: Int
+    "性别{dict:STA002}"
+    sex: String
     "移动电话"
     mobile: String
-    "是否为管理员[0: 否,1: 是]"
-    admin: Int
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
     "备注"
     remark: String
 }
 
 input UpdUser {
-    "用户类型[dict:SYS001]"
-    type: String!
-    "账户"
-    account: String!
-    "密码"
-    password: String!
+    "用户类型{dict:BUS002}"
+    type: String
     "用户名称"
-    name: String!
+    name: String
     "头像"
     avatar: String
     "身份证"
-    i_card: String
+    id_card: String
     "出生年月"
     birth: Int
-    "性别[dict:STA002]"
-    sex: Int
+    "性别{dict:STA002}"
+    sex: String
     "移动电话"
     mobile: String
-    "是否为管理员[0: 否,1: 是]"
-    admin: Int
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
     "备注"
     remark: String
 }
@@ -2376,6 +2340,38 @@ func (ec *executionContext) _Cron_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Cron_state(ctx context.Context, field graphql.CollectedField, obj *beans.Cron) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Cron",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.State, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Cron_name(ctx context.Context, field graphql.CollectedField, obj *beans.Cron) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2440,38 +2436,6 @@ func (ec *executionContext) _Cron_expression(ctx context.Context, field graphql.
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Cron_state(ctx context.Context, field graphql.CollectedField, obj *beans.Cron) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Cron",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.State, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Cron_previous(ctx context.Context, field graphql.CollectedField, obj *beans.Cron) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2531,9 +2495,9 @@ func (ec *executionContext) _Cron_last(ctx context.Context, field graphql.Collec
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*float64)
+	res := resTmp.(*int64)
 	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Cron_message(ctx context.Context, field graphql.CollectedField, obj *beans.Cron) (ret graphql.Marshaler) {
@@ -2568,7 +2532,7 @@ func (ec *executionContext) _Cron_message(ctx context.Context, field graphql.Col
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Cron_dict(ctx context.Context, field graphql.CollectedField, obj *beans.Cron) (ret graphql.Marshaler) {
+func (ec *executionContext) _Cron_result(ctx context.Context, field graphql.CollectedField, obj *beans.Cron) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2586,7 +2550,7 @@ func (ec *executionContext) _Cron_dict(ctx context.Context, field graphql.Collec
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Dict, nil
+		return obj.Result, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2659,9 +2623,9 @@ func (ec *executionContext) _Cron_status(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CronLog_id(ctx context.Context, field graphql.CollectedField, obj *beans.CronLog) (ret graphql.Marshaler) {
@@ -2888,6 +2852,38 @@ func (ec *executionContext) _CronLog_message(ctx context.Context, field graphql.
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _CronLog_result(ctx context.Context, field graphql.CollectedField, obj *beans.CronLog) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CronLog",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Result, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _CronLog_weight(ctx context.Context, field graphql.CollectedField, obj *beans.CronLog) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2947,9 +2943,9 @@ func (ec *executionContext) _CronLog_status(ctx context.Context, field graphql.C
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CronLogs_total(ctx context.Context, field graphql.CollectedField, obj *CronLogs) (ret graphql.Marshaler) {
@@ -3363,9 +3359,9 @@ func (ec *executionContext) _Dict_status(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Dict_values(ctx context.Context, field graphql.CollectedField, obj *beans.Dict) (ret graphql.Marshaler) {
@@ -3528,7 +3524,7 @@ func (ec *executionContext) _DictItem_value(ctx context.Context, field graphql.C
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DictItem_extension(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _DictItem_ext(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3546,7 +3542,7 @@ func (ec *executionContext) _DictItem_extension(ctx context.Context, field graph
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Extension, nil
+		return obj.Ext, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3560,7 +3556,7 @@ func (ec *executionContext) _DictItem_extension(ctx context.Context, field graph
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DictItem_disable(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _DictItem_disabled(ctx context.Context, field graphql.CollectedField, obj *beans.DictItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3578,7 +3574,7 @@ func (ec *executionContext) _DictItem_disable(ctx context.Context, field graphql
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Disable, nil
+		return obj.Disabled, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3715,9 +3711,9 @@ func (ec *executionContext) _DictItem_status(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_world(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6263,9 +6259,9 @@ func (ec *executionContext) _Role_status(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Roles_total(ctx context.Context, field graphql.CollectedField, obj *Roles) (ret graphql.Marshaler) {
@@ -6438,70 +6434,6 @@ func (ec *executionContext) _User_type(ctx context.Context, field graphql.Collec
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_account(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Account, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _User_password(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Password, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6566,7 +6498,7 @@ func (ec *executionContext) _User_avatar(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_i_card(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_id_card(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6584,7 +6516,7 @@ func (ec *executionContext) _User_i_card(ctx context.Context, field graphql.Coll
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ICard, nil
+		return obj.IdCard, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6657,9 +6589,9 @@ func (ec *executionContext) _User_sex(ctx context.Context, field graphql.Collect
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_mobile(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
@@ -6692,38 +6624,6 @@ func (ec *executionContext) _User_mobile(ctx context.Context, field graphql.Coll
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _User_admin(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Admin, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_created(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
@@ -6849,9 +6749,9 @@ func (ec *executionContext) _User_status(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_remark(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
@@ -8115,7 +8015,7 @@ func (ec *executionContext) unmarshalInputNewDict(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8155,19 +8055,11 @@ func (ec *executionContext) unmarshalInputNewDictItem(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
-		case "extension":
+		case "ext":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("extension"))
-			it.Extension, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "disable":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("disable"))
-			it.Disable, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ext"))
+			it.Ext, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8183,7 +8075,7 @@ func (ec *executionContext) unmarshalInputNewDictItem(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8227,7 +8119,7 @@ func (ec *executionContext) unmarshalInputNewRole(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8247,23 +8139,7 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			it.Type, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "account":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("account"))
-			it.Account, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "password":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8271,7 +8147,7 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8283,11 +8159,11 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "i_card":
+		case "id_card":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("i_card"))
-			it.ICard, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id_card"))
+			it.IDCard, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8303,7 +8179,7 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sex"))
-			it.Sex, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Sex, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8312,14 +8188,6 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mobile"))
 			it.Mobile, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "admin":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("admin"))
-			it.Admin, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8335,7 +8203,7 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8407,7 +8275,7 @@ func (ec *executionContext) unmarshalInputQCronLog(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cron"))
-			it.Cron, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Cron, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8599,7 +8467,7 @@ func (ec *executionContext) unmarshalInputUpdDict(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8631,19 +8499,11 @@ func (ec *executionContext) unmarshalInputUpdDictItem(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
-		case "extension":
+		case "ext":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("extension"))
-			it.Extension, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "disable":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("disable"))
-			it.Disable, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ext"))
+			it.Ext, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8659,7 +8519,7 @@ func (ec *executionContext) unmarshalInputUpdDictItem(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8672,10 +8532,6 @@ func (ec *executionContext) unmarshalInputUpdDictItem(ctx context.Context, obj i
 func (ec *executionContext) unmarshalInputUpdRole(ctx context.Context, obj interface{}) (UpdRole, error) {
 	var it UpdRole
 	var asMap = obj.(map[string]interface{})
-
-	if _, present := asMap["status"]; !present {
-		asMap["status"] = 1
-	}
 
 	for k, v := range asMap {
 		switch k {
@@ -8707,7 +8563,7 @@ func (ec *executionContext) unmarshalInputUpdRole(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8727,23 +8583,7 @@ func (ec *executionContext) unmarshalInputUpdUser(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			it.Type, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "account":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("account"))
-			it.Account, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "password":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8751,7 +8591,7 @@ func (ec *executionContext) unmarshalInputUpdUser(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8763,11 +8603,11 @@ func (ec *executionContext) unmarshalInputUpdUser(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "i_card":
+		case "id_card":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("i_card"))
-			it.ICard, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id_card"))
+			it.IDCard, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8783,7 +8623,7 @@ func (ec *executionContext) unmarshalInputUpdUser(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sex"))
-			it.Sex, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Sex, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8792,14 +8632,6 @@ func (ec *executionContext) unmarshalInputUpdUser(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mobile"))
 			it.Mobile, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "admin":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("admin"))
-			it.Admin, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8815,7 +8647,7 @@ func (ec *executionContext) unmarshalInputUpdUser(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8854,20 +8686,20 @@ func (ec *executionContext) _Cron(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = graphql.MarshalString("Cron")
 		case "id":
 			out.Values[i] = ec._Cron_id(ctx, field, obj)
+		case "state":
+			out.Values[i] = ec._Cron_state(ctx, field, obj)
 		case "name":
 			out.Values[i] = ec._Cron_name(ctx, field, obj)
 		case "expression":
 			out.Values[i] = ec._Cron_expression(ctx, field, obj)
-		case "state":
-			out.Values[i] = ec._Cron_state(ctx, field, obj)
 		case "previous":
 			out.Values[i] = ec._Cron_previous(ctx, field, obj)
 		case "last":
 			out.Values[i] = ec._Cron_last(ctx, field, obj)
 		case "message":
 			out.Values[i] = ec._Cron_message(ctx, field, obj)
-		case "dict":
-			out.Values[i] = ec._Cron_dict(ctx, field, obj)
+		case "result":
+			out.Values[i] = ec._Cron_result(ctx, field, obj)
 		case "weight":
 			out.Values[i] = ec._Cron_weight(ctx, field, obj)
 		case "status":
@@ -8908,6 +8740,8 @@ func (ec *executionContext) _CronLog(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._CronLog_end(ctx, field, obj)
 		case "message":
 			out.Values[i] = ec._CronLog_message(ctx, field, obj)
+		case "result":
+			out.Values[i] = ec._CronLog_result(ctx, field, obj)
 		case "weight":
 			out.Values[i] = ec._CronLog_weight(ctx, field, obj)
 		case "status":
@@ -9045,10 +8879,10 @@ func (ec *executionContext) _DictItem(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = ec._DictItem_name(ctx, field, obj)
 		case "value":
 			out.Values[i] = ec._DictItem_value(ctx, field, obj)
-		case "extension":
-			out.Values[i] = ec._DictItem_extension(ctx, field, obj)
-		case "disable":
-			out.Values[i] = ec._DictItem_disable(ctx, field, obj)
+		case "ext":
+			out.Values[i] = ec._DictItem_ext(ctx, field, obj)
+		case "disabled":
+			out.Values[i] = ec._DictItem_disabled(ctx, field, obj)
 		case "created":
 			out.Values[i] = ec._DictItem_created(ctx, field, obj)
 		case "updated":
@@ -9493,24 +9327,18 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_id(ctx, field, obj)
 		case "type":
 			out.Values[i] = ec._User_type(ctx, field, obj)
-		case "account":
-			out.Values[i] = ec._User_account(ctx, field, obj)
-		case "password":
-			out.Values[i] = ec._User_password(ctx, field, obj)
 		case "name":
 			out.Values[i] = ec._User_name(ctx, field, obj)
 		case "avatar":
 			out.Values[i] = ec._User_avatar(ctx, field, obj)
-		case "i_card":
-			out.Values[i] = ec._User_i_card(ctx, field, obj)
+		case "id_card":
+			out.Values[i] = ec._User_id_card(ctx, field, obj)
 		case "birth":
 			out.Values[i] = ec._User_birth(ctx, field, obj)
 		case "sex":
 			out.Values[i] = ec._User_sex(ctx, field, obj)
 		case "mobile":
 			out.Values[i] = ec._User_mobile(ctx, field, obj)
-		case "admin":
-			out.Values[i] = ec._User_admin(ctx, field, obj)
 		case "created":
 			out.Values[i] = ec._User_created(ctx, field, obj)
 		case "updated":
@@ -10431,21 +10259,6 @@ func (ec *executionContext) marshalODictItem2ᚕgithubᚗcomᚋzhanghupᚋgoᚑa
 	}
 	wg.Wait()
 	return ret
-}
-
-func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalFloat(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalFloat(*v)
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {

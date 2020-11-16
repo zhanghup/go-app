@@ -31,7 +31,7 @@ input QDict{
 type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     id: String
 
-    "字典类型"
+    "字典类型{dict:SYS001}"
     type: String
     "字典编码"
     code: String
@@ -46,8 +46,8 @@ type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     updated: Int
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 
     "选项列表"
     values: [DictItem!]
@@ -55,7 +55,7 @@ type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
 }
 
 input NewDict {
-    "字典类型"
+    "字典类型{dict:SYS001}"
     type: String
     "字典编码"
     code: String
@@ -66,12 +66,12 @@ input NewDict {
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 }
 
 input UpdDict {
-    "字典类型"
+    "字典类型{dict:SYS001}"
     type: String
     "字典名称"
     name: String
@@ -80,8 +80,8 @@ input UpdDict {
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 }
 
 type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
@@ -104,8 +104,8 @@ type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
     updated: Int
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 
 }
 
@@ -121,8 +121,8 @@ input NewDictItem{
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 }
 
 input UpdDictItem{
@@ -135,6 +135,6 @@ input UpdDictItem{
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 }

@@ -53,7 +53,7 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 				if !ok {
 					return nil, "[5] 未授权"
 				}
-				if token.Status == nil || *token.Status != 1 {
+				if token.Status == nil || *token.Status != "1" {
 					return nil, "[6] 未授权"
 				}
 				if time.Now().Unix() > *token.Updated+*token.Expire {
@@ -83,8 +83,18 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 			}
 			// 是否为管理员用户
 			{
+				acc := beans.Account{}
+				ok, err := db.Table(acc).Where("id = ? and status = 1", *user.Token.Aid).Get(&acc)
+				if err != nil {
+					return err.Error(), "[11] 未授权"
+				}
+				if !ok {
+					return nil, "[12] 未授权"
+				}
+				user.Account = acc
+
 				admin := true
-				if user.User.Admin == nil || *user.User.Admin == 0 {
+				if acc.Admin == nil || *acc.Admin == 0 {
 					admin = false
 				}
 				user.Admin = admin

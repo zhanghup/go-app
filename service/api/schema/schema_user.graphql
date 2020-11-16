@@ -30,7 +30,7 @@ type Users{
 type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     id: String
 
-    "用户类型"
+    "用户类型{dict:BUS002}"
     type: String
     "用户名称"
     name: String
@@ -40,7 +40,7 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     id_card: String
     "出生年月"
     birth: Int
-    "性别"
+    "性别{dict:STA002}"
     sex: String
     "移动电话"
     mobile: String
@@ -50,15 +50,15 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     updated: Int
     "排序"
     weight: Int
-    "状态"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
     "备注"
     remark: String
 
 }
 
 input NewUser {
-    "用户类型"
+    "用户类型{dict:BUS002}"
     type: String
     "用户名称"
     name: String
@@ -68,20 +68,20 @@ input NewUser {
     id_card: String
     "出生年月"
     birth: Int
-    "性别"
+    "性别{dict:STA002}"
     sex: String
     "移动电话"
     mobile: String
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
     "备注"
     remark: String
 }
 
 input UpdUser {
-    "用户类型"
+    "用户类型{dict:BUS002}"
     type: String
     "用户名称"
     name: String
@@ -91,14 +91,14 @@ input UpdUser {
     id_card: String
     "出生年月"
     birth: Int
-    "性别"
+    "性别{dict:STA002}"
     sex: String
     "移动电话"
     mobile: String
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
     "备注"
     remark: String
 }

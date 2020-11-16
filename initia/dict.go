@@ -36,7 +36,7 @@ func InitDictCode(db *xorm.Engine, ty string, dicts []DictInfo) {
 				Bean: beans.Bean{
 					Id:     tools.Ptr.Uid(),
 					Weight: &ii,
-					Status: tools.Ptr.Int(1),
+					Status: tools.Ptr.String("1"),
 				},
 				Code: tools.Ptr.String(ty + dict.Code),
 				Name: &dict.Name,
@@ -56,7 +56,7 @@ func InitDictCode(db *xorm.Engine, ty string, dicts []DictInfo) {
 					Bean: beans.Bean{
 						Id:     tools.Ptr.Uid(),
 						Weight: &i,
-						Status: tools.Ptr.Int(1),
+						Status: tools.Ptr.String("1"),
 					},
 					Code:     tools.Ptr.String(ty + dict.Code),
 					Name:     &o.Name,

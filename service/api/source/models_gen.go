@@ -24,7 +24,7 @@ type IPermObj struct {
 }
 
 type NewDict struct {
-	// 字典类型
+	// 字典类型{dict:SYS001}
 	Type *string `json:"type"`
 	// 字典编码
 	Code *string `json:"code"`
@@ -34,8 +34,8 @@ type NewDict struct {
 	Remark *string `json:"remark"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA001]
-	Status *int `json:"status"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 }
 
 type NewDictItem struct {
@@ -46,13 +46,11 @@ type NewDictItem struct {
 	// 值
 	Value *string `json:"value"`
 	// 扩展
-	Extension *string `json:"extension"`
-	// 禁止操作
-	Disable *int `json:"disable"`
+	Ext *string `json:"ext"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA001]
-	Status *int `json:"status"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 }
 
 type NewRole struct {
@@ -62,35 +60,29 @@ type NewRole struct {
 	Desc *string `json:"desc"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA001]
-	Status *int `json:"status"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 }
 
 type NewUser struct {
-	// 用户类型[dict:SYS001]
-	Type string `json:"type"`
-	// 账户
-	Account string `json:"account"`
-	// 密码
-	Password string `json:"password"`
+	// 用户类型{dict:BUS002}
+	Type *string `json:"type"`
 	// 用户名称
-	Name string `json:"name"`
+	Name *string `json:"name"`
 	// 头像
 	Avatar *string `json:"avatar"`
 	// 身份证
-	ICard *string `json:"i_card"`
+	IDCard *string `json:"id_card"`
 	// 出生年月
 	Birth *int `json:"birth"`
-	// 性别[dict:STA002]
-	Sex *int `json:"sex"`
+	// 性别{dict:STA002}
+	Sex *string `json:"sex"`
 	// 移动电话
 	Mobile *string `json:"mobile"`
-	// 是否为管理员[0: 否,1: 是]
-	Admin *int `json:"admin"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA001]
-	Status *int `json:"status"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 	// 备注
 	Remark *string `json:"remark"`
 }
@@ -110,7 +102,7 @@ type QCron struct {
 }
 
 type QCronLog struct {
-	Cron    *string `json:"cron"`
+	Cron    string  `json:"cron"`
 	Keyword *string `json:"keyword"`
 	Index   *int    `json:"index"`
 	Size    *int    `json:"size"`
@@ -142,7 +134,7 @@ type Roles struct {
 }
 
 type UpdDict struct {
-	// 字典类型
+	// 字典类型{dict:SYS001}
 	Type *string `json:"type"`
 	// 字典名称
 	Name *string `json:"name"`
@@ -150,8 +142,8 @@ type UpdDict struct {
 	Remark *string `json:"remark"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA001]
-	Status *int `json:"status"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 }
 
 type UpdDictItem struct {
@@ -160,13 +152,11 @@ type UpdDictItem struct {
 	// 值
 	Value *string `json:"value"`
 	// 扩展
-	Extension *string `json:"extension"`
-	// 禁止操作
-	Disable *int `json:"disable"`
+	Ext *string `json:"ext"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA001]
-	Status *int `json:"status"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 }
 
 type UpdRole struct {
@@ -176,35 +166,29 @@ type UpdRole struct {
 	Desc *string `json:"desc"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA001]
-	Status *int `json:"status"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 }
 
 type UpdUser struct {
-	// 用户类型[dict:SYS001]
-	Type string `json:"type"`
-	// 账户
-	Account string `json:"account"`
-	// 密码
-	Password string `json:"password"`
+	// 用户类型{dict:BUS002}
+	Type *string `json:"type"`
 	// 用户名称
-	Name string `json:"name"`
+	Name *string `json:"name"`
 	// 头像
 	Avatar *string `json:"avatar"`
 	// 身份证
-	ICard *string `json:"i_card"`
+	IDCard *string `json:"id_card"`
 	// 出生年月
 	Birth *int `json:"birth"`
-	// 性别[dict:STA002]
-	Sex *int `json:"sex"`
+	// 性别{dict:STA002}
+	Sex *string `json:"sex"`
 	// 移动电话
 	Mobile *string `json:"mobile"`
-	// 是否为管理员[0: 否,1: 是]
-	Admin *int `json:"admin"`
 	// 排序
 	Weight *int `json:"weight"`
-	// 状态[dict:STA001]
-	Status *int `json:"status"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 	// 备注
 	Remark *string `json:"remark"`
 }

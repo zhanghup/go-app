@@ -65,8 +65,8 @@ type Role @goModel(model: "github.com/zhanghup/go-app/beans.Role") {
     updated: Int
     "排序"
     weight: Int
-    "状态"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 }
 
 input NewRole {
@@ -77,8 +77,8 @@ input NewRole {
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 }
 
 input UpdRole {
@@ -89,6 +89,6 @@ input UpdRole {
 
     "排序"
     weight: Int
-    "状态[dict:STA001]"
-    status: Int = 1
+    "状态{dict:STA001}"
+    status: String
 }

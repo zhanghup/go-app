@@ -52,7 +52,7 @@ func (this *Uploader) UploadIO(read io.Reader, name, contentType string) (string
 		res := beans.Resource{
 			Bean: beans.Bean{
 				Id:     tools.Ptr.Uid(),
-				Status: tools.Ptr.Int(1),
+				Status: tools.Ptr.String("1"),
 			},
 			ContentType: contentType,
 			MD5:         md5,

@@ -3,7 +3,6 @@ package main
 import (
 	rice "github.com/giter/go.rice"
 	"github.com/zhanghup/go-app/boot"
-	"github.com/zhanghup/go-app/initia"
 )
 
 func main() {
@@ -12,10 +11,9 @@ func main() {
 		panic(err)
 	}
 	_ = boot.Boot(box).
-		SyncTables().
-		InitDatas().
-		InitDict("AUT", []initia.DictInfo{{Code: "001", Name: "河东域名同步"}}).
-		JobsInit().
+		//SyncTables().
+		//InitDatas().
+		//JobsInit().
 		//Jobs("测试", "0 * * * * * ", func() error {
 		//	if time.Now().Unix()%2 == 0 {
 		//		return errors.New("测试错误")

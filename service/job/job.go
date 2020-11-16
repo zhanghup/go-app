@@ -70,11 +70,11 @@ func AddJob(name, spec string, action func() error, flag ...bool) error {
 		model := beans.Cron{
 			Bean: beans.Bean{
 				Id:     &id,
-				Status: tools.Ptr.Int(1),
+				Status: tools.Ptr.String("1"),
 			},
 			Name:       &name,
 			Expression: &spec,
-			State:      tools.Ptr.Int(1),
+			State:      tools.Ptr.String("start"),
 		}
 		_, err := job.db.Insert(&model)
 		if err != nil {
@@ -109,7 +109,7 @@ func AddJob(name, spec string, action func() error, flag ...bool) error {
 				return err
 			}
 
-			if ji.cron.State != nil && *ji.cron.State == 1 {
+			if ji.cron.State != nil && *ji.cron.State == "1" {
 				err := addJob(id)
 				if err != nil {
 					return err
@@ -206,12 +206,12 @@ func Run(id string) func() {
 		err := ji.fn()
 		l2 := time.Now().UnixNano()
 
-		last := float64(l2-l1) / float64(time.Second)
+		last := int64(float64(l2-l1) * 1000 / float64(time.Second))
 		message := "ok"
-		status := 1
+		status := "1"
 		if err != nil {
 			message = err.Error()
-			status = 0
+			status = "0"
 		}
 
 		model := beans.Cron{}

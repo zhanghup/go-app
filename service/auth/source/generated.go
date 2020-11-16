@@ -44,7 +44,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		Login  func(childComplexity int, account string, password string) int
+		Login  func(childComplexity int, username string, password string) int
 		Logout func(childComplexity int) int
 	}
 
@@ -55,7 +55,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	Login(ctx context.Context, account string, password string) (string, error)
+	Login(ctx context.Context, username string, password string) (string, error)
 	Logout(ctx context.Context) (bool, error)
 }
 type QueryResolver interface {
@@ -88,7 +88,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Login(childComplexity, args["account"].(string), args["password"].(string)), true
+		return e.complexity.Mutation.Login(childComplexity, args["username"].(string), args["password"].(string)), true
 
 	case "Mutation.logout":
 		if e.complexity.Mutation.Logout == nil {
@@ -196,7 +196,7 @@ type Query {
 
 type Mutation {
   "用户登录"
-  login(account:String!,password:String!): String!
+  login(username:String!,password:String!): String!
 
   "登出"
   logout:Boolean!
@@ -237,14 +237,14 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["account"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("account"))
+	if tmp, ok := rawArgs["username"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["account"] = arg0
+	args["username"] = arg0
 	var arg1 string
 	if tmp, ok := rawArgs["password"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
@@ -335,7 +335,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Login(rctx, args["account"].(string), args["password"].(string))
+		return ec.resolvers.Mutation().Login(rctx, args["username"].(string), args["password"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

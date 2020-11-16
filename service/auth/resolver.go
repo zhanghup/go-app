@@ -4,12 +4,12 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/auth/source"
 	"github.com/zhanghup/go-app/service/directive"
@@ -17,6 +17,7 @@ import (
 	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
+	"net/http"
 	"time"
 	"xorm.io/xorm"
 )
@@ -77,7 +78,7 @@ func (this *mutationResolver) Logout(ctx context.Context) (bool, error) {
 	if tok == "" {
 		return false, nil
 	}
-	_, err := this.DB.Table(beans.UserToken{}).Where("id = ?",tok).Update(map[string]interface{}{"status": 0})
+	_, err := this.DB.Table(beans.Token{}).Where("id = ?", tok).Update(map[string]interface{}{"status": 0})
 	return err == nil, err
 }
 
@@ -86,7 +87,7 @@ func (this *queryResolver) LoginStatus(ctx context.Context) (bool, error) {
 
 	if tok == "" {
 		tokk, err := this.Gin(ctx).Cookie(directive.GIN_TOKEN)
-		if err != nil {
+		if err != nil && err != http.ErrNoCookie {
 			return false, err
 		}
 		tok = tokk
@@ -94,7 +95,7 @@ func (this *queryResolver) LoginStatus(ctx context.Context) (bool, error) {
 	if tok == "" {
 		return false, nil
 	}
-	t := beans.UserToken{}
+	t := beans.Token{}
 	ok, err := this.DB.Where("id = ? and status = 1", tok).Get(&t)
 	if err != nil {
 		return false, err
@@ -108,9 +109,35 @@ func (this *queryResolver) LoginStatus(ctx context.Context) (bool, error) {
 	return true, nil
 }
 
-func (this *mutationResolver) Login(ctx context.Context, account string, password string) (string, error) {
+func (this *mutationResolver) Login(ctx context.Context, username string, password string) (string, error) {
+	acc := beans.Account{}
+	// 1. 找到账户
+	ok, err := this.DB.Where("username = ? and status = '1' and type = 'password'", username).Get(&acc)
+	if err != nil {
+		return "", err
+	}
+	if !ok {
+		return "", errors.New("账户不存在")
+	}
+
+	// 2. 验证密码
+	flag := false
+	if acc.Salt == nil {
+		if *acc.Password == password {
+			flag = true
+		}
+	} else {
+		if *acc.Password == tools.Crypto.Password(password, *acc.Salt) {
+			flag = true
+		}
+	}
+	if !flag {
+		return "", errors.New("用户名或者密码错误")
+	}
+
+	// 3. 找到用户
 	user := beans.User{}
-	ok, err := this.DB.Where("account = ? and status = 1", account).Get(&user)
+	ok, err = this.DB.Where("id = ? and status = '1'", acc.Uid).Get(&user)
 	if err != nil {
 		return "", err
 	}
@@ -118,42 +145,29 @@ func (this *mutationResolver) Login(ctx context.Context, account string, passwor
 		return "", errors.New("用户不存在")
 	}
 
-	flag := false
-	if user.Salt == nil {
-		if *user.Password == password {
-			flag = true
-		}
-	} else {
-		if *user.Password == tools.Crypto.Password(password, *user.Salt) {
-			flag = true
-		}
-	}
-	if !flag {
-		return "", errors.New("用户名或者密码错误")
-	}
-	tok, err := this.Token(ctx, *user.Id, "pc")
+	tok, err := this.Token(ctx, *user.Id, *acc.Id)
 	if err != nil {
 		return "", err
 	} else {
-		go event.UserLogin("pc", &user)
+		go event.UserLogin(acc, user)
 	}
 	return tok, nil
 }
 
-func (this *mutationResolver) Token(ctx context.Context, uid, ty string) (string, error) {
-	token := new(beans.UserToken)
+func (this *mutationResolver) Token(ctx context.Context, uid, aid string) (string, error) {
+	token := new(beans.Token)
 	err := this.DBS.TS(func(sess *txorm.Session) error {
-		e := sess.SF(`update user_token set status = 0 where uid = :uid and type = :type`, map[string]interface{}{
-			"uid":  uid,
-			"type": ty,
+		e := sess.SF(`update token set status = '0' where uid = :uid and aid = :aid`, map[string]interface{}{
+			"uid": uid,
+			"aid": aid,
 		}).Exec()
 		if e != nil {
 			return e
 		}
 		token.Id = tools.Ptr.Uid()
-		token.Status = tools.Ptr.Int(1)
+		token.Status = tools.Ptr.String("1")
 		token.Uid = &uid
-		token.Type = tools.Ptr.String(string(ty))
+		token.Aid = &aid
 		token.Agent = tools.Ptr.String(this.Gin(ctx).Request.UserAgent())
 		token.Expire = tools.Ptr.Int64(2 * 60 * 60)
 		token.Ops = tools.Ptr.Int64(0)
@@ -172,7 +186,7 @@ func (this *mutationResolver) Token(ctx context.Context, uid, ty string) (string
 type queryResolver struct{ *Resolver }
 
 func (q *queryResolver) Hello(ctx context.Context) (*string, error) {
-	panic("implement me")
+	return tools.Ptr.String("hello world"), nil
 }
 
 func (this *Resolver) Query() source.QueryResolver {

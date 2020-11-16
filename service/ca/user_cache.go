@@ -10,6 +10,7 @@ import (
 
 type User struct {
 	User        beans.User
+	Account     beans.Account
 	Token       beans.Token
 	PermObjects map[string]string
 	Perms       map[string][]string
@@ -72,7 +73,7 @@ func init() {
 			UserCache.RemoveByUser(*user.Id)
 		})
 
-		go event.UserLoginSubscribe(func(ty string, user *beans.User) {
+		go event.UserLoginSubscribe(func(acc beans.Account, user beans.User) {
 			UserCache.RemoveByUser(*user.Id)
 		})
 

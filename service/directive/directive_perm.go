@@ -18,7 +18,7 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 		lg := beans.OperateLog{
 			Bean: beans.Bean{
 				Id:     tools.Ptr.Uid(),
-				Status: tools.Ptr.Int(1),
+				Status: tools.Ptr.String("1"),
 			},
 			Type:  &entity,
 			Opt:   &perm,

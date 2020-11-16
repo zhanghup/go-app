@@ -19,7 +19,7 @@ type Query {
 
 type Mutation {
   "用户登录"
-  login(account:String!,password:String!): String!
+  login(username:String!,password:String!): String!
 
   "登出"
   logout:Boolean!
