@@ -45,7 +45,7 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 			user = ca.User{}
 			// token 验证
 			{
-				token := beans.UserToken{}
+				token := beans.Token{}
 				ok, err := db.Table(token).Where("id = ?", tok).Get(&token)
 				if err != nil {
 					return err.Error(), "[4] 未授权"

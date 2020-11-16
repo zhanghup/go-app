@@ -10,7 +10,7 @@ import (
 
 type User struct {
 	User        beans.User
-	Token       beans.UserToken
+	Token       beans.Token
 	PermObjects map[string]string
 	Perms       map[string][]string
 	Admin       bool
