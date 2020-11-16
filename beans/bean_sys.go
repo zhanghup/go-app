@@ -19,7 +19,7 @@ type User struct {
 	Avatar *string `json:"avatar"`  // 头像
 	IdCard *string `json:"id_card"` // 身份证ID
 	Birth  *int64  `json:"birth"`   // 出生日期
-	Sex    *int    `json:"sex"`     // 人物性别
+	Sex    *string `json:"sex"`     // 人物性别
 	Mobile *string `json:"mobile"`  // 联系电话
 	Remark *string `json:"remark"`  // 备注
 }

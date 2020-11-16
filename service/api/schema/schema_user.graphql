@@ -30,33 +30,27 @@ type Users{
 type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     id: String
 
-    "用户类型[dict:SYS001]"
+    "用户类型"
     type: String
-    "账户"
-    account: String
-    "密码"
-    password: String
     "用户名称"
     name: String
     "头像"
     avatar: String
     "身份证"
-    i_card: String
+    id_card: String
     "出生年月"
     birth: Int
-    "性别[dict:STA002]"
-    sex: Int
+    "性别"
+    sex: String
     "移动电话"
     mobile: String
-    "是否为管理员[0: 否,1: 是]"
-    admin: Int
     "创建时间"
     created: Int
     "更新时间"
     updated: Int
     "排序"
     weight: Int
-    "状态[dict:STA001]"
+    "状态"
     status: Int
     "备注"
     remark: String
@@ -64,26 +58,20 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
 }
 
 input NewUser {
-    "用户类型[dict:SYS001]"
-    type: String!
-    "账户"
-    account: String!
-    "密码"
-    password: String!
+    "用户类型"
+    type: String
     "用户名称"
-    name: String!
+    name: String
     "头像"
     avatar: String
     "身份证"
-    i_card: String
+    id_card: String
     "出生年月"
     birth: Int
-    "性别[dict:STA002]"
-    sex: Int
+    "性别"
+    sex: String
     "移动电话"
     mobile: String
-    "是否为管理员[0: 否,1: 是]"
-    admin: Int
     "排序"
     weight: Int
     "状态[dict:STA001]"
@@ -93,26 +81,20 @@ input NewUser {
 }
 
 input UpdUser {
-    "用户类型[dict:SYS001]"
-    type: String!
-    "账户"
-    account: String!
-    "密码"
-    password: String!
+    "用户类型"
+    type: String
     "用户名称"
-    name: String!
+    name: String
     "头像"
     avatar: String
     "身份证"
-    i_card: String
+    id_card: String
     "出生年月"
     birth: Int
-    "性别[dict:STA002]"
-    sex: Int
+    "性别"
+    sex: String
     "移动电话"
     mobile: String
-    "是否为管理员[0: 否,1: 是]"
-    admin: Int
     "排序"
     weight: Int
     "状态[dict:STA001]"
