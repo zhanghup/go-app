@@ -29,20 +29,20 @@ type Crons{
 type Cron @goModel(model:"github.com/zhanghup/go-app/beans.Cron")  {
     id: String
 
+    "是否启动定时任务[0:启动,1:停止]"
+    state: Int
     "任务名称"
     name: String
     "任务表达式"
     expression: String
-    "是否启动定时任务[0:启动,1:停止]"
-    state: Int
     "上一次执行时间"
     previous: Int64
     "任务持续时间（秒）"
-    last: Float
+    last: Int64
     "任务结果"
     message: String
-    "字典项"
-    dict: String
+    "任务结果状态"
+    result: String
 
     "排序"
     weight: Int
@@ -80,6 +80,8 @@ type CronLog @goModel(model:"github.com/zhanghup/go-app/beans.CronLog")  {
     end:Int
     "任务结果"
     message: String
+    "任务结果状态"
+    result: String
 
     "排序"
     weight: Int

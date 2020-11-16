@@ -59,13 +59,13 @@ type Role @goModel(model: "github.com/zhanghup/go-app/beans.Role") {
     "角色名称"
     desc: String
 
-    "创建时间[fmt:YYYY-MM-DD HH:mm,sort:'order:[created]']"
+    "创建时间"
     created: Int
-    "更新时间[fmt:YYYY-MM-DD HH:mm],sort:true"
+    "更新时间"
     updated: Int
     "排序"
     weight: Int
-    "状态[fmt:STA001]"
+    "状态"
     status: Int
 }
 

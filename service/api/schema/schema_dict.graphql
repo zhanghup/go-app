@@ -94,9 +94,9 @@ type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
     "值"
     value: String
     "扩展"
-    extension: String
+    ext: String
     "禁止操作"
-    disable: Int
+    disabled: Int
 
     "创建时间"
     created: Int
@@ -117,9 +117,7 @@ input NewDictItem{
     "值"
     value: String
     "扩展"
-    extension: String
-    "禁止操作"
-    disable: Int
+    ext: String
 
     "排序"
     weight: Int
@@ -133,9 +131,7 @@ input UpdDictItem{
     "值"
     value: String
     "扩展"
-    extension: String
-    "禁止操作"
-    disable: Int
+    ext: String
 
     "排序"
     weight: Int
