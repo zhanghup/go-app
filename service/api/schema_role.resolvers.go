@@ -116,8 +116,13 @@ func (r *mutationResolver) RoleToUser(ctx context.Context, uid string, roles []s
 		user, err := r.UserLoader(ctx, uid)
 		if err != nil {
 			tog.Error(err.Error())
+			return
 		}
-		event.UserRoleChange(user)
+		if user != nil {
+			tog.Error("用户不存在")
+			return
+		}
+		event.UserRoleChange(*user)
 	}()
 	return true, nil
 }
