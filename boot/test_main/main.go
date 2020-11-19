@@ -11,9 +11,9 @@ func main() {
 		panic(err)
 	}
 	_ = boot.Boot(box).
-		//SyncTables().
-		//InitDatas().
-		//JobsInit().
+		SyncTables().
+		InitDatas().
+		JobsInit().
 		//Jobs("测试", "0 * * * * * ", func() error {
 		//	if time.Now().Unix()%2 == 0 {
 		//		return errors.New("测试错误")

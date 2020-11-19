@@ -65,11 +65,11 @@ func init() {
 			db:       db,
 		}
 
-		go event.UserRemoveSubscribe(func(user *beans.User) {
+		go event.UserRemoveSubscribe(func(user beans.User) {
 			UserCache.RemoveByUser(*user.Id)
 		})
 
-		go event.UserUpdateSubscribe(func(user *beans.User) {
+		go event.UserUpdateSubscribe(func(user beans.User) {
 			UserCache.RemoveByUser(*user.Id)
 		})
 
@@ -77,7 +77,7 @@ func init() {
 			UserCache.RemoveByUser(*user.Id)
 		})
 
-		go event.UserRoleChangeSubscribe(func(user *beans.User) {
+		go event.UserRoleChangeSubscribe(func(user beans.User) {
 			UserCache.RemoveByUser(*user.Id)
 		})
 	})
