@@ -4,7 +4,7 @@
 #}
 #
 #extend type Mutation {
-#    user_create(input:NewUser!):User
+#    user_create(input:NewUser!):String!
 #    user_update(id: String!,input:UpdUser!):Boolean!
 #    user_removes(ids: [String!]):Boolean!
 #}

@@ -1,0 +1,93 @@
+extend type Query{
+    depts(query:QDept!):Depts
+    dept(id: String!):Dept
+}
+
+extend type Mutation {
+    dept_create(input:NewDept!):String!
+    dept_update(id: String!,input:UpdDept!):Boolean!
+    dept_removes(ids: [String!]):Boolean!
+}
+
+input QDept{
+    pid: String
+
+    index: Int
+    size: Int
+    count: Boolean
+}
+
+type Depts{
+    total: Int
+    data:[Dept!]
+}
+
+type Dept @goModel(model:"github.com/zhanghup/go-app/beans.Dept") {
+    id: String
+
+    "组织类型{dict:BUS001}"
+    type: String
+    "组织代码"
+    code: String
+    "组织名称"
+    name: String
+    "组织头像"
+    avatar: String
+    "父级组织ID"
+    pid: String
+    "备注"
+    remark: String
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+
+}
+
+input NewDept {
+
+    "组织类型{dict:BUS001}"
+    type: String
+    "组织代码"
+    code: String
+    "组织名称"
+    name: String
+    "组织头像"
+    avatar: String
+    "父级组织ID"
+    pid: String
+    "备注"
+    remark: String
+
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+
+input UpdDept {
+
+    "组织类型{dict:BUS001}"
+    type: String
+    "组织代码"
+    code: String
+    "组织名称"
+    name: String
+    "组织头像"
+    avatar: String
+    "父级组织ID"
+    pid: String
+    "备注"
+    remark: String
+
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+

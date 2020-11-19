@@ -22,6 +22,12 @@ func (this *Resolver) RoleLoader(ctx context.Context, id string) (*beans.Role, e
 	err := this.Loader(ctx).Object(result, "select * from role where id in :keys", nil, "Id", "").Load(id, result)
 	return result, err
 }
+func (this *Resolver) DeptLoader(ctx context.Context, id string) (*beans.Dept, error) {
+	result := new(beans.Dept)
+	err := this.Loader(ctx).Object(result, "select * from dept where id in :keys", nil, "Id", "").Load(id, result)
+	return result, err
+}
+
 func (this *Resolver) UserLoader(ctx context.Context, id string) (*beans.User, error) {
 	result := new(beans.User)
 	err := this.Loader(ctx).Object(result, "select * from user where id in :keys", nil, "Id", "").Load(id, result)

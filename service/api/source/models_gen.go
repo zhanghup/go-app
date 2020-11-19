@@ -16,11 +16,35 @@ type Crons struct {
 	Data  []beans.Cron `json:"data"`
 }
 
+type Depts struct {
+	Total *int         `json:"total"`
+	Data  []beans.Dept `json:"data"`
+}
+
 type IPermObj struct {
 	// 对象
 	Object string `json:"object"`
 	// 操作权限
 	Mask string `json:"mask"`
+}
+
+type NewDept struct {
+	// 组织类型{dict:BUS001}
+	Type *string `json:"type"`
+	// 组织代码
+	Code *string `json:"code"`
+	// 组织名称
+	Name *string `json:"name"`
+	// 组织头像
+	Avatar *string `json:"avatar"`
+	// 父级组织ID
+	Pid *string `json:"pid"`
+	// 备注
+	Remark *string `json:"remark"`
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 }
 
 type NewDict struct {
@@ -109,6 +133,13 @@ type QCronLog struct {
 	Count   *bool   `json:"count"`
 }
 
+type QDept struct {
+	Pid   *string `json:"pid"`
+	Index *int    `json:"index"`
+	Size  *int    `json:"size"`
+	Count *bool   `json:"count"`
+}
+
 type QDict struct {
 	// 字典类型
 	Type *string `json:"type"`
@@ -131,6 +162,25 @@ type QUser struct {
 type Roles struct {
 	Total *int         `json:"total"`
 	Data  []beans.Role `json:"data"`
+}
+
+type UpdDept struct {
+	// 组织类型{dict:BUS001}
+	Type *string `json:"type"`
+	// 组织代码
+	Code *string `json:"code"`
+	// 组织名称
+	Name *string `json:"name"`
+	// 组织头像
+	Avatar *string `json:"avatar"`
+	// 父级组织ID
+	Pid *string `json:"pid"`
+	// 备注
+	Remark *string `json:"remark"`
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 }
 
 type UpdDict struct {
