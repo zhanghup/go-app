@@ -42,3 +42,41 @@ func (r *queryResolver) Depts(ctx context.Context, query source.QDept) (*source.
 func (r *queryResolver) Dept(ctx context.Context, id string) (*beans.Dept, error) {
 	return r.Resolver.DeptLoader(ctx, id)
 }
+func (r *queryResolver) DeptTree__(items []beans.Dept, pid string, flag ...bool) interface{} {
+	type DeptTreeItem struct {
+		Id       *string     `json:"id"`
+		Name     *string     `json:"name"`
+		Code     *string     `json:"code"`
+		Children interface{} `json:"children"`
+	}
+
+	results := make([]DeptTreeItem, 0)
+	for _, o := range items {
+		item := DeptTreeItem{
+			Id:   o.Id,
+			Name: o.Name,
+			Code: o.Code,
+		}
+
+		if len(flag) > 0 && flag[0] {
+			if o.Pid == nil {
+				item.Children = r.DeptTree__(items, *o.Id)
+				results = append(results, item)
+			}
+		} else {
+			if *o.Pid == pid {
+				item.Children = r.DeptTree__(items, *o.Id)
+				results = append(results, item)
+			}
+		}
+	}
+	return results
+}
+func (r *queryResolver) DeptTree(ctx context.Context) (interface{}, error) {
+	depts := make([]beans.Dept, 0)
+	err := r.DB.Find(&depts)
+	if err != nil {
+		return nil, err
+	}
+	return r.DeptTree__(depts, "", true), err
+}

@@ -164,6 +164,7 @@ type ComplexityRoot struct {
 		CronLogs        func(childComplexity int, query QCronLog) int
 		Crons           func(childComplexity int, query QCron) int
 		Dept            func(childComplexity int, id string) int
+		DeptTree        func(childComplexity int) int
 		Depts           func(childComplexity int, query QDept) int
 		Dict            func(childComplexity int, id string) int
 		Dicts           func(childComplexity int, query *QDict) int
@@ -254,6 +255,7 @@ type QueryResolver interface {
 	CronLogs(ctx context.Context, query QCronLog) (*CronLogs, error)
 	Depts(ctx context.Context, query QDept) (*Depts, error)
 	Dept(ctx context.Context, id string) (*beans.Dept, error)
+	DeptTree(ctx context.Context) (interface{}, error)
 	Dicts(ctx context.Context, query *QDict) ([]beans.Dict, error)
 	Dict(ctx context.Context, id string) (*beans.Dict, error)
 	Roles(ctx context.Context, query QRole) (*Roles, error)
@@ -1014,6 +1016,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Dept(childComplexity, args["id"].(string)), true
 
+	case "Query.dept_tree":
+		if e.complexity.Query.DeptTree == nil {
+			break
+		}
+
+		return e.complexity.Query.DeptTree(childComplexity), true
+
 	case "Query.depts":
 		if e.complexity.Query.Depts == nil {
 			break
@@ -1516,6 +1525,7 @@ type CronLog @goModel(model:"github.com/zhanghup/go-app/beans.CronLog")  {
 	{Name: "schema/schema_dept.graphql", Input: `extend type Query{
     depts(query:QDept!):Depts
     dept(id: String!):Dept
+    dept_tree: Any
 }
 
 extend type Mutation {
@@ -6403,6 +6413,38 @@ func (ec *executionContext) _Query_dept(ctx context.Context, field graphql.Colle
 	return ec.marshalODept2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDept(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_dept_tree(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().DeptTree(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(interface{})
+	fc.Result = res
+	return ec.marshalOAny2interface(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_dicts(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -10406,6 +10448,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_dept(ctx, field)
+				return res
+			})
+		case "dept_tree":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_dept_tree(ctx, field)
 				return res
 			})
 		case "dicts":

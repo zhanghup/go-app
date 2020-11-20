@@ -1,6 +1,7 @@
 extend type Query{
     depts(query:QDept!):Depts
     dept(id: String!):Dept
+    dept_tree: Any
 }
 
 extend type Mutation {
