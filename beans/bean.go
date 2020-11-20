@@ -19,11 +19,15 @@ type Bean struct {
 	Created *int64  `json:"created" xorm:"created Int(14)"`
 	Updated *int64  `json:"updated" xorm:"updated  Int(14)"`
 	Weight  *int    `json:"weight" xorm:"weight  Int(9)"`
-	Status  *string    `json:"status" xorm:"status  Int(1)"`
+	Status  *string `json:"status" xorm:"status  Int(1)"`
 }
 
 func Sync(db *xorm.Engine) {
 	err := db.Sync2(sys_tables()...)
+	if err != nil {
+		panic(err)
+	}
+	err = db.Sync2(msg_tables()...)
 	if err != nil {
 		panic(err)
 	}

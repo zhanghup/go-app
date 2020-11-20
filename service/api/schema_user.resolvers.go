@@ -5,83 +5,80 @@ package api
 
 import (
 	"context"
+	"errors"
+	"github.com/zhanghup/go-app/service/event"
+	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-tools/tog"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
 )
 
-func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser) (bool, error) {
-	//user := &beans.User{
-	//	Salt: tools.Ptr.String(tools.Str.RandString(10)),
-	//}
-	//input.Password = tools.Crypto.Password(input.Password, *user.Salt)
-	//
-	//id, err := r.Create(ctx, user, input)
-	//
+func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser) (string, error) {
+	id, err := r.Create(ctx, new(beans.User), input)
+	if err != nil {
+		return "", err
+	}
+
 	//// 用户新增推送
-	//go func() {
-	//	user, err := r.UserLoader(ctx, id)
-	//	if err != nil {
-	//		tog.Error(err.Error())
-	//	}
-	//	event.UserCreate(user)
-	//}()
-	//
-	//return err == nil, err
-	panic("未实现")
+	go func() {
+		user, err := r.UserLoader(ctx, id)
+		if err != nil {
+			tog.Error(err.Error())
+			return
+		}
+		if user == nil {
+			tog.Error("用户不存在")
+			return
+		}
+		event.UserCreate(*user)
+	}()
+	return id, err
 }
 
 func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input source.UpdUser) (bool, error) {
-	//user, err := r.UserLoader(ctx, id)
-	//if err != nil {
-	//	return false, err
-	//}
-	//if input.Password == "" {
-	//	return false, errors.New("密码不能为空")
-	//}
-	//if *user.Password != input.Password {
-	//	input.Password = tools.Crypto.Password(input.Password, *user.Salt)
-	//}
-	//ok, err := r.Update(ctx, new(beans.User), id, input)
-	//if err != nil {
-	//	return false, err
-	//}
-	//
-	//// 用户更新推送
-	//go func() {
-	//	user, err := r.UserLoader(ctx, id)
-	//	if err != nil {
-	//		tog.Error(err.Error())
-	//	}
-	//	event.UserUpdate(user)
-	//}()
-	//
-	//return ok, nil
-	panic("未实现")
+	user, err := r.UserLoader(ctx, id)
+	if err != nil {
+		return false, err
+	}
+	if user == nil {
+		return false, errors.New("用户不存在")
+	}
+
+	ok, err := r.Update(ctx, new(beans.User), id, input)
+	if err != nil {
+		return false, err
+	}
+
+	// 用户更新推送
+	go func() {
+		event.UserUpdate(*user)
+	}()
+
+	return ok, nil
 }
 
 func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool, error) {
-	//if tools.Str.Contains(ids, "root") {
-	//	return false, errors.New("root用户无法删除")
-	//}
-	//users := make([]beans.User, 0)
-	//err := r.DB.In("id", ids).Find(&users)
-	//if err != nil {
-	//	return false, err
-	//}
-	//ok, err := r.Removes(ctx, new(beans.User), ids)
-	//if err != nil || !ok {
-	//	return false, err
-	//}
-	//
-	//go func() {
-	//	for _, user := range users {
-	//		event.UserRemove(&user)
-	//	}
-	//}()
-	//
-	//return true, nil
-	panic("未实现")
+	if tools.Str.Contains(ids, "root") {
+		return false, errors.New("root用户无法删除")
+	}
+	users := make([]beans.User, 0)
+	err := r.DB.In("id", ids).Find(&users)
+	if err != nil {
+		return false, err
+	}
+	ok, err := r.Removes(ctx, new(beans.User), ids)
+	if err != nil || !ok {
+		return false, err
+	}
+
+	go func() {
+		for _, user := range users {
+			event.UserRemove(user)
+		}
+	}()
+
+	return true, nil
 }
 
 func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.Users, error) {

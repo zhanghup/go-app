@@ -243,7 +243,7 @@ type MutationResolver interface {
 	RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error)
 	RolePermObjCreate(ctx context.Context, id string, perms []IPermObj) (bool, error)
 	RoleToUser(ctx context.Context, uid string, roles []string) (bool, error)
-	UserCreate(ctx context.Context, input NewUser) (bool, error)
+	UserCreate(ctx context.Context, input NewUser) (string, error)
 	UserUpdate(ctx context.Context, id string, input UpdUser) (bool, error)
 	UserRemoves(ctx context.Context, ids []string) (bool, error)
 }
@@ -1862,7 +1862,7 @@ input UpdRole {
 
 extend type Mutation {
     "用户新建"
-    user_create(input:NewUser!):Boolean!  @perm(entity: "user",perm: "C")
+    user_create(input:NewUser!):String!  @perm(entity: "user",perm: "C")
     "用户更新"
     user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U")
     "用户批量删除"
@@ -5840,10 +5840,10 @@ func (ec *executionContext) _Mutation_user_create(ctx context.Context, field gra
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(bool); ok {
+		if data, ok := tmp.(string); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5855,9 +5855,9 @@ func (ec *executionContext) _Mutation_user_create(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_user_update(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {

@@ -5,6 +5,7 @@ package api
 
 import (
 	"context"
+
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
 )
@@ -42,6 +43,22 @@ func (r *queryResolver) Depts(ctx context.Context, query source.QDept) (*source.
 func (r *queryResolver) Dept(ctx context.Context, id string) (*beans.Dept, error) {
 	return r.Resolver.DeptLoader(ctx, id)
 }
+
+func (r *queryResolver) DeptTree(ctx context.Context) (interface{}, error) {
+	depts := make([]beans.Dept, 0)
+	err := r.DB.Find(&depts)
+	if err != nil {
+		return nil, err
+	}
+	return r.DeptTree__(depts, "", true), err
+}
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
 func (r *queryResolver) DeptTree__(items []beans.Dept, pid string, flag ...bool) interface{} {
 	type DeptTreeItem struct {
 		Id       *string     `json:"id"`
@@ -71,12 +88,4 @@ func (r *queryResolver) DeptTree__(items []beans.Dept, pid string, flag ...bool)
 		}
 	}
 	return results
-}
-func (r *queryResolver) DeptTree(ctx context.Context) (interface{}, error) {
-	depts := make([]beans.Dept, 0)
-	err := r.DB.Find(&depts)
-	if err != nil {
-		return nil, err
-	}
-	return r.DeptTree__(depts, "", true), err
 }
