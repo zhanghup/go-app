@@ -6,12 +6,13 @@ package api
 import (
 	"context"
 	"errors"
-	"github.com/zhanghup/go-app/service/event"
-	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-tools/tog"
+	"fmt"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
+	"github.com/zhanghup/go-app/service/event"
+	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-tools/tog"
 )
 
 func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser) (string, error) {
@@ -94,3 +95,12 @@ func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.
 func (r *queryResolver) User(ctx context.Context, id string) (*beans.User, error) {
 	return r.UserLoader(ctx, id)
 }
+
+func (r *userResolver) ODept(ctx context.Context, obj *beans.User) (*beans.Dept, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+// User returns source.UserResolver implementation.
+func (r *Resolver) User() source.UserResolver { return &userResolver{r} }
+
+type userResolver struct{ *Resolver }

@@ -39,3 +39,4 @@ func (this *Resolver) CronLoader(ctx context.Context, id string) (*beans.Cron, e
 	err := this.Loader(ctx).Object(result, "select * from cron where id in :keys", nil, "Id", "").Load(id, result)
 	return result, err
 }
+

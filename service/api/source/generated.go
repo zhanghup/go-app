@@ -36,10 +36,12 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Dept() DeptResolver
 	Dict() DictResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Subscription() SubscriptionResolver
+	User() UserResolver
 }
 
 type DirectiveRoot struct {
@@ -89,6 +91,7 @@ type ComplexityRoot struct {
 		Created func(childComplexity int) int
 		Id      func(childComplexity int) int
 		Name    func(childComplexity int) int
+		ODept   func(childComplexity int) int
 		Pid     func(childComplexity int) int
 		Remark  func(childComplexity int) int
 		Status  func(childComplexity int) int
@@ -205,6 +208,7 @@ type ComplexityRoot struct {
 		IdCard  func(childComplexity int) int
 		Mobile  func(childComplexity int) int
 		Name    func(childComplexity int) int
+		ODept   func(childComplexity int) int
 		Remark  func(childComplexity int) int
 		Sex     func(childComplexity int) int
 		Status  func(childComplexity int) int
@@ -219,6 +223,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type DeptResolver interface {
+	ODept(ctx context.Context, obj *beans.Dept) (*beans.Dept, error)
+}
 type DictResolver interface {
 	Values(ctx context.Context, obj *beans.Dict) ([]beans.DictItem, error)
 }
@@ -267,6 +274,9 @@ type QueryResolver interface {
 }
 type SubscriptionResolver interface {
 	Hello(ctx context.Context) (<-chan *string, error)
+}
+type UserResolver interface {
+	ODept(ctx context.Context, obj *beans.User) (*beans.Dept, error)
 }
 
 type executableSchema struct {
@@ -486,6 +496,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Dept.Name(childComplexity), true
+
+	case "Dept.o_dept":
+		if e.complexity.Dept.ODept == nil {
+			break
+		}
+
+		return e.complexity.Dept.ODept(childComplexity), true
 
 	case "Dept.pid":
 		if e.complexity.Dept.Pid == nil {
@@ -1264,6 +1281,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Name(childComplexity), true
 
+	case "User.o_dept":
+		if e.complexity.User.ODept == nil {
+			break
+		}
+
+		return e.complexity.User.ODept(childComplexity), true
+
 	case "User.remark":
 		if e.complexity.User.Remark == nil {
 			break
@@ -1571,6 +1595,8 @@ type Dept @goModel(model:"github.com/zhanghup/go-app/beans.Dept") {
     weight: Int
     "状态{dict:STA001}"
     status: String
+
+    o_dept: Dept
 
 }
 
@@ -1909,6 +1935,8 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     status: String
     "备注"
     remark: String
+
+    o_dept:Dept
 
 }
 
@@ -3794,6 +3822,38 @@ func (ec *executionContext) _Dept_status(ctx context.Context, field graphql.Coll
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Dept_o_dept(ctx context.Context, field graphql.CollectedField, obj *beans.Dept) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Dept",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Dept().ODept(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*beans.Dept)
+	fc.Result = res
+	return ec.marshalODept2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDept(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Depts_total(ctx context.Context, field graphql.CollectedField, obj *Depts) (ret graphql.Marshaler) {
@@ -7806,6 +7866,38 @@ func (ec *executionContext) _User_remark(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _User_o_dept(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.User().ODept(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*beans.Dept)
+	fc.Result = res
+	return ec.marshalODept2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDept(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Users_total(ctx context.Context, field graphql.CollectedField, obj *Users) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -10058,6 +10150,17 @@ func (ec *executionContext) _Dept(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Dept_weight(ctx, field, obj)
 		case "status":
 			out.Values[i] = ec._Dept_status(ctx, field, obj)
+		case "o_dept":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Dept_o_dept(ctx, field, obj)
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10683,6 +10786,17 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_status(ctx, field, obj)
 		case "remark":
 			out.Values[i] = ec._User_remark(ctx, field, obj)
+		case "o_dept":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_o_dept(ctx, field, obj)
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

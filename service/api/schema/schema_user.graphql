@@ -55,6 +55,8 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     "备注"
     remark: String
 
+    o_dept:Dept
+
 }
 
 input NewUser {

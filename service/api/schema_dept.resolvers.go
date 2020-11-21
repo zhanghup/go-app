@@ -5,10 +5,16 @@ package api
 
 import (
 	"context"
-
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
 )
+
+func (r *deptResolver) ODept(ctx context.Context, obj *beans.Dept) (*beans.Dept, error) {
+	if obj.Pid == nil {
+		return nil, nil
+	}
+	return r.Resolver.DeptLoader(ctx, *obj.Pid)
+}
 
 func (r *mutationResolver) DeptCreate(ctx context.Context, input source.NewDept) (string, error) {
 	return r.Create(ctx, new(beans.Dept), input)
@@ -50,42 +56,10 @@ func (r *queryResolver) DeptTree(ctx context.Context) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return r.DeptTree__(depts, "", true), err
+	return r.DeptTreeHelp(depts, "", true), err
 }
 
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) DeptTree__(items []beans.Dept, pid string, flag ...bool) interface{} {
-	type DeptTreeItem struct {
-		Id       *string     `json:"id"`
-		Name     *string     `json:"name"`
-		Code     *string     `json:"code"`
-		Children interface{} `json:"children"`
-	}
+// Dept returns source.DeptResolver implementation.
+func (r *Resolver) Dept() source.DeptResolver { return &deptResolver{r} }
 
-	results := make([]DeptTreeItem, 0)
-	for _, o := range items {
-		item := DeptTreeItem{
-			Id:   o.Id,
-			Name: o.Name,
-			Code: o.Code,
-		}
-
-		if len(flag) > 0 && flag[0] {
-			if o.Pid == nil {
-				item.Children = r.DeptTree__(items, *o.Id)
-				results = append(results, item)
-			}
-		} else {
-			if *o.Pid == pid {
-				item.Children = r.DeptTree__(items, *o.Id)
-				results = append(results, item)
-			}
-		}
-	}
-	return results
-}
+type deptResolver struct{ *Resolver }

@@ -48,6 +48,8 @@ type Dept @goModel(model:"github.com/zhanghup/go-app/beans.Dept") {
     "状态{dict:STA001}"
     status: String
 
+    o_dept: Dept
+
 }
 
 input NewDept {
