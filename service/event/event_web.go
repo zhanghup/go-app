@@ -11,15 +11,32 @@ const (
 )
 
 // 消息事件 - 新增
-func MsgNew(uid string, msg beans.Msg)                     { EventPublish(msg_new+"-"+uid, msg) }
-func MsgNewSubscribe(uid string, fn func(msg beans.Msg))   { EventSubscribe(msg_new+"-"+uid, fn) }
-func MsgNewUnSubscribe(uid string, fn func(msg beans.Msg)) { EventUnsubscribe(msg_new+"-"+uid, fn) }
+func MsgNew(uid, target string, msg []beans.MsgEvent) { EventPublish(msg_new+"-"+uid+"-"+target, msg) }
+func MsgNewSubscribe(uid, target string, fn func(msg []beans.MsgEvent)) {
+	EventSubscribe(msg_new+"-"+uid+"-"+target, fn)
+}
+func MsgNewUnSubscribe(uid, target string, fn func(msg []beans.MsgEvent)) {
+	EventUnsubscribe(msg_new+"-"+uid+"-"+target, fn)
+}
 
 // 消息事件 - 已读
-func MsgRead(uid string, msg beans.Msg)                     { EventPublish(msg_read+"-"+uid, msg) }
-func MsgReadSubscribe(uid string, fn func(msg beans.Msg))   { EventSubscribe(msg_read+"-"+uid, fn) }
-func MsgReadUnSubscribe(uid string, fn func(msg beans.Msg)) { EventUnsubscribe(msg_read+"-"+uid, fn) }
+func MsgRead(uid, target string, msg []beans.MsgEvent) {
+	EventPublish(msg_read+"-"+uid+"-"+target, msg)
+}
+func MsgReadSubscribe(uid, target string, fn func(msg []beans.MsgEvent)) {
+	EventSubscribe(msg_read+"-"+uid+"-"+target, fn)
+}
+func MsgReadUnSubscribe(uid, target string, fn func(msg []beans.MsgEvent)) {
+	EventUnsubscribe(msg_read+"-"+uid+"-"+target, fn)
+}
 
 // 消息事件 - 确认
-func MsgConfirm(uid string, msg beans.Msg)                   { EventPublish(msg_confirm+"-"+uid, msg) }
-func MsgConfirmSubscribe(uid string, fn func(msg beans.Msg)) { EventSubscribe(msg_confirm+"-"+uid, fn) }
+func MsgConfirm(uid, target string, msg beans.MsgEvent) {
+	EventPublish(msg_confirm+"-"+uid+"-"+target, msg)
+}
+func MsgConfirmSubscribe(uid, target string, fn func(msg []beans.MsgEvent)) {
+	EventSubscribe(msg_confirm+"-"+uid+"-"+target, fn)
+}
+func MsgConfirmUnSubscribe(uid, target string, fn func(msg []beans.MsgEvent)) {
+	EventUnsubscribe(msg_confirm+"-"+uid+"-"+target, fn)
+}
