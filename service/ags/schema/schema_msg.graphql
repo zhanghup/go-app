@@ -1,0 +1,63 @@
+
+extend type Subscription {
+    message_new(type: String!): [MsgInfo!]
+    message_read(type: String!): [MsgInfo!]
+    message_confirm(type: String!): [MsgInfo!]
+}
+
+type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
+    id: String
+
+    "事件id"
+    event: String
+    "接收者"
+    receiver: String
+    "接收者名称"
+    receiver_name: String
+    "模板id"
+    template: String
+    "消息类型"
+    type: String
+    "消息级别"
+    level: String
+    "消息接收平台"
+    target: String
+    "消息超时时间"
+    timeout: Int64
+    "是否弹出 - dict"
+    alert: String
+    "弹出消息是否必须确认 - dict"
+    must_confirm: String
+    "确认平台 [web,app,mini,sms...] - dict"
+    confirm_target: String
+    "已读平台 [web,app,mini,sms...] - dict"
+    read_target: String
+    "消息状态 [0:已读、1:未读、2:已读过期、3:未读过期、4:已确认] dict"
+    state: String
+    "消息发送时间"
+    send_time: Int64
+    "消息阅读时间"
+    read_time: Int64
+    "消息确认时间"
+    confirm_time: Int64
+    "消息对象"
+    otype: String
+    "消息对象id"
+    oid:String
+    "消息标题"
+    title: String
+    "消息体"
+    content: String
+    "消息提示图片"
+    img_path: String
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+
+}

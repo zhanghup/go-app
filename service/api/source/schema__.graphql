@@ -20,7 +20,7 @@
 #    data:[User!]
 #}
 #
-#type User {
+#type User @goModel(model:"github.com/zhanghup/go-app/beans.User") {
 #    id: String
 #
 #
@@ -31,8 +31,8 @@
 #    updated: Int
 #    "排序"
 #    weight: Int
-#    "状态[dict:STA001]"
-#    status: Int
+#    "状态{dict:STA001}"
+#    status: String
 #
 #}
 #
@@ -42,7 +42,7 @@
 #    "排序"
 #    weight: Int
 #    "状态{dict:STA001}"
-#    status: Int
+#    status: String
 #}
 #
 #input UpdUser {
@@ -50,6 +50,6 @@
 #    "排序"
 #    weight: Int
 #    "状态{dict:STA001}"
-#    status: Int
+#    status: String
 #}
 #

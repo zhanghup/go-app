@@ -1,0 +1,12 @@
+extend type Query {
+    "登录状态查询"
+    login_status: Boolean!
+}
+
+extend type Mutation {
+    "用户登录"
+    login(username:String!,password:String!): String!
+
+    "登出"
+    logout:Boolean!
+}

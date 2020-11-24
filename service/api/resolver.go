@@ -11,9 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/api/source"
 	"github.com/zhanghup/go-app/service/directive"
-	"github.com/zhanghup/go-app/service/gs"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgql"
 	"net/http"
@@ -63,7 +63,7 @@ func Gin(g gin.IRouter, db *xorm.Engine) {
 
 	g.Group("/", directive.WebAuth(db)).POST("/api", ggin(db))
 	g.Group("/", directive.WebAuth(db)).GET("/api", ggin(db))
-	gs.Playground(g, "/api/playground1", "/api")
+	ags.Playground(g, "/api/playground1", "/api")
 	g.GET("/api/playground2", func(c *gin.Context) {
 		playground.Handler("标题", "/api")(c.Writer, c.Request)
 	})

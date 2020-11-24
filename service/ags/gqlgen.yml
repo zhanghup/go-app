@@ -1,5 +1,5 @@
 schema:
-  - schema.graphql
+  - schema/schema*.graphql
 exec:
   filename: source/generated.go
   package: source
@@ -7,6 +7,8 @@ model:
   filename: source/models_gen.go
   package: source
 resolver:
+  layout: follow-schema
+  dir: resolvers
   filename: resolver.go
   type: Resolver
 omit_slice_element_pointers: true

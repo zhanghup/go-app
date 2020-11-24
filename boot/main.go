@@ -6,8 +6,8 @@ import (
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-app/initia"
+	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/api"
-	"github.com/zhanghup/go-app/service/auth"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-app/service/file"
 	"github.com/zhanghup/go-app/service/job"
@@ -93,7 +93,7 @@ func (this *Struct) RouterFile() *Struct {
 // 登录登出等接口
 func (this *Struct) RouterAuth() *Struct {
 	this.routerfns = append(this.routerfns, func(g *gin.Engine, db *xorm.Engine) {
-		auth.Gin(g.Group("/"), this.db)
+		ags.Gin(g.Group("/"), this.db)
 	})
 	return this
 }
