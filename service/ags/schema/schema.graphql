@@ -2,6 +2,7 @@ scalar Int64
 
 "数据操作权限"
 directive @perm(entity:String!, perm: String!) on FIELD_DEFINITION
+directive @user on FIELD_DEFINITION
 
 directive @goModel(model: String, models: [String!]) on OBJECT
     | INPUT_OBJECT

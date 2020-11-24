@@ -6,30 +6,23 @@ package resolvers
 import (
 	"context"
 
-	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/service/ags/source"
 	"github.com/zhanghup/go-app/service/event"
 )
 
-func (r *subscriptionResolver) MessageNew(ctx context.Context, typeArg string) (<-chan []beans.MsgInfo, error) {
-	datas := make(chan []beans.MsgInfo, 100)
-	event.MsgNewSubscribe(*r.Me(ctx).Info.User.Id, typeArg, func(msg []beans.MsgInfo) {
-		datas <- msg
-	})
-	return datas, nil
-}
+func (r *subscriptionResolver) Message(ctx context.Context, typeArg string) (<-chan *source.Message, error) {
+	datas := make(chan *source.Message, 100)
 
-func (r *subscriptionResolver) MessageRead(ctx context.Context, typeArg string) (<-chan []beans.MsgInfo, error) {
-	datas := make(chan []beans.MsgInfo, 100)
-	event.MsgReadSubscribe(*r.Me(ctx).Info.User.Id, typeArg, func(msg []beans.MsgInfo) {
-		datas <- msg
-	})
-	return datas, nil
-}
+	fn := func(msg event.MsgInfo) {
+		action := source.MessageEnum(msg.Action)
+		datas <- &source.Message{
+			Action:   &action,
+			Messages: msg.Messages,
+		}
+	}
 
-func (r *subscriptionResolver) MessageConfirm(ctx context.Context, typeArg string) (<-chan []beans.MsgInfo, error) {
-	datas := make(chan []beans.MsgInfo, 100)
-	event.MsgConfirmSubscribe(*r.Me(ctx).Info.User.Id, typeArg, func(msg []beans.MsgInfo) {
-		datas <- msg
-	})
+	event.MsgNewSubscribe(*r.Me(ctx).Info.User.Id, event.MsgTarget(typeArg), fn)
+	go event.MsgNewUnSubscribeWithContext(ctx, *r.Me(ctx).Info.User.Id, event.MsgTarget(typeArg), fn)
+
 	return datas, nil
 }

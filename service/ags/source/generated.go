@@ -43,9 +43,15 @@ type ResolverRoot interface {
 
 type DirectiveRoot struct {
 	Perm func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string) (res interface{}, err error)
+	User func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
+	Message struct {
+		Action   func(childComplexity int) int
+		Messages func(childComplexity int) int
+	}
+
 	MsgInfo struct {
 		Alert         func(childComplexity int) int
 		ConfirmTarget func(childComplexity int) int
@@ -87,10 +93,8 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
-		Hello          func(childComplexity int) int
-		MessageConfirm func(childComplexity int, typeArg string) int
-		MessageNew     func(childComplexity int, typeArg string) int
-		MessageRead    func(childComplexity int, typeArg string) int
+		Hello   func(childComplexity int) int
+		Message func(childComplexity int, typeArg string) int
 	}
 }
 
@@ -105,9 +109,7 @@ type QueryResolver interface {
 }
 type SubscriptionResolver interface {
 	Hello(ctx context.Context) (<-chan *string, error)
-	MessageNew(ctx context.Context, typeArg string) (<-chan []beans.MsgInfo, error)
-	MessageRead(ctx context.Context, typeArg string) (<-chan []beans.MsgInfo, error)
-	MessageConfirm(ctx context.Context, typeArg string) (<-chan []beans.MsgInfo, error)
+	Message(ctx context.Context, typeArg string) (<-chan *Message, error)
 }
 
 type executableSchema struct {
@@ -124,6 +126,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Message.action":
+		if e.complexity.Message.Action == nil {
+			break
+		}
+
+		return e.complexity.Message.Action(childComplexity), true
+
+	case "Message.messages":
+		if e.complexity.Message.Messages == nil {
+			break
+		}
+
+		return e.complexity.Message.Messages(childComplexity), true
 
 	case "MsgInfo.alert":
 		if e.complexity.MsgInfo.Alert == nil {
@@ -354,41 +370,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subscription.Hello(childComplexity), true
 
-	case "Subscription.message_confirm":
-		if e.complexity.Subscription.MessageConfirm == nil {
+	case "Subscription.message":
+		if e.complexity.Subscription.Message == nil {
 			break
 		}
 
-		args, err := ec.field_Subscription_message_confirm_args(context.TODO(), rawArgs)
+		args, err := ec.field_Subscription_message_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Subscription.MessageConfirm(childComplexity, args["type"].(string)), true
-
-	case "Subscription.message_new":
-		if e.complexity.Subscription.MessageNew == nil {
-			break
-		}
-
-		args, err := ec.field_Subscription_message_new_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Subscription.MessageNew(childComplexity, args["type"].(string)), true
-
-	case "Subscription.message_read":
-		if e.complexity.Subscription.MessageRead == nil {
-			break
-		}
-
-		args, err := ec.field_Subscription_message_read_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Subscription.MessageRead(childComplexity, args["type"].(string)), true
+		return e.complexity.Subscription.Message(childComplexity, args["type"].(string)), true
 
 	}
 	return 0, false
@@ -475,6 +467,7 @@ var sources = []*ast.Source{
 
 "数据操作权限"
 directive @perm(entity:String!, perm: String!) on FIELD_DEFINITION
+directive @user on FIELD_DEFINITION
 
 directive @goModel(model: String, models: [String!]) on OBJECT
     | INPUT_OBJECT
@@ -513,9 +506,17 @@ extend type Mutation {
 `, BuiltIn: false},
 	{Name: "schema/schema_msg.graphql", Input: `
 extend type Subscription {
-    message_new(type: String!): [MsgInfo!]
-    message_read(type: String!): [MsgInfo!]
-    message_confirm(type: String!): [MsgInfo!]
+    message(type: String!): Message
+}
+
+type Message{
+    action: MessageEnum
+    messages:[MsgInfo!]
+}
+
+enum MessageEnum{
+    web
+    app
 }
 
 type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
@@ -644,37 +645,7 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Subscription_message_confirm_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["type"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["type"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Subscription_message_new_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["type"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["type"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Subscription_message_read_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Subscription_message_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -726,6 +697,70 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Message_action(ctx context.Context, field graphql.CollectedField, obj *Message) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Message",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Action, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*MessageEnum)
+	fc.Result = res
+	return ec.marshalOMessageEnum2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋagsᚋsourceᚐMessageEnum(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Message_messages(ctx context.Context, field graphql.CollectedField, obj *Message) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Message",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Messages, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]beans.MsgInfo)
+	fc.Result = res
+	return ec.marshalOMsgInfo2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfoᚄ(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _MsgInfo_id(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
 	defer func() {
@@ -1848,7 +1883,7 @@ func (ec *executionContext) _Subscription_hello(ctx context.Context, field graph
 	}
 }
 
-func (ec *executionContext) _Subscription_message_new(ctx context.Context, field graphql.CollectedField) (ret func() graphql.Marshaler) {
+func (ec *executionContext) _Subscription_message(ctx context.Context, field graphql.CollectedField) (ret func() graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1865,7 +1900,7 @@ func (ec *executionContext) _Subscription_message_new(ctx context.Context, field
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Subscription_message_new_args(ctx, rawArgs)
+	args, err := ec.field_Subscription_message_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return nil
@@ -1873,7 +1908,7 @@ func (ec *executionContext) _Subscription_message_new(ctx context.Context, field
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Subscription().MessageNew(rctx, args["type"].(string))
+		return ec.resolvers.Subscription().Message(rctx, args["type"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1883,7 +1918,7 @@ func (ec *executionContext) _Subscription_message_new(ctx context.Context, field
 		return nil
 	}
 	return func() graphql.Marshaler {
-		res, ok := <-resTmp.(<-chan []beans.MsgInfo)
+		res, ok := <-resTmp.(<-chan *Message)
 		if !ok {
 			return nil
 		}
@@ -1891,105 +1926,7 @@ func (ec *executionContext) _Subscription_message_new(ctx context.Context, field
 			w.Write([]byte{'{'})
 			graphql.MarshalString(field.Alias).MarshalGQL(w)
 			w.Write([]byte{':'})
-			ec.marshalOMsgInfo2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfoᚄ(ctx, field.Selections, res).MarshalGQL(w)
-			w.Write([]byte{'}'})
-		})
-	}
-}
-
-func (ec *executionContext) _Subscription_message_read(ctx context.Context, field graphql.CollectedField) (ret func() graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = nil
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Subscription",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Subscription_message_read_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return nil
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Subscription().MessageRead(rctx, args["type"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return nil
-	}
-	if resTmp == nil {
-		return nil
-	}
-	return func() graphql.Marshaler {
-		res, ok := <-resTmp.(<-chan []beans.MsgInfo)
-		if !ok {
-			return nil
-		}
-		return graphql.WriterFunc(func(w io.Writer) {
-			w.Write([]byte{'{'})
-			graphql.MarshalString(field.Alias).MarshalGQL(w)
-			w.Write([]byte{':'})
-			ec.marshalOMsgInfo2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfoᚄ(ctx, field.Selections, res).MarshalGQL(w)
-			w.Write([]byte{'}'})
-		})
-	}
-}
-
-func (ec *executionContext) _Subscription_message_confirm(ctx context.Context, field graphql.CollectedField) (ret func() graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = nil
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Subscription",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Subscription_message_confirm_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return nil
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Subscription().MessageConfirm(rctx, args["type"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return nil
-	}
-	if resTmp == nil {
-		return nil
-	}
-	return func() graphql.Marshaler {
-		res, ok := <-resTmp.(<-chan []beans.MsgInfo)
-		if !ok {
-			return nil
-		}
-		return graphql.WriterFunc(func(w io.Writer) {
-			w.Write([]byte{'{'})
-			graphql.MarshalString(field.Alias).MarshalGQL(w)
-			w.Write([]byte{':'})
-			ec.marshalOMsgInfo2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfoᚄ(ctx, field.Selections, res).MarshalGQL(w)
+			ec.marshalOMessage2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋagsᚋsourceᚐMessage(ctx, field.Selections, res).MarshalGQL(w)
 			w.Write([]byte{'}'})
 		})
 	}
@@ -3090,6 +3027,32 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** object.gotpl ****************************
 
+var messageImplementors = []string{"Message"}
+
+func (ec *executionContext) _Message(ctx context.Context, sel ast.SelectionSet, obj *Message) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, messageImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Message")
+		case "action":
+			out.Values[i] = ec._Message_action(ctx, field, obj)
+		case "messages":
+			out.Values[i] = ec._Message_messages(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var msgInfoImplementors = []string{"MsgInfo"}
 
 func (ec *executionContext) _MsgInfo(ctx context.Context, sel ast.SelectionSet, obj *beans.MsgInfo) graphql.Marshaler {
@@ -3272,12 +3235,8 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 	switch fields[0].Name {
 	case "hello":
 		return ec._Subscription_hello(ctx, fields[0])
-	case "message_new":
-		return ec._Subscription_message_new(ctx, fields[0])
-	case "message_read":
-		return ec._Subscription_message_read(ctx, fields[0])
-	case "message_confirm":
-		return ec._Subscription_message_confirm(ctx, fields[0])
+	case "message":
+		return ec._Subscription_message(ctx, fields[0])
 	default:
 		panic("unknown field " + strconv.Quote(fields[0].Name))
 	}
@@ -3858,6 +3817,29 @@ func (ec *executionContext) marshalOInt642ᚖint64(ctx context.Context, sel ast.
 		return graphql.Null
 	}
 	return graphql.MarshalInt64(*v)
+}
+
+func (ec *executionContext) marshalOMessage2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋagsᚋsourceᚐMessage(ctx context.Context, sel ast.SelectionSet, v *Message) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Message(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOMessageEnum2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋagsᚋsourceᚐMessageEnum(ctx context.Context, v interface{}) (*MessageEnum, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(MessageEnum)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOMessageEnum2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋagsᚋsourceᚐMessageEnum(ctx context.Context, sel ast.SelectionSet, v *MessageEnum) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) marshalOMsgInfo2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfoᚄ(ctx context.Context, sel ast.SelectionSet, v []beans.MsgInfo) graphql.Marshaler {

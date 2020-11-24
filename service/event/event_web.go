@@ -1,42 +1,52 @@
 package event
 
 import (
+	"context"
 	"github.com/zhanghup/go-app/beans"
 )
 
+type MsgAction string
+type MsgTarget string
+
 const (
-	msg_new     = "msg:new"
-	msg_read    = "msg:read"
-	msg_confirm = "msg:confirm"
+	message          = "message"
+	MsgActionAdd     = MsgAction("add")
+	MsgActionRead    = MsgAction("read")
+	MsgActionConfirm = MsgAction("confirm")
+	MsgTargetWeb     = MsgTarget("web")
+	MsgTargetApp     = MsgTarget("app")
 )
 
-// 消息事件 - 新增
-func MsgNew(uid, target string, msg []beans.MsgInfo) { EventPublish(msg_new+"-"+uid+"-"+target, msg) }
-func MsgNewSubscribe(uid, target string, fn func(msg []beans.MsgInfo)) {
-	EventSubscribe(msg_new+"-"+uid+"-"+target, fn)
-}
-func MsgNewUnSubscribe(uid, target string, fn func(msg []beans.MsgInfo)) {
-	EventUnsubscribe(msg_new+"-"+uid+"-"+target, fn)
+type MsgInfo struct {
+	Action   MsgAction
+	Messages []beans.MsgInfo
 }
 
-// 消息事件 - 已读
-func MsgRead(uid, target string, msg []beans.MsgInfo) {
-	EventPublish(msg_read+"-"+uid+"-"+target, msg)
-}
-func MsgReadSubscribe(uid, target string, fn func(msg []beans.MsgInfo)) {
-	EventSubscribe(msg_read+"-"+uid+"-"+target, fn)
-}
-func MsgReadUnSubscribe(uid, target string, fn func(msg []beans.MsgInfo)) {
-	EventUnsubscribe(msg_read+"-"+uid+"-"+target, fn)
+/*
+	消息事件 - 插入
+*/
+func MsgNew(uid string, target MsgTarget, action MsgAction, msg []beans.MsgInfo) {
+	EventPublish(message+"-"+uid+"-"+string(target), MsgInfo{Action: action, Messages: msg})
 }
 
-// 消息事件 - 确认
-func MsgConfirm(uid, target string, msg beans.MsgInfo) {
-	EventPublish(msg_confirm+"-"+uid+"-"+target, msg)
+/*
+	消息事件 - 数据监听
+*/
+func MsgNewSubscribe(uid string, target MsgTarget, fn func(msg MsgInfo)) {
+	EventSubscribe(message+"-"+uid+"-"+string(target), fn)
 }
-func MsgConfirmSubscribe(uid, target string, fn func(msg []beans.MsgInfo)) {
-	EventSubscribe(msg_confirm+"-"+uid+"-"+target, fn)
+
+/*
+	消息事件 - 取消监听
+*/
+func MsgNewUnSubscribe(uid string, target MsgTarget, fn func(msg MsgInfo)) {
+	EventUnsubscribe(message+"-"+uid+"-"+string(target), fn)
 }
-func MsgConfirmUnSubscribe(uid, target string, fn func(msg []beans.MsgInfo)) {
-	EventUnsubscribe(msg_confirm+"-"+uid+"-"+target, fn)
+
+/*
+	消息事件 - 取消监听
+*/
+func MsgNewUnSubscribeWithContext(ctx context.Context, uid string, target MsgTarget, fn func(msg MsgInfo)) {
+	<-ctx.Done()
+	EventUnsubscribe(message+"-"+uid+"-"+string(target), fn)
 }

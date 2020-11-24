@@ -12,6 +12,7 @@ import (
 
 type IMessage interface {
 	Send() error
+	TimeoutMark() error
 }
 
 type message struct {
@@ -96,7 +97,7 @@ func (this *message) Send() error {
 		}
 
 		keys := strings.Split(k, ",")
-		event.MsgNew(keys[0], keys[1], sends)
+		event.MsgNew(keys[0], event.MsgTarget(keys[1]), event.MsgActionAdd, sends)
 	}
 
 	err = this.dbs.TS(func(sess *txorm.Session) error {
@@ -106,7 +107,7 @@ func (this *message) Send() error {
 		if err != nil {
 			return err
 		}
-		err = sess.Insert(inserted...)
+		err = sess.Table(beans.MsgInfo{}).Insert(inserted...)
 		return err
 	})
 

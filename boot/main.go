@@ -9,7 +9,6 @@ import (
 	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/api"
 	"github.com/zhanghup/go-app/service/event"
-	"github.com/zhanghup/go-app/service/file"
 	"github.com/zhanghup/go-app/service/job"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
@@ -20,6 +19,7 @@ import (
 type Struct struct {
 	box       *rice.Box
 	db        *xorm.Engine
+	msg       ags.IMessage
 	routerfns []func(g *gin.Engine, db *xorm.Engine)
 }
 
@@ -30,11 +30,6 @@ func Boot(box *rice.Box, initdb ...bool) *Struct {
 		return s
 	}
 	return s.enableXorm()
-}
-
-func (this *Struct) Init(fn func(db *xorm.Engine)) *Struct {
-	fn(this.db)
-	return this
 }
 
 // 初始化数据库
@@ -49,9 +44,18 @@ func (this *Struct) enableXorm() *Struct {
 	}
 	e.ShowSQL(true)
 	this.db = e
+	return this
+}
 
+// 通知数据库完成初始化
+func (this *Struct) XormInited() *Struct {
 	// 数据库初始化完成事件
-	event.XormDefaultInit(e)
+	event.XormDefaultInit(this.db)
+	return this
+}
+
+func (this *Struct) Init(fn func(db *xorm.Engine)) *Struct {
+	fn(this.db)
 	return this
 }
 
@@ -82,18 +86,10 @@ func (this *Struct) InitDict(ty string, dicts []initia.DictInfo) *Struct {
 	return this
 }
 
-// 文件操作接口
-func (this *Struct) RouterFile() *Struct {
+// 基础操作接口
+func (this *Struct) RouterAgs() *Struct {
 	this.routerfns = append(this.routerfns, func(g *gin.Engine, db *xorm.Engine) {
-		file.Gin(g.Group("/"), g.Group("/"), db)
-	})
-	return this
-}
-
-// 登录登出等接口
-func (this *Struct) RouterAuth() *Struct {
-	this.routerfns = append(this.routerfns, func(g *gin.Engine, db *xorm.Engine) {
-		ags.Gin(g.Group("/"), this.db)
+		ags.Gin(g.Group("/"), g.Group("/"), db)
 	})
 	return this
 }
@@ -110,14 +106,24 @@ func (this *Struct) RouterApi() *Struct {
 func (this *Struct) JobsInit() *Struct {
 	err := job.InitJobs(this.db)
 	if err != nil {
+		tog.Error(err.Error())
 		panic(err)
 	}
+	return this
+}
+
+// 初始化内置的消息任务
+func (this *Struct) JobsInitMessages() *Struct {
+	this.msg = ags.NewMessage(this.db)
+	this.Jobs("消息实时推送任务", "* * * * * *", this.msg.Send)
+	this.Jobs("消息超时处理任务", "* * * * * *", this.msg.TimeoutMark)
 	return this
 }
 func (this *Struct) Jobs(name, spec string, fn func() error, flag ...bool) *Struct {
 	err := job.AddJob(name, spec, fn, flag...)
 	if err != nil {
 		tog.Error(err.Error())
+		panic(err)
 	}
 	return this
 }

@@ -62,6 +62,12 @@ func InitJobs(db *xorm.Engine) error {
 	return nil
 }
 
+/*
+	name	任务名称
+	spec 	任务执行时间
+	action 	执行方法
+	flag 	是否立即执行
+*/
 func AddJob(name, spec string, action func() error, flag ...bool) error {
 
 	id := tools.Crypto.MD5([]byte(name))
@@ -208,10 +214,10 @@ func Run(id string) func() {
 
 		last := int64(float64(l2-l1) * 1000 / float64(time.Second))
 		message := "ok"
-		status := "1"
+		result := "1"
 		if err != nil {
 			message = err.Error()
-			status = "0"
+			result = "0"
 		}
 
 		model := beans.Cron{}
@@ -224,7 +230,7 @@ func Run(id string) func() {
 			return
 		}
 
-		model.Status = &status
+		model.Result = &result
 		model.Last = &last
 		model.Message = &message
 		model.Previous = model.Updated
@@ -237,7 +243,7 @@ func Run(id string) func() {
 		lg := beans.CronLog{
 			Bean: beans.Bean{
 				Id:     tools.Ptr.Uid(),
-				Status: &status,
+				Status: tools.Ptr.String("1"),
 			},
 			Name:       &ji.name,
 			Expression: &ji.spec,

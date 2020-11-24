@@ -1,4 +1,4 @@
-package file
+package ags
 
 import (
 	"bytes"
@@ -219,10 +219,4 @@ func (this *Uploader) Resize() func(c *gin.Context) {
 	}
 }
 
-func Gin(auth, any gin.IRouter, db *xorm.Engine) {
-	up := NewUploader(db)
-	auth.POST("/upload", up.Upload())
-	any.GET("/upload/:id", up.Get())
-	any.GET("/upload/:id/:width/:height", up.Resize())
-	any.GET("/upload/:id/:width", up.Resize())
-}
+

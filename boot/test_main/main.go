@@ -11,9 +11,11 @@ func main() {
 		panic(err)
 	}
 	_ = boot.Boot(box).
-		//SyncTables().
+		SyncTables().
 		//InitDatas().
+		XormInited().
 		JobsInit().
+		JobsInitMessages().
 		//Jobs("测试", "0 * * * * * ", func() error {
 		//	if time.Now().Unix()%2 == 0 {
 		//		return errors.New("测试错误")
@@ -31,8 +33,7 @@ func main() {
 		//
 		//	return nil
 		//}).
-		RouterFile().
-		RouterAuth().
+		RouterAgs().
 		RouterApi().
 		StartRouter()
 }

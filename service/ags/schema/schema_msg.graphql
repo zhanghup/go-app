@@ -1,8 +1,16 @@
 
 extend type Subscription {
-    message_new(type: String!): [MsgInfo!]
-    message_read(type: String!): [MsgInfo!]
-    message_confirm(type: String!): [MsgInfo!]
+    message(type: String!): Message
+}
+
+type Message{
+    action: MessageEnum
+    messages:[MsgInfo!]
+}
+
+enum MessageEnum{
+    web
+    app
 }
 
 type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
