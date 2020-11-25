@@ -8,14 +8,16 @@ import (
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
+	"github.com/zhanghup/go-tools/tgql"
 	"xorm.io/xorm"
 )
 
 type Resolver struct {
-	DB  *xorm.Engine
-	DBS *txorm.Engine
-	Gin func(g context.Context) *gin.Context
-	Me  func(ctx context.Context) directive.Me
+	DB     *xorm.Engine
+	DBS    *txorm.Engine
+	Gin    func(g context.Context) *gin.Context
+	Me     func(ctx context.Context) directive.Me
+	Loader func(ctx context.Context) tgql.Loader
 }
 
 func NewResolver(db *xorm.Engine) source.ResolverRoot {
@@ -27,7 +29,8 @@ func NewResolver(db *xorm.Engine) source.ResolverRoot {
 			ggg := gg.(*gin.Context)
 			return ggg
 		},
-		Me: directive.MyInfo,
+		Me:     directive.MyInfo,
+		Loader: tgql.DataLoaden,
 	}
 }
 

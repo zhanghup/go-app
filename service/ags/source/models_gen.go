@@ -11,8 +11,13 @@ import (
 )
 
 type Message struct {
-	Action   *MessageEnum    `json:"action"`
+	Target   MessageEnum     `json:"target"`
 	Messages []beans.MsgInfo `json:"messages"`
+}
+
+type NewMessageConfirm struct {
+	// 确认备注
+	Remark *string `json:"remark"`
 }
 
 type MessageEnum string

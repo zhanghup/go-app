@@ -1,8 +1,13 @@
-extend type Subscription {
-    message(target: MessageEnum!): Message
+extend type Mutation {
+    "消息确认"
+    message_confirm(id:String!,input: NewMessageConfirm!):Boolean!
+    message_read(id:String!):Boolean!
 }
 
-
+input NewMessageConfirm{
+    "确认备注"
+    remark: String
+}
 
 type Message{
     target: MessageEnum!
