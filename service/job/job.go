@@ -115,7 +115,7 @@ func AddJob(name, spec string, action func() error, flag ...bool) error {
 				return err
 			}
 
-			if ji.cron.State != nil && *ji.cron.State == "1" {
+			if ji.cron.State != nil && *ji.cron.State == "start" {
 				err := addJob(id)
 				if err != nil {
 					return err
@@ -235,7 +235,7 @@ func Run(id string) func() {
 		model.Message = &message
 		model.Previous = model.Updated
 
-		_, err = job.db.Table(beans.Cron{}).Where("id = ?", id).Cols("last", "message", "previous", "updated", "status").Update(model)
+		_, err = job.db.Table(beans.Cron{}).Where("id = ?", id).Cols("last", "message", "previous", "updated", "result").Update(model)
 		if err != nil {
 			tog.Error(err.Error())
 			return
@@ -249,6 +249,7 @@ func Run(id string) func() {
 			Expression: &ji.spec,
 			Cron:       &id,
 			Message:    &message,
+			Result:     &result,
 			Start:      tools.Ptr.Int64(l1 / int64(time.Second)),
 			End:        tools.Ptr.Int64(l2 / int64(time.Second)),
 		}

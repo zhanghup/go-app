@@ -53,12 +53,10 @@ type ComplexityRoot struct {
 	}
 
 	MsgInfo struct {
-		Alert         func(childComplexity int) int
 		ConfirmTarget func(childComplexity int) int
 		ConfirmTime   func(childComplexity int) int
 		Content       func(childComplexity int) int
 		Created       func(childComplexity int) int
-		Event         func(childComplexity int) int
 		Id            func(childComplexity int) int
 		ImgPath       func(childComplexity int) int
 		Level         func(childComplexity int) int
@@ -141,13 +139,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Message.Messages(childComplexity), true
 
-	case "MsgInfo.alert":
-		if e.complexity.MsgInfo.Alert == nil {
-			break
-		}
-
-		return e.complexity.MsgInfo.Alert(childComplexity), true
-
 	case "MsgInfo.confirm_target":
 		if e.complexity.MsgInfo.ConfirmTarget == nil {
 			break
@@ -175,13 +166,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgInfo.Created(childComplexity), true
-
-	case "MsgInfo.event":
-		if e.complexity.MsgInfo.Event == nil {
-			break
-		}
-
-		return e.complexity.MsgInfo.Event(childComplexity), true
 
 	case "MsgInfo.id":
 		if e.complexity.MsgInfo.Id == nil {
@@ -522,31 +506,27 @@ enum MessageEnum{
 type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
     id: String
 
-    "事件id"
-    event: String
     "接收者"
     receiver: String
     "接收者名称"
     receiver_name: String
     "模板id"
     template: String
-    "消息类型"
+    "消息类型{dict:SYS005}"
     type: String
-    "消息级别"
+    "消息级别{dict: SYS006}"
     level: String
-    "消息接收平台"
+    "消息接收平台{dict:SYS007}"
     target: String
     "消息超时时间"
     timeout: Int64
-    "是否弹出 - dict"
-    alert: String
-    "弹出消息是否必须确认 - dict"
+    "弹出消息是否必须确认{dict:STA005}"
     must_confirm: String
-    "确认平台 [web,app,mini,sms...] - dict"
+    "确认平台{dict:SYS007}"
     confirm_target: String
-    "已读平台 [web,app,mini,sms...] - dict"
+    "已读平台{dict:SYS007}"
     read_target: String
-    "消息状态 [0:已读、1:未读、2:已读过期、3:未读过期、4:已确认] dict"
+    "消息状态{ dict:SYS008}"
     state: String
     "消息发送时间"
     send_time: Int64
@@ -794,38 +774,6 @@ func (ec *executionContext) _MsgInfo_id(ctx context.Context, field graphql.Colle
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _MsgInfo_event(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "MsgInfo",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Event, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _MsgInfo_receiver(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1048,38 +996,6 @@ func (ec *executionContext) _MsgInfo_timeout(ctx context.Context, field graphql.
 	res := resTmp.(*int64)
 	fc.Result = res
 	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _MsgInfo_alert(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "MsgInfo",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Alert, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MsgInfo_must_confirm(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
@@ -3066,8 +2982,6 @@ func (ec *executionContext) _MsgInfo(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = graphql.MarshalString("MsgInfo")
 		case "id":
 			out.Values[i] = ec._MsgInfo_id(ctx, field, obj)
-		case "event":
-			out.Values[i] = ec._MsgInfo_event(ctx, field, obj)
 		case "receiver":
 			out.Values[i] = ec._MsgInfo_receiver(ctx, field, obj)
 		case "receiver_name":
@@ -3082,8 +2996,6 @@ func (ec *executionContext) _MsgInfo(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._MsgInfo_target(ctx, field, obj)
 		case "timeout":
 			out.Values[i] = ec._MsgInfo_timeout(ctx, field, obj)
-		case "alert":
-			out.Values[i] = ec._MsgInfo_alert(ctx, field, obj)
 		case "must_confirm":
 			out.Values[i] = ec._MsgInfo_must_confirm(ctx, field, obj)
 		case "confirm_target":

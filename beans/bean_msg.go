@@ -12,8 +12,7 @@ type MsgTemplate struct {
 	Level       *string `json:"level"`        // 消息等级 [0:严重、1:重要、2:次要、3:普通]
 	Target      *string `json:"target"`       // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
 	Expire      *int64  `json:"timeout"`      // 消息超时时间（秒）
-	MustConfirm *string `json:"must_confirm"` // 弹出消息是否必须确认 - dict
-	Alert       *string `json:"alert"`        // 是否弹出 - dict
+	MustConfirm *string `json:"must_confirm"` // 消息是否必须确认 - dict
 	ImgPath     *string `json:"img_path"`     // 消息提示图片
 }
 
@@ -28,7 +27,6 @@ type MsgTemplateGroup struct {
 type MsgGroup struct {
 	Bean `xorm:"extends"`
 	Name *string `json:"name"` // 群组名称
-	Uid  *string `json:"uid"`  // 创建者
 }
 
 // 群组-用户
@@ -48,7 +46,6 @@ type MsgEvent struct {
 	Level        *string `json:"level"`                 // 消息等级 [0:严重、1:重要、2:次要、3:普通]
 	Target       *string `json:"target"`                // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
 	Timeout      *int64  `json:"timeout"`               // 消息超时时间
-	Alert        *string `json:"alert"`                 // 是否弹出 - dict
 	MustConfirm  *string `json:"must_confirm"`          // 弹出消息是否必须确认 - dict
 	Otype        *string `json:"otype"`                 // 消息对象
 	Oid          *string `json:"oid"`                   // 消息对象id
@@ -60,7 +57,6 @@ type MsgEvent struct {
 // 消息体
 type MsgInfo struct {
 	Bean          `xorm:"extends"`
-	Event         *string `json:"event"`                 // 事件id
 	Receiver      *string `json:"receiver" xorm:"index"` // 消息接收者
 	ReceiverName  *string `json:"receiver_name"`         // 接收者名称
 	Template      *string `json:"template"`              // 消息模板
@@ -68,7 +64,6 @@ type MsgInfo struct {
 	Level         *string `json:"level"`                 // 消息等级 [0:严重、1:重要、2:次要、3:普通]
 	Target        *string `json:"target"`                // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
 	Timeout       *int64  `json:"timeout"`               // 消息超时时间
-	Alert         *string `json:"alert"`                 // 是否弹出 - dict
 	MustConfirm   *string `json:"must_confirm"`          // 弹出消息是否必须确认 - dict
 	ConfirmTarget *string `json:"confirm_target"`        // 确认平台 [web,app,mini,sms...] - dict
 	ReadTarget    *string `json:"read_target"`           // 已读平台 [web,app,mini,sms...] - dict
@@ -76,6 +71,7 @@ type MsgInfo struct {
 	SendTime      *int64  `json:"send_time"`             // 消息发送时间
 	ReadTime      *int64  `json:"read_time"`             // 消息阅读时间
 	ConfirmTime   *int64  `json:"confirm_time"`          // 消息确认时间
+	ConfirmRemark *string `json:"confirm_remark"`        // 消息确认备注
 	Otype         *string `json:"otype"`                 // 消息对象
 	Oid           *string `json:"oid"`                   // 消息对象id
 	Title         *string `json:"title"`                 // 消息标题
