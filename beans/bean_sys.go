@@ -92,16 +92,13 @@ type PermObject struct {
 
 // 菜单
 type Menu struct {
-	Bean      `xorm:"extends"`
-	Code      *string `json:"code"`
-	Title     *string `json:"title"`
-	Meta      *string `json:"meta"`
-	Name      *string `json:"name"`
-	Path      *string `json:"path"`
-	Alias     *string `json:"alias"`
-	Icon      *string `json:"icon"`
-	Component *string `json:"component"`
-	Parent    *string `json:"parent"`
+	Bean   `xorm:"extends"`
+	Name   *string `json:"name"`
+	Title  *string `json:"title"`
+	Path   *string `json:"path"`
+	Alias  *string `json:"alias"`
+	Icon   *string `json:"icon"`
+	Parent *string `json:"parent"`
 }
 
 // 资源

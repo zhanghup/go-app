@@ -4,6 +4,10 @@ extend type Mutation {
     message_read(id:String!):Boolean!
 }
 
+extend type Subscription {
+    message: Message
+}
+
 input NewMessageConfirm{
     "确认备注"
     remark: String

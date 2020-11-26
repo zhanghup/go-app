@@ -131,6 +131,39 @@ type ComplexityRoot struct {
 		Weight   func(childComplexity int) int
 	}
 
+	Message struct {
+		Messages func(childComplexity int) int
+		Target   func(childComplexity int) int
+	}
+
+	MsgInfo struct {
+		ConfirmRemark func(childComplexity int) int
+		ConfirmTarget func(childComplexity int) int
+		ConfirmTime   func(childComplexity int) int
+		Content       func(childComplexity int) int
+		Created       func(childComplexity int) int
+		Id            func(childComplexity int) int
+		ImgPath       func(childComplexity int) int
+		Level         func(childComplexity int) int
+		MustConfirm   func(childComplexity int) int
+		Oid           func(childComplexity int) int
+		Otype         func(childComplexity int) int
+		ReadTarget    func(childComplexity int) int
+		ReadTime      func(childComplexity int) int
+		Receiver      func(childComplexity int) int
+		ReceiverName  func(childComplexity int) int
+		SendTime      func(childComplexity int) int
+		State         func(childComplexity int) int
+		Status        func(childComplexity int) int
+		Target        func(childComplexity int) int
+		Template      func(childComplexity int) int
+		Timeout       func(childComplexity int) int
+		Title         func(childComplexity int) int
+		Type          func(childComplexity int) int
+		Updated       func(childComplexity int) int
+		Weight        func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CronRun           func(childComplexity int, id string) int
 		CronStart         func(childComplexity int, id string) int
@@ -145,6 +178,8 @@ type ComplexityRoot struct {
 		DictItemUpdate    func(childComplexity int, id string, input UpdDictItem) int
 		DictRemoves       func(childComplexity int, ids []string) int
 		DictUpdate        func(childComplexity int, id string, input UpdDict) int
+		MessageConfirm    func(childComplexity int, id string, input NewMessageConfirm) int
+		MessageRead       func(childComplexity int, id string) int
 		RoleCreate        func(childComplexity int, input NewRole) int
 		RolePermCreate    func(childComplexity int, id string, typeArg string, perms []string) int
 		RolePermObjCreate func(childComplexity int, id string, perms []IPermObj) int
@@ -197,7 +232,8 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
-		Hello func(childComplexity int) int
+		Hello   func(childComplexity int) int
+		Message func(childComplexity int) int
 	}
 
 	User struct {
@@ -244,6 +280,8 @@ type MutationResolver interface {
 	DictItemUpdate(ctx context.Context, id string, input UpdDictItem) (bool, error)
 	DictItemRemoves(ctx context.Context, ids []string) (bool, error)
 	DictItemSort(ctx context.Context, code string, items []string) (bool, error)
+	MessageConfirm(ctx context.Context, id string, input NewMessageConfirm) (bool, error)
+	MessageRead(ctx context.Context, id string) (bool, error)
 	RoleCreate(ctx context.Context, input NewRole) (bool, error)
 	RoleUpdate(ctx context.Context, id string, input UpdRole) (bool, error)
 	RoleRemoves(ctx context.Context, ids []string) (bool, error)
@@ -274,6 +312,7 @@ type QueryResolver interface {
 }
 type SubscriptionResolver interface {
 	Hello(ctx context.Context) (<-chan *string, error)
+	Message(ctx context.Context) (<-chan *Message, error)
 }
 type UserResolver interface {
 	ODept(ctx context.Context, obj *beans.User) (*beans.Dept, error)
@@ -700,6 +739,195 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DictItem.Weight(childComplexity), true
 
+	case "Message.messages":
+		if e.complexity.Message.Messages == nil {
+			break
+		}
+
+		return e.complexity.Message.Messages(childComplexity), true
+
+	case "Message.target":
+		if e.complexity.Message.Target == nil {
+			break
+		}
+
+		return e.complexity.Message.Target(childComplexity), true
+
+	case "MsgInfo.confirm_remark":
+		if e.complexity.MsgInfo.ConfirmRemark == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.ConfirmRemark(childComplexity), true
+
+	case "MsgInfo.confirm_target":
+		if e.complexity.MsgInfo.ConfirmTarget == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.ConfirmTarget(childComplexity), true
+
+	case "MsgInfo.confirm_time":
+		if e.complexity.MsgInfo.ConfirmTime == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.ConfirmTime(childComplexity), true
+
+	case "MsgInfo.content":
+		if e.complexity.MsgInfo.Content == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Content(childComplexity), true
+
+	case "MsgInfo.created":
+		if e.complexity.MsgInfo.Created == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Created(childComplexity), true
+
+	case "MsgInfo.id":
+		if e.complexity.MsgInfo.Id == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Id(childComplexity), true
+
+	case "MsgInfo.img_path":
+		if e.complexity.MsgInfo.ImgPath == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.ImgPath(childComplexity), true
+
+	case "MsgInfo.level":
+		if e.complexity.MsgInfo.Level == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Level(childComplexity), true
+
+	case "MsgInfo.must_confirm":
+		if e.complexity.MsgInfo.MustConfirm == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.MustConfirm(childComplexity), true
+
+	case "MsgInfo.oid":
+		if e.complexity.MsgInfo.Oid == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Oid(childComplexity), true
+
+	case "MsgInfo.otype":
+		if e.complexity.MsgInfo.Otype == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Otype(childComplexity), true
+
+	case "MsgInfo.read_target":
+		if e.complexity.MsgInfo.ReadTarget == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.ReadTarget(childComplexity), true
+
+	case "MsgInfo.read_time":
+		if e.complexity.MsgInfo.ReadTime == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.ReadTime(childComplexity), true
+
+	case "MsgInfo.receiver":
+		if e.complexity.MsgInfo.Receiver == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Receiver(childComplexity), true
+
+	case "MsgInfo.receiver_name":
+		if e.complexity.MsgInfo.ReceiverName == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.ReceiverName(childComplexity), true
+
+	case "MsgInfo.send_time":
+		if e.complexity.MsgInfo.SendTime == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.SendTime(childComplexity), true
+
+	case "MsgInfo.state":
+		if e.complexity.MsgInfo.State == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.State(childComplexity), true
+
+	case "MsgInfo.status":
+		if e.complexity.MsgInfo.Status == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Status(childComplexity), true
+
+	case "MsgInfo.target":
+		if e.complexity.MsgInfo.Target == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Target(childComplexity), true
+
+	case "MsgInfo.template":
+		if e.complexity.MsgInfo.Template == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Template(childComplexity), true
+
+	case "MsgInfo.timeout":
+		if e.complexity.MsgInfo.Timeout == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Timeout(childComplexity), true
+
+	case "MsgInfo.title":
+		if e.complexity.MsgInfo.Title == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Title(childComplexity), true
+
+	case "MsgInfo.type":
+		if e.complexity.MsgInfo.Type == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Type(childComplexity), true
+
+	case "MsgInfo.updated":
+		if e.complexity.MsgInfo.Updated == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Updated(childComplexity), true
+
+	case "MsgInfo.weight":
+		if e.complexity.MsgInfo.Weight == nil {
+			break
+		}
+
+		return e.complexity.MsgInfo.Weight(childComplexity), true
+
 	case "Mutation.cron_run":
 		if e.complexity.Mutation.CronRun == nil {
 			break
@@ -855,6 +1083,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DictUpdate(childComplexity, args["id"].(string), args["input"].(UpdDict)), true
+
+	case "Mutation.message_confirm":
+		if e.complexity.Mutation.MessageConfirm == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_message_confirm_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MessageConfirm(childComplexity, args["id"].(string), args["input"].(NewMessageConfirm)), true
+
+	case "Mutation.message_read":
+		if e.complexity.Mutation.MessageRead == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_message_read_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MessageRead(childComplexity, args["id"].(string)), true
 
 	case "Mutation.role_create":
 		if e.complexity.Mutation.RoleCreate == nil {
@@ -1231,6 +1483,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Subscription.Hello(childComplexity), true
+
+	case "Subscription.message":
+		if e.complexity.Subscription.Message == nil {
+			break
+		}
+
+		return e.complexity.Subscription.Message(childComplexity), true
 
 	case "User.avatar":
 		if e.complexity.User.Avatar == nil {
@@ -1783,6 +2042,85 @@ input UpdDictItem{
     "状态{dict:STA001}"
     status: String
 }`, BuiltIn: false},
+	{Name: "schema/schema_msg.graphql", Input: `extend type Mutation {
+    "消息确认"
+    message_confirm(id:String!,input: NewMessageConfirm!):Boolean!
+    message_read(id:String!):Boolean!
+}
+
+extend type Subscription {
+    message: Message
+}
+
+input NewMessageConfirm{
+    "确认备注"
+    remark: String
+}
+
+type Message{
+    target: MessageEnum!
+    messages:[MsgInfo!]
+}
+
+enum MessageEnum{
+    web
+    app
+}
+
+type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
+    id: String
+
+    "接收者"
+    receiver: String
+    "接收者名称"
+    receiver_name: String
+    "模板id"
+    template: String
+    "消息类型{dict:SYS005}"
+    type: String
+    "消息级别{dict: SYS006}"
+    level: String
+    "消息接收平台{dict:SYS007}"
+    target: String
+    "消息超时时间"
+    timeout: Int64
+    "弹出消息是否必须确认{dict:STA005}"
+    must_confirm: String
+    "确认平台{dict:SYS007}"
+    confirm_target: String
+    "已读平台{dict:SYS007}"
+    read_target: String
+    "消息状态{ dict:SYS008}"
+    state: String
+    "消息发送时间"
+    send_time: Int64
+    "消息阅读时间"
+    read_time: Int64
+    "消息确认时间"
+    confirm_time: Int64
+    "消息确认备注"
+    confirm_remark:String
+    "消息对象"
+    otype: String
+    "消息对象id"
+    oid:String
+    "消息标题"
+    title: String
+    "消息体"
+    content: String
+    "消息提示图片"
+    img_path: String
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+
+}`, BuiltIn: false},
 	{Name: "schema/schema_role.graphql", Input: `extend type Query {
     "角色列表（分页）"
     roles(query: QRole!): Roles @perm(entity: "role",perm: "R")
@@ -2255,6 +2593,45 @@ func (ec *executionContext) field_Mutation_dict_update_args(ctx context.Context,
 		}
 	}
 	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_message_confirm_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 NewMessageConfirm
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNNewMessageConfirm2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewMessageConfirm(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_message_read_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -4560,6 +4937,873 @@ func (ec *executionContext) _DictItem_status(ctx context.Context, field graphql.
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Message_target(ctx context.Context, field graphql.CollectedField, obj *Message) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Message",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Target, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(MessageEnum)
+	fc.Result = res
+	return ec.marshalNMessageEnum2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMessageEnum(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Message_messages(ctx context.Context, field graphql.CollectedField, obj *Message) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Message",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Messages, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]beans.MsgInfo)
+	fc.Result = res
+	return ec.marshalOMsgInfo2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfoᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_id(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Id, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_receiver(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Receiver, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_receiver_name(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReceiverName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_template(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Template, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_type(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_level(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Level, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_target(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Target, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_timeout(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Timeout, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_must_confirm(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MustConfirm, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_confirm_target(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConfirmTarget, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_read_target(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReadTarget, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_state(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.State, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_send_time(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SendTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_read_time(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReadTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_confirm_time(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConfirmTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_confirm_remark(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConfirmRemark, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_otype(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Otype, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_oid(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Oid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_title(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_content(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Content, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_img_path(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImgPath, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_created(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Created, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_updated(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Updated, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_weight(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Weight, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgInfo_status(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_world(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -5402,6 +6646,90 @@ func (ec *executionContext) _Mutation_dict_item_sort(ctx context.Context, field 
 			return data, nil
 		}
 		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_message_confirm(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_message_confirm_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MessageConfirm(rctx, args["id"].(string), args["input"].(NewMessageConfirm))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_message_read(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_message_read_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MessageRead(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7450,6 +8778,48 @@ func (ec *executionContext) _Subscription_hello(ctx context.Context, field graph
 	}
 }
 
+func (ec *executionContext) _Subscription_message(ctx context.Context, field graphql.CollectedField) (ret func() graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = nil
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Subscription",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Subscription().Message(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	if resTmp == nil {
+		return nil
+	}
+	return func() graphql.Marshaler {
+		res, ok := <-resTmp.(<-chan *Message)
+		if !ok {
+			return nil
+		}
+		return graphql.WriterFunc(func(w io.Writer) {
+			w.Write([]byte{'{'})
+			graphql.MarshalString(field.Alias).MarshalGQL(w)
+			w.Write([]byte{':'})
+			ec.marshalOMessage2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMessage(ctx, field.Selections, res).MarshalGQL(w)
+			w.Write([]byte{'}'})
+		})
+	}
+}
+
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9273,6 +10643,26 @@ func (ec *executionContext) unmarshalInputNewDictItem(ctx context.Context, obj i
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewMessageConfirm(ctx context.Context, obj interface{}) (NewMessageConfirm, error) {
+	var it NewMessageConfirm
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "remark":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remark"))
+			it.Remark, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewRole(ctx context.Context, obj interface{}) (NewRole, error) {
 	var it NewRole
 	var asMap = obj.(map[string]interface{})
@@ -10291,6 +11681,107 @@ func (ec *executionContext) _DictItem(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
+var messageImplementors = []string{"Message"}
+
+func (ec *executionContext) _Message(ctx context.Context, sel ast.SelectionSet, obj *Message) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, messageImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Message")
+		case "target":
+			out.Values[i] = ec._Message_target(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "messages":
+			out.Values[i] = ec._Message_messages(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var msgInfoImplementors = []string{"MsgInfo"}
+
+func (ec *executionContext) _MsgInfo(ctx context.Context, sel ast.SelectionSet, obj *beans.MsgInfo) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, msgInfoImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MsgInfo")
+		case "id":
+			out.Values[i] = ec._MsgInfo_id(ctx, field, obj)
+		case "receiver":
+			out.Values[i] = ec._MsgInfo_receiver(ctx, field, obj)
+		case "receiver_name":
+			out.Values[i] = ec._MsgInfo_receiver_name(ctx, field, obj)
+		case "template":
+			out.Values[i] = ec._MsgInfo_template(ctx, field, obj)
+		case "type":
+			out.Values[i] = ec._MsgInfo_type(ctx, field, obj)
+		case "level":
+			out.Values[i] = ec._MsgInfo_level(ctx, field, obj)
+		case "target":
+			out.Values[i] = ec._MsgInfo_target(ctx, field, obj)
+		case "timeout":
+			out.Values[i] = ec._MsgInfo_timeout(ctx, field, obj)
+		case "must_confirm":
+			out.Values[i] = ec._MsgInfo_must_confirm(ctx, field, obj)
+		case "confirm_target":
+			out.Values[i] = ec._MsgInfo_confirm_target(ctx, field, obj)
+		case "read_target":
+			out.Values[i] = ec._MsgInfo_read_target(ctx, field, obj)
+		case "state":
+			out.Values[i] = ec._MsgInfo_state(ctx, field, obj)
+		case "send_time":
+			out.Values[i] = ec._MsgInfo_send_time(ctx, field, obj)
+		case "read_time":
+			out.Values[i] = ec._MsgInfo_read_time(ctx, field, obj)
+		case "confirm_time":
+			out.Values[i] = ec._MsgInfo_confirm_time(ctx, field, obj)
+		case "confirm_remark":
+			out.Values[i] = ec._MsgInfo_confirm_remark(ctx, field, obj)
+		case "otype":
+			out.Values[i] = ec._MsgInfo_otype(ctx, field, obj)
+		case "oid":
+			out.Values[i] = ec._MsgInfo_oid(ctx, field, obj)
+		case "title":
+			out.Values[i] = ec._MsgInfo_title(ctx, field, obj)
+		case "content":
+			out.Values[i] = ec._MsgInfo_content(ctx, field, obj)
+		case "img_path":
+			out.Values[i] = ec._MsgInfo_img_path(ctx, field, obj)
+		case "created":
+			out.Values[i] = ec._MsgInfo_created(ctx, field, obj)
+		case "updated":
+			out.Values[i] = ec._MsgInfo_updated(ctx, field, obj)
+		case "weight":
+			out.Values[i] = ec._MsgInfo_weight(ctx, field, obj)
+		case "status":
+			out.Values[i] = ec._MsgInfo_status(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -10370,6 +11861,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "dict_item_sort":
 			out.Values[i] = ec._Mutation_dict_item_sort(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message_confirm":
+			out.Values[i] = ec._Mutation_message_confirm(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message_read":
+			out.Values[i] = ec._Mutation_message_read(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -10744,6 +12245,8 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 	switch fields[0].Name {
 	case "hello":
 		return ec._Subscription_hello(ctx, fields[0])
+	case "message":
+		return ec._Subscription_message(ctx, fields[0])
 	default:
 		panic("unknown field " + strconv.Quote(fields[0].Name))
 	}
@@ -11140,6 +12643,20 @@ func (ec *executionContext) unmarshalNIPermObj2ᚕgithubᚗcomᚋzhanghupᚋgo�
 	return res, nil
 }
 
+func (ec *executionContext) unmarshalNMessageEnum2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMessageEnum(ctx context.Context, v interface{}) (MessageEnum, error) {
+	var res MessageEnum
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNMessageEnum2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMessageEnum(ctx context.Context, sel ast.SelectionSet, v MessageEnum) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) marshalNMsgInfo2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfo(ctx context.Context, sel ast.SelectionSet, v beans.MsgInfo) graphql.Marshaler {
+	return ec._MsgInfo(ctx, sel, &v)
+}
+
 func (ec *executionContext) unmarshalNNewDept2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewDept(ctx context.Context, v interface{}) (NewDept, error) {
 	res, err := ec.unmarshalInputNewDept(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -11152,6 +12669,11 @@ func (ec *executionContext) unmarshalNNewDict2githubᚗcomᚋzhanghupᚋgoᚑapp
 
 func (ec *executionContext) unmarshalNNewDictItem2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewDictItem(ctx context.Context, v interface{}) (NewDictItem, error) {
 	res, err := ec.unmarshalInputNewDictItem(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewMessageConfirm2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewMessageConfirm(ctx context.Context, v interface{}) (NewMessageConfirm, error) {
+	res, err := ec.unmarshalInputNewMessageConfirm(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -11825,6 +13347,53 @@ func (ec *executionContext) marshalOInt642ᚖint64(ctx context.Context, sel ast.
 		return graphql.Null
 	}
 	return graphql.MarshalInt64(*v)
+}
+
+func (ec *executionContext) marshalOMessage2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMessage(ctx context.Context, sel ast.SelectionSet, v *Message) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Message(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOMsgInfo2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfoᚄ(ctx context.Context, sel ast.SelectionSet, v []beans.MsgInfo) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMsgInfo2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfo(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalOPermObj2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐPermObjᚄ(ctx context.Context, sel ast.SelectionSet, v []PermObj) graphql.Marshaler {

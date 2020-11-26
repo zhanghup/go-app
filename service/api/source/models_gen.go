@@ -3,6 +3,10 @@
 package source
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/zhanghup/go-app/beans"
 )
 
@@ -26,6 +30,11 @@ type IPermObj struct {
 	Object string `json:"object"`
 	// 操作权限
 	Mask string `json:"mask"`
+}
+
+type Message struct {
+	Target   MessageEnum     `json:"target"`
+	Messages []beans.MsgInfo `json:"messages"`
 }
 
 type NewDept struct {
@@ -75,6 +84,11 @@ type NewDictItem struct {
 	Weight *int `json:"weight"`
 	// 状态{dict:STA001}
 	Status *string `json:"status"`
+}
+
+type NewMessageConfirm struct {
+	// 确认备注
+	Remark *string `json:"remark"`
 }
 
 type NewRole struct {
@@ -246,4 +260,45 @@ type UpdUser struct {
 type Users struct {
 	Total *int         `json:"total"`
 	Data  []beans.User `json:"data"`
+}
+
+type MessageEnum string
+
+const (
+	MessageEnumWeb MessageEnum = "web"
+	MessageEnumApp MessageEnum = "app"
+)
+
+var AllMessageEnum = []MessageEnum{
+	MessageEnumWeb,
+	MessageEnumApp,
+}
+
+func (e MessageEnum) IsValid() bool {
+	switch e {
+	case MessageEnumWeb, MessageEnumApp:
+		return true
+	}
+	return false
+}
+
+func (e MessageEnum) String() string {
+	return string(e)
+}
+
+func (e *MessageEnum) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = MessageEnum(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid MessageEnum", str)
+	}
+	return nil
+}
+
+func (e MessageEnum) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
