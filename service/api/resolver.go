@@ -46,6 +46,14 @@ func ggin(db *xorm.Engine) func(c *gin.Context) {
 			CheckOrigin: func(r *http.Request) bool {
 				return true
 			},
+			Error: func(w http.ResponseWriter, r *http.Request, status int, reason error) {
+
+			},
+		},
+		InitFunc: func(ctx context.Context, initPayload transport.InitPayload) (context.Context, error) {
+			gtx := ctx.Value(directive.GIN_CONTEXT).(*gin.Context)
+			_, err := directive.WebAuthFunc(db, gtx)
+			return ctx, err
 		},
 	})
 	srv.Use(extension.Introspection{})
