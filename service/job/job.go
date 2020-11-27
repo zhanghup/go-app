@@ -15,7 +15,7 @@ type jobitem struct {
 	id    cron.EntryID
 	name  string
 	spec  string
-	fn    func() error // 为了可以手动停止，然后执行
+	fn    func(db *xorm.Engine) error // 为了可以手动停止，然后执行
 	flag  bool
 	isRun bool
 
@@ -68,7 +68,7 @@ func InitJobs(db *xorm.Engine) error {
 	action 	执行方法
 	flag 	是否立即执行
 */
-func AddJob(name, spec string, action func() error, flag ...bool) error {
+func AddJob(name, spec string, action func(db *xorm.Engine) error, flag ...bool) error {
 
 	id := tools.Crypto.MD5([]byte(name))
 	if job.data.Get(id) == nil {
@@ -209,7 +209,7 @@ func Run(id string) func() {
 		}()
 
 		l1 := time.Now().UnixNano()
-		err := ji.fn()
+		err := ji.fn(job.db)
 		l2 := time.Now().UnixNano()
 
 		last := int64(float64(l2-l1) * 1000 / float64(time.Second))

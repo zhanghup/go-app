@@ -8,50 +8,13 @@ package beans
 type MsgTemplate struct {
 	Bean        `xorm:"extends"`
 	Name        *string `json:"name"`
+	Code        *string `json:"code"`         // 模板编码
 	Type        *string `json:"type"`         // 消息分类 - dict
 	Level       *string `json:"level"`        // 消息等级 [0:严重、1:重要、2:次要、3:普通]
 	Target      *string `json:"target"`       // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
 	Expire      *int64  `json:"timeout"`      // 消息超时时间（秒）
 	MustConfirm *string `json:"must_confirm"` // 消息是否必须确认 - dict
 	ImgPath     *string `json:"img_path"`     // 消息提示图片
-}
-
-// 模板 - 群组
-type MsgTemplateGroup struct {
-	Bean     `xorm:"extends"`
-	Group    *string `json:"group"`
-	Template *string `json:"template"`
-}
-
-// 消息群组
-type MsgGroup struct {
-	Bean `xorm:"extends"`
-	Name *string `json:"name"` // 群组名称
-}
-
-// 群组-用户
-type MsgGroupUser struct {
-	Bean  `xorm:"extends"`
-	Group *string `json:"group"`
-	Uid   *string `json:"uid"`
-}
-
-// 消息事件
-type MsgEvent struct {
-	Bean         `xorm:"extends"`
-	Receiver     *string `json:"receiver" xorm:"index"` // 消息接收者
-	ReceiverName *string `json:"receiver_name"`         // 接收者名称
-	Template     *string `json:"template"`              // 消息模板
-	Type         *string `json:"type"`                  // 消息分类 - dict
-	Level        *string `json:"level"`                 // 消息等级 [0:严重、1:重要、2:次要、3:普通]
-	Target       *string `json:"target"`                // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
-	Timeout      *int64  `json:"timeout"`               // 消息超时时间
-	MustConfirm  *string `json:"must_confirm"`          // 弹出消息是否必须确认 - dict
-	Otype        *string `json:"otype"`                 // 消息对象
-	Oid          *string `json:"oid"`                   // 消息对象id
-	Title        *string `json:"title"`                 // 消息标题
-	Content      *string `json:"msg_content"`           // 消息体
-	ImgPath      *string `json:"img_path"`              // 消息提示图片
 }
 
 // 消息体
@@ -82,10 +45,6 @@ type MsgInfo struct {
 func msg_tables() []interface{} {
 	return []interface{}{
 		new(MsgTemplate),
-		new(MsgGroup),
-		new(MsgGroupUser),
-		new(MsgEvent),
 		new(MsgInfo),
-		new(MsgTemplateGroup),
 	}
 }

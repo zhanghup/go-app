@@ -89,7 +89,7 @@ func (this *Struct) InitDict(ty string, dicts []initia.DictInfo) *Struct {
 // 基础操作接口
 func (this *Struct) RouterAgs() *Struct {
 	this.routerfns = append(this.routerfns, func(g *gin.Engine, db *xorm.Engine) {
-		ags.Gin(g.Group("/zpx"), g.Group("/zpx"), db)
+		ags.Gin(g.Group(""), g.Group(""), db)
 	})
 	return this
 }
@@ -97,7 +97,7 @@ func (this *Struct) RouterAgs() *Struct {
 // 内置api接口
 func (this *Struct) RouterApi() *Struct {
 	this.routerfns = append(this.routerfns, func(g *gin.Engine, db *xorm.Engine) {
-		api.Gin(g.Group("/zpx"), this.db)
+		api.Gin(g.Group(""), this.db)
 	})
 	return this
 }
@@ -115,11 +115,12 @@ func (this *Struct) JobsInit() *Struct {
 // 初始化内置的消息任务
 func (this *Struct) JobsInitMessages() *Struct {
 	this.msg = ags.NewMessage(this.db)
-	this.Jobs("消息实时推送任务", "* * * * * *", this.msg.Send)
-	this.Jobs("消息超时处理任务", "* * * * * *", this.msg.TimeoutMark)
+	this.Jobs("消息超时处理任务", "* * * * * *", func(db *xorm.Engine) error {
+		return this.msg.TimeoutMark()
+	})
 	return this
 }
-func (this *Struct) Jobs(name, spec string, fn func() error, flag ...bool) *Struct {
+func (this *Struct) Jobs(name, spec string, fn func(db *xorm.Engine) error, flag ...bool) *Struct {
 	err := job.AddJob(name, spec, fn, flag...)
 	if err != nil {
 		tog.Error(err.Error())

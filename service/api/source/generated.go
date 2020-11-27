@@ -16,6 +16,7 @@ import (
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/service/event"
 )
 
 // region    ************************** generated!.gotpl **************************
@@ -132,8 +133,8 @@ type ComplexityRoot struct {
 	}
 
 	Message struct {
-		Messages func(childComplexity int) int
-		Target   func(childComplexity int) int
+		Action  func(childComplexity int) int
+		Message func(childComplexity int) int
 	}
 
 	MsgInfo struct {
@@ -739,19 +740,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DictItem.Weight(childComplexity), true
 
-	case "Message.messages":
-		if e.complexity.Message.Messages == nil {
+	case "Message.action":
+		if e.complexity.Message.Action == nil {
 			break
 		}
 
-		return e.complexity.Message.Messages(childComplexity), true
+		return e.complexity.Message.Action(childComplexity), true
 
-	case "Message.target":
-		if e.complexity.Message.Target == nil {
+	case "Message.message":
+		if e.complexity.Message.Message == nil {
 			break
 		}
 
-		return e.complexity.Message.Target(childComplexity), true
+		return e.complexity.Message.Message(childComplexity), true
 
 	case "MsgInfo.confirm_remark":
 		if e.complexity.MsgInfo.ConfirmRemark == nil {
@@ -2058,13 +2059,14 @@ input NewMessageConfirm{
 }
 
 type Message{
-    target: MessageEnum!
-    messages:[MsgInfo!]
+    action: MsgAction!
+    message:MsgInfo
 }
 
-enum MessageEnum{
-    web
-    app
+enum MsgAction  @goModel(model:"github.com/zhanghup/go-app/service/event.MsgAction"){
+    add
+    read
+    confirm
 }
 
 type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
@@ -4937,7 +4939,7 @@ func (ec *executionContext) _DictItem_status(ctx context.Context, field graphql.
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Message_target(ctx context.Context, field graphql.CollectedField, obj *Message) (ret graphql.Marshaler) {
+func (ec *executionContext) _Message_action(ctx context.Context, field graphql.CollectedField, obj *Message) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4955,7 +4957,7 @@ func (ec *executionContext) _Message_target(ctx context.Context, field graphql.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Target, nil
+		return obj.Action, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4967,12 +4969,12 @@ func (ec *executionContext) _Message_target(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(MessageEnum)
+	res := resTmp.(event.MsgAction)
 	fc.Result = res
-	return ec.marshalNMessageEnum2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMessageEnum(ctx, field.Selections, res)
+	return ec.marshalNMsgAction2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋeventᚐMsgAction(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Message_messages(ctx context.Context, field graphql.CollectedField, obj *Message) (ret graphql.Marshaler) {
+func (ec *executionContext) _Message_message(ctx context.Context, field graphql.CollectedField, obj *Message) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4990,7 +4992,7 @@ func (ec *executionContext) _Message_messages(ctx context.Context, field graphql
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Messages, nil
+		return obj.Message, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4999,9 +5001,9 @@ func (ec *executionContext) _Message_messages(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]beans.MsgInfo)
+	res := resTmp.(*beans.MsgInfo)
 	fc.Result = res
-	return ec.marshalOMsgInfo2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfoᚄ(ctx, field.Selections, res)
+	return ec.marshalOMsgInfo2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MsgInfo_id(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
@@ -11692,13 +11694,13 @@ func (ec *executionContext) _Message(ctx context.Context, sel ast.SelectionSet, 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Message")
-		case "target":
-			out.Values[i] = ec._Message_target(ctx, field, obj)
+		case "action":
+			out.Values[i] = ec._Message_action(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "messages":
-			out.Values[i] = ec._Message_messages(ctx, field, obj)
+		case "message":
+			out.Values[i] = ec._Message_message(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -12643,18 +12645,20 @@ func (ec *executionContext) unmarshalNIPermObj2ᚕgithubᚗcomᚋzhanghupᚋgo�
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalNMessageEnum2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMessageEnum(ctx context.Context, v interface{}) (MessageEnum, error) {
-	var res MessageEnum
-	err := res.UnmarshalGQL(v)
+func (ec *executionContext) unmarshalNMsgAction2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋeventᚐMsgAction(ctx context.Context, v interface{}) (event.MsgAction, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := event.MsgAction(tmp)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNMessageEnum2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMessageEnum(ctx context.Context, sel ast.SelectionSet, v MessageEnum) graphql.Marshaler {
-	return v
-}
-
-func (ec *executionContext) marshalNMsgInfo2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfo(ctx context.Context, sel ast.SelectionSet, v beans.MsgInfo) graphql.Marshaler {
-	return ec._MsgInfo(ctx, sel, &v)
+func (ec *executionContext) marshalNMsgAction2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋeventᚐMsgAction(ctx context.Context, sel ast.SelectionSet, v event.MsgAction) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNNewDept2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewDept(ctx context.Context, v interface{}) (NewDept, error) {
@@ -13356,44 +13360,11 @@ func (ec *executionContext) marshalOMessage2ᚖgithubᚗcomᚋzhanghupᚋgoᚑap
 	return ec._Message(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOMsgInfo2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfoᚄ(ctx context.Context, sel ast.SelectionSet, v []beans.MsgInfo) graphql.Marshaler {
+func (ec *executionContext) marshalOMsgInfo2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfo(ctx context.Context, sel ast.SelectionSet, v *beans.MsgInfo) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNMsgInfo2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfo(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
+	return ec._MsgInfo(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOPermObj2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐPermObjᚄ(ctx context.Context, sel ast.SelectionSet, v []PermObj) graphql.Marshaler {

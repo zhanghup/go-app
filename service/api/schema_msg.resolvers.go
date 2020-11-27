@@ -27,7 +27,7 @@ func (r *mutationResolver) MessageConfirm(ctx context.Context, id string, input 
 		"confirm_time":   time.Now().Unix(),
 	})
 	if err == nil {
-		go event.MsgNew(*r.Me(ctx).Info.User.Id, event.MsgTargetWeb, event.MsgActionConfirm, []beans.MsgInfo{*msg})
+		go event.MsgNew(*r.Me(ctx).Info.User.Id, event.MsgTargetWeb, event.MsgActionConfirm, *msg)
 	}
 
 	return err == nil, err
@@ -46,7 +46,7 @@ func (r *mutationResolver) MessageRead(ctx context.Context, id string) (bool, er
 		"read_time": time.Now().Unix(),
 	})
 	if err == nil {
-		go event.MsgNew(*r.Me(ctx).Info.User.Id, event.MsgTargetWeb, event.MsgActionRead, []beans.MsgInfo{*msg})
+		go event.MsgNew(*r.Me(ctx).Info.User.Id, event.MsgTargetWeb, event.MsgActionRead, *msg)
 	}
 
 	return err == nil, err
@@ -55,11 +55,10 @@ func (r *mutationResolver) MessageRead(ctx context.Context, id string) (bool, er
 func (r *subscriptionResolver) Message(ctx context.Context) (<-chan *source.Message, error) {
 	datas := make(chan *source.Message, 100)
 
-	fn := func(msg event.MsgInfo) {
-		action := source.MessageEnum(msg.Action)
+	fn := func(action event.MsgAction, msg beans.MsgInfo) {
 		datas <- &source.Message{
-			Target:   action,
-			Messages: msg.Messages,
+			Action:  action,
+			Message: &msg,
 		}
 	}
 

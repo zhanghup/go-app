@@ -14,13 +14,14 @@ input NewMessageConfirm{
 }
 
 type Message{
-    target: MessageEnum!
-    messages:[MsgInfo!]
+    action: MsgAction!
+    message:MsgInfo
 }
 
-enum MessageEnum{
-    web
-    app
+enum MsgAction  @goModel(model:"github.com/zhanghup/go-app/service/event.MsgAction"){
+    add
+    read
+    confirm
 }
 
 type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {

@@ -69,11 +69,11 @@ func ggin(db *xorm.Engine) func(c *gin.Context) {
 
 func Gin(g gin.IRouter, db *xorm.Engine) {
 
-	g.Group("/", directive.WebAuth(db)).POST("/api", ggin(db))
-	g.Group("/", directive.WebAuth(db)).GET("/api", ggin(db))
-	ags.Playground(g, "/api/playground1", "/api")
-	g.GET("/api/playground2", func(c *gin.Context) {
-		playground.Handler("标题", "/api")(c.Writer, c.Request)
+	g.Group("/", directive.WebAuth(db)).POST("/zpx/api", ggin(db))
+	g.Group("/", directive.WebAuth(db)).GET("/zpx/api", ggin(db))
+	ags.Playground(g, "/zpx/api/playground1", "/zpx/api")
+	g.GET("/zpx/api/playground2", func(c *gin.Context) {
+		playground.Handler("标题", "/zpx/api")(c.Writer, c.Request)
 	})
 }
 

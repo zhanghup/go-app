@@ -3,11 +3,8 @@
 package source
 
 import (
-	"fmt"
-	"io"
-	"strconv"
-
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/service/event"
 )
 
 type CronLogs struct {
@@ -33,8 +30,8 @@ type IPermObj struct {
 }
 
 type Message struct {
-	Target   MessageEnum     `json:"target"`
-	Messages []beans.MsgInfo `json:"messages"`
+	Action  event.MsgAction `json:"action"`
+	Message *beans.MsgInfo  `json:"message"`
 }
 
 type NewDept struct {
@@ -260,45 +257,4 @@ type UpdUser struct {
 type Users struct {
 	Total *int         `json:"total"`
 	Data  []beans.User `json:"data"`
-}
-
-type MessageEnum string
-
-const (
-	MessageEnumWeb MessageEnum = "web"
-	MessageEnumApp MessageEnum = "app"
-)
-
-var AllMessageEnum = []MessageEnum{
-	MessageEnumWeb,
-	MessageEnumApp,
-}
-
-func (e MessageEnum) IsValid() bool {
-	switch e {
-	case MessageEnumWeb, MessageEnumApp:
-		return true
-	}
-	return false
-}
-
-func (e MessageEnum) String() string {
-	return string(e)
-}
-
-func (e *MessageEnum) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = MessageEnum(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid MessageEnum", str)
-	}
-	return nil
-}
-
-func (e MessageEnum) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
 }

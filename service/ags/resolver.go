@@ -50,16 +50,16 @@ func ggin(db *xorm.Engine) func(c *gin.Context) {
 }
 
 func Gin(auth, any gin.IRouter, db *xorm.Engine) {
-	any.POST("/ags", ggin(db))
-	any.GET("/ags", ggin(db))
-	Playground(any, "/ags/playground1", "/ags")
-	any.GET("/ags/playground2", func(c *gin.Context) {
-		playground.Handler("标题", "/ags")(c.Writer, c.Request)
+	any.POST("/zpx/ags", ggin(db))
+	any.GET("/zpx/ags", ggin(db))
+	Playground(any, "/zpx/ags/playground1", "/zpx/ags")
+	any.GET("/zpx/ags/playground2", func(c *gin.Context) {
+		playground.Handler("标题", "/zpx/ags")(c.Writer, c.Request)
 	})
 
 	up := NewUploader(db)
-	auth.POST("/ags/upload", up.Upload())
-	any.GET("/ags/upload/:id", up.Get())
-	any.GET("/ags/upload/:id/:width/:height", up.Resize())
-	any.GET("/ags/upload/:id/:width", up.Resize())
+	auth.POST("/zpx/ags/upload", up.Upload())
+	any.GET("/zpx/ags/upload/:id", up.Get())
+	any.GET("/zpx/ags/upload/:id/:width/:height", up.Resize())
+	any.GET("/zpx/ags/upload/:id/:width", up.Resize())
 }

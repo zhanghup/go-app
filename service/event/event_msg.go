@@ -17,36 +17,31 @@ const (
 	MsgTargetApp     = MsgTarget("app")
 )
 
-type MsgInfo struct {
-	Action   MsgAction
-	Messages []beans.MsgInfo
-}
-
 /*
 	消息事件 - 插入
 */
-func MsgNew(uid string, target MsgTarget, action MsgAction, msg []beans.MsgInfo) {
-	EventPublish(message+"-"+uid+"-"+string(target), MsgInfo{Action: action, Messages: msg})
+func MsgNew(uid string, target MsgTarget, action MsgAction, msg beans.MsgInfo) {
+	EventPublish(message+"-"+uid+"-"+string(target), action, msg)
 }
 
 /*
 	消息事件 - 数据监听
 */
-func MsgNewSubscribe(uid string, target MsgTarget, fn func(msg MsgInfo)) {
+func MsgNewSubscribe(uid string, target MsgTarget, fn func(action MsgAction, msg beans.MsgInfo)) {
 	EventSubscribe(message+"-"+uid+"-"+string(target), fn)
 }
 
 /*
 	消息事件 - 取消监听
 */
-func MsgNewUnSubscribe(uid string, target MsgTarget, fn func(msg MsgInfo)) {
+func MsgNewUnSubscribe(uid string, target MsgTarget, fn func(action MsgAction, msg beans.MsgInfo)) {
 	EventUnsubscribe(message+"-"+uid+"-"+string(target), fn)
 }
 
 /*
 	消息事件 - 取消监听
 */
-func MsgNewUnSubscribeWithContext(ctx context.Context, uid string, target MsgTarget, fn func(msg MsgInfo)) {
+func MsgNewUnSubscribeWithContext(ctx context.Context, uid string, target MsgTarget, fn func(action MsgAction, msg beans.MsgInfo)) {
 	<-ctx.Done()
 	EventUnsubscribe(message+"-"+uid+"-"+string(target), fn)
 }
