@@ -22,8 +22,8 @@ func ggin(db *xorm.Engine) func(c *gin.Context) {
 	c := source.Config{Resolvers: resolvers.NewResolver(db)}
 
 	srv := handler.New(source.NewExecutableSchema(c))
-	srv.AddTransport(transport.POST{})
-	srv.AddTransport(transport.Websocket{
+	srv.AddTransport(&transport.POST{})
+	srv.AddTransport(&transport.Websocket{
 		KeepAlivePingInterval: 10 * time.Second,
 		Upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {

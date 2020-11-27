@@ -23,6 +23,9 @@ func Playground(g gin.IRouter, url, query string) {
 					function graphQLFetcher(graphQLParams) {
 						return fetch("%s", {
 							method: "post",
+							headers:{
+								"Content-Type": "application/json"
+							},
 							body: JSON.stringify(graphQLParams),
 							credentials: "include",
 						}).then(function (response) {

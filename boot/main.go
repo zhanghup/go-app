@@ -89,7 +89,7 @@ func (this *Struct) InitDict(ty string, dicts []initia.DictInfo) *Struct {
 // 基础操作接口
 func (this *Struct) RouterAgs() *Struct {
 	this.routerfns = append(this.routerfns, func(g *gin.Engine, db *xorm.Engine) {
-		ags.Gin(g.Group("/"), g.Group("/"), db)
+		ags.Gin(g.Group("/zpx"), g.Group("/zpx"), db)
 	})
 	return this
 }
@@ -97,7 +97,7 @@ func (this *Struct) RouterAgs() *Struct {
 // 内置api接口
 func (this *Struct) RouterApi() *Struct {
 	this.routerfns = append(this.routerfns, func(g *gin.Engine, db *xorm.Engine) {
-		api.Gin(g.Group("/"), this.db)
+		api.Gin(g.Group("/zpx"), this.db)
 	})
 	return this
 }
