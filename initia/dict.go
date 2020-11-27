@@ -3,155 +3,207 @@ package initia
 import (
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tog"
 	"xorm.io/xorm"
 )
 
-type DictInfo struct {
-	Code string
-	Name string
+func InitDict(db *xorm.Engine) {
+	// SYS
+	{
+		// 字典类型 SYS001
+		InitDictCode(db, "SYS", "001", "字典类型", []DictInfoItem{
+			{"1", "系统类型", "SYS", "", 1},
+			{"2", "系统状态", "STA", "", 1},
+			{"3", "业务类型", "BUS", "", 1},
+		})
 
-	Children []DictInfoItem
+		// 账号类型 SYS002
+		InitDictCode(db, "SYS", "002", "账号类型", []DictInfoItem{
+			{"1", "用户密码", "password", "", 1},
+		})
+
+		// 权限类型 SYS003
+		InitDictCode(db, "SYS", "003", "权限类型", []DictInfoItem{
+			{"1", "菜单权限", "menu", "", 1},
+		})
+
+		// 权限状态 SYS004
+		InitDictCode(db, "SYS", "004", "权限状态", []DictInfoItem{
+			{"1", "新增", "C", "", 1},
+			{"2", "查询", "R", "", 1},
+			{"3", "编辑", "U", "", 1},
+			{"4", "删除", "D", "", 1},
+			{"5", "管理", "M", "", 1},
+		})
+
+		// 权限类型 SYS005
+		InitDictCode(db, "SYS", "005", "消息模板类型", []DictInfoItem{
+			{"1", "确认框", "confirm", "", 1},
+			{"2", "消息提示", "message", "", 1},
+			{"3", "通知", "notice", "", 1},
+		})
+
+		// 消息等级 SYS006
+		InitDictCode(db, "SYS", "006", "消息等级", []DictInfoItem{
+			{"1", "严重", "0", "", 1},
+			{"2", "重要", "1", "", 1},
+			{"3", "次要", "2", "", 1},
+			{"4", "普通", "3", "", 1},
+		})
+
+		// 消息推送目标 SYS007
+		InitDictCode(db, "SYS", "007", "消息推送目标", []DictInfoItem{
+			{"1", "网页", "web", "", 1},
+		})
+
+		// 消息状态 SYS008
+		InitDictCode(db, "SYS", "008", "消息状态", []DictInfoItem{
+			{"1", "已读", "0", "", 1},
+			{"2", "未读", "1", "", 1},
+			{"3", "已读过期", "2", "", 1},
+			{"4", "未读过期", "3", "", 1},
+			{"5", "已确认", "4", "", 1},
+		})
+	}
+
+	// STA
+	{
+		// 数据状态 STA001
+		InitDictCode(db, "STA", "001", "数据状态", []DictInfoItem{
+			{"1", "启用", "1", "", 1},
+			{"2", "禁用", "0", "", 1},
+		})
+
+		// 人物性别 STA002
+		InitDictCode(db, "STA", "002", "人物性别", []DictInfoItem{
+			{"1", "男", "1", "", 1},
+			{"2", "女", "2", "", 1},
+			{"3", "未知", "3", "", 1},
+		})
+
+		// 运行状态 STA003
+		InitDictCode(db, "STA", "003", "运行状态", []DictInfoItem{
+			{"1", "开始", "start", "", 1},
+			{"2", "停止", "stop", "", 1},
+		})
+
+		// 执行结果 STA004
+		InitDictCode(db, "STA", "004", "执行结果", []DictInfoItem{
+			{"1", "成功", "success", "", 1},
+			{"2", "失败", "error", "", 1},
+			{"3", "拒绝", "refuse", "", 1},
+		})
+
+		// 是否 STA005
+		InitDictCode(db, "STA", "005", "是否", []DictInfoItem{
+			{"1", "是", "1", "", 1},
+			{"2", "否", "0", "", 1},
+		})
+	}
+
+	// BUS
+	{
+		// 组织类型 BUS001
+		InitDictCode(db, "BUS", "001", "组织类型", []DictInfoItem{
+			{"1", "普通组织", "1", "", 0},
+		})
+
+		// 用户类型 BUS001
+		InitDictCode(db, "BUS", "002", "用户类型", []DictInfoItem{
+			{"1", "普通用户", "1", "", 0},
+		})
+	}
+}
+
+func InitDictCode(db *xorm.Engine, typeArg, code, name string, items []DictInfoItem) {
+	hisDict := beans.Dict{}
+	id := typeArg + code
+	ok, err := db.Table(hisDict).Where("id = ?", id).Get(&hisDict)
+	if err != nil {
+		tog.Error(err.Error())
+		return
+	}
+	if !ok {
+		hisDict.Id = &id
+		hisDict.Status = tools.Ptr.String("1")
+		hisDict.Code = &id
+		hisDict.Name = &name
+		hisDict.Type = &typeArg
+		_, err = db.Insert(hisDict)
+		if err != nil {
+			tog.Error(err.Error())
+			return
+		}
+	} else {
+		hisDict.Id = &id
+		hisDict.Status = tools.Ptr.String("1")
+		hisDict.Code = &id
+		hisDict.Name = &name
+		hisDict.Type = &typeArg
+		_, err = db.Where("id = ?", id).Update(hisDict)
+		if err != nil {
+			tog.Error(err.Error())
+			return
+		}
+	}
+
+	for i, item := range items {
+		if len(item.Id) == 0 {
+			panic("DictInfoItem 的id属性必须被指定，并且为不重复数据")
+		}
+		itemid := id + "-" + item.Id
+
+		dictItem := beans.DictItem{}
+		ok, err := db.Where("id = ?", itemid).Get(&dictItem)
+		if err != nil {
+			tog.Error(err.Error())
+			return
+		}
+
+
+		if ok {
+			_, err = db.Where("id = ?", itemid).Update(beans.DictItem{
+				Bean: beans.Bean{
+					Id:     &itemid,
+					Weight: &i,
+					Status: tools.Ptr.String("1"),
+				},
+				Code:     &id,
+				Name:     &item.Name,
+				Value:    &item.Value,
+				Disabled: &item.Disabled,
+				Ext:      &item.Ext,
+			})
+			if err != nil {
+				tog.Error(err.Error())
+				return
+			}
+		} else {
+			_, err = db.Insert(beans.DictItem{
+				Bean: beans.Bean{
+					Id:     &itemid,
+					Weight: &i,
+					Status: tools.Ptr.String("1"),
+				},
+				Code:     &id,
+				Name:     &item.Name,
+				Value:    &item.Value,
+				Disabled: &item.Disabled,
+				Ext:      &item.Ext,
+			})
+			if err != nil {
+				tog.Error(err.Error())
+				return
+			}
+		}
+
+	}
 }
 
 type DictInfoItem struct {
+	Id       string
 	Name     string
 	Value    string
 	Ext      string
 	Disabled int
-}
-
-func InitDictCode(db *xorm.Engine, ty string, dicts []DictInfo) {
-	for ii, dict := range dicts {
-		hisDict := beans.Dict{}
-		ok, err := db.Table(hisDict).Where("code = ?", ty+dict.Code).Get(&hisDict)
-		if err != nil {
-			panic(err)
-		}
-
-		// 若不存在当前字典项，则新增
-		if !ok {
-			_, err = db.Table(hisDict).Insert(beans.Dict{
-				Bean: beans.Bean{
-					Id:     tools.Ptr.Uid(),
-					Weight: &ii,
-					Status: tools.Ptr.String("1"),
-				},
-				Code: tools.Ptr.String(ty + dict.Code),
-				Name: &dict.Name,
-				Type: &ty,
-			})
-			if err != nil {
-				panic(err)
-			}
-		} else {
-			continue
-		}
-
-		// 只有不存在字典项的时候，新增字典项，然后增加具体条目
-		if len(dict.Children) > 0 {
-			for i, o := range dict.Children {
-				_, err = db.Table(beans.DictItem{}).Insert(beans.DictItem{
-					Bean: beans.Bean{
-						Id:     tools.Ptr.Uid(),
-						Weight: &i,
-						Status: tools.Ptr.String("1"),
-					},
-					Code:     tools.Ptr.String(ty + dict.Code),
-					Name:     &o.Name,
-					Value:    &o.Value,
-					Disabled: &o.Disabled,
-					Ext:      &o.Ext,
-				})
-				if err != nil {
-					panic(err)
-				}
-			}
-		}
-	}
-}
-
-func InitDict(db *xorm.Engine) {
-	initDictSys(db)
-	initDictSta(db)
-	initDictBus(db)
-}
-
-func initDictSys(db *xorm.Engine) {
-	err := txorm.NewEngine(db).SF(`delete from dict_item where code in (select code from dict where type = 'SYS')`).Exec()
-	if err != nil {
-		tog.Error(err.Error())
-	}
-	err = txorm.NewEngine(db).SF(`delete from dict where type = 'SYS'`).Exec()
-	if err != nil {
-		tog.Error(err.Error())
-	}
-	InitDictCode(db, "SYS", []DictInfo{
-		{Code: "001", Name: "字典类型", Children: []DictInfoItem{
-			{Name: "系统类型", Value: "SYS", Disabled: 1},
-			{Name: "系统状态", Value: "STA", Disabled: 1},
-			{Name: "业务类型", Value: "BUS", Disabled: 1},
-		}},
-		{Code: "002", Name: "账号类型", Children: []DictInfoItem{
-			{Name: "用户密码", Value: "password", Disabled: 1},
-		}},
-		{Code: "003", Name: "权限类型", Children: []DictInfoItem{
-		}},
-		{Code: "004", Name: "权限状态", Children: []DictInfoItem{
-			{Name: "新增", Value: "C", Disabled: 1},
-			{Name: "查询", Value: "R", Disabled: 1},
-			{Name: "编辑", Value: "U", Disabled: 1},
-			{Name: "删除", Value: "D", Disabled: 1},
-			{Name: "管理", Value: "M", Disabled: 1},
-		}},
-	})
-}
-
-func initDictSta(db *xorm.Engine) {
-	err := txorm.NewEngine(db).SF(`delete from dict_item where code in (select code from dict where type = 'STA')`).Exec()
-	if err != nil {
-		tog.Error(err.Error())
-	}
-	err = txorm.NewEngine(db).SF(`delete from dict where type = 'STA'`).Exec()
-	if err != nil {
-		tog.Error(err.Error())
-	}
-	InitDictCode(db, "STA", []DictInfo{
-		{Code: "001", Name: "数据状态", Children: []DictInfoItem{
-			{Name: "启用", Value: "1", Disabled: 1},
-			{Name: "禁用", Value: "0", Disabled: 1},
-		}},
-		{Code: "002", Name: "人物性别", Children: []DictInfoItem{
-			{Name: "男", Value: "1", Disabled: 1},
-			{Name: "女", Value: "2", Disabled: 1},
-			{Name: "未知", Value: "3", Disabled: 1},
-		}},
-		{Code: "003", Name: "运行状态", Children: []DictInfoItem{
-			{Name: "开始", Value: "start", Disabled: 1},
-			{Name: "停止", Value: "stop", Disabled: 1},
-		}},
-		{Code: "004", Name: "执行结果", Children: []DictInfoItem{
-			{Name: "成功", Value: "success", Disabled: 1},
-			{Name: "失败", Value: "error", Disabled: 1},
-			{Name: "拒绝", Value: "refuse", Disabled: 1},
-		}},
-	})
-}
-
-func initDictBus(db *xorm.Engine) {
-	err := txorm.NewEngine(db).SF(`delete from dict_item where code in (select code from dict where type = 'BUS')`).Exec()
-	if err != nil {
-		tog.Error(err.Error())
-	}
-	err = txorm.NewEngine(db).SF(`delete from dict where type = 'BUS'`).Exec()
-	if err != nil {
-		tog.Error(err.Error())
-	}
-	InitDictCode(db, "BUS", []DictInfo{
-		{Code: "001", Name: "组织类型", Children: []DictInfoItem{
-		}},
-		{Code: "002", Name: "用户类型", Children: []DictInfoItem{
-		}},
-	})
 }

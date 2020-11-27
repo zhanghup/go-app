@@ -83,7 +83,7 @@ type NewDictItem struct {
 	Status *string `json:"status"`
 }
 
-type NewMessageConfirm struct {
+type NewMsgConfirm struct {
 	// 确认备注
 	Remark *string `json:"remark"`
 }
@@ -156,6 +156,13 @@ type QDict struct {
 	Type *string `json:"type"`
 }
 
+type QMsgTemplate struct {
+	// 名称模糊查询
+	Name *string `json:"name"`
+	// 编码模糊查询
+	Code *string `json:"code"`
+}
+
 type QRole struct {
 	Keyword *string `json:"keyword"`
 	Index   *int    `json:"index"`
@@ -218,6 +225,25 @@ type UpdDictItem struct {
 	Weight *int `json:"weight"`
 	// 状态{dict:STA001}
 	Status *string `json:"status"`
+}
+
+type UpdMsgTemplate struct {
+	// 模板名称
+	Name *string `json:"name"`
+	// 消息分类{dict:SYS005}
+	Type *string `json:"type"`
+	// 消息等级{dict:SYS006}
+	Level *string `json:"level"`
+	// 消息推送平台{dict:SYS007}
+	Target *string `json:"target"`
+	// 消息超时时间（秒）
+	Expire *int64 `json:"expire"`
+	// 消息是否必须确认{dict:STA005}
+	MustConfirm *string `json:"must_confirm"`
+	// 消息提示图片
+	ImgPath *string `json:"img_path"`
+	// 备注
+	Remark *string `json:"remark"`
 }
 
 type UpdRole struct {

@@ -1,14 +1,28 @@
+extend type Query{
+    msg_templates(query:QMsgTemplate):[MsgTemplate!]
+    msg_template(id: String!):MsgTemplate
+}
+
 extend type Mutation {
     "消息确认"
-    message_confirm(id:String!,input: NewMessageConfirm!):Boolean!
-    message_read(id:String!):Boolean!
+    msg_info_confirm(id:String!,input: NewMsgConfirm!):Boolean!
+    msg_info_read(id:String!):Boolean!
+
+    msg_template_update(id: String!,input:UpdMsgTemplate!):Boolean!
 }
 
 extend type Subscription {
     message: Message
 }
 
-input NewMessageConfirm{
+input QMsgTemplate{
+    "名称模糊查询"
+    name: String
+    "编码模糊查询"
+    code: String
+}
+
+input NewMsgConfirm{
     "确认备注"
     remark: String
 }
@@ -67,6 +81,8 @@ type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
     content: String
     "消息提示图片"
     img_path: String
+    "备注"
+    remark: String
 
     "创建时间"
     created: Int
@@ -77,4 +93,55 @@ type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
     "状态{dict:STA001}"
     status: String
 
+}
+
+type MsgTemplate @goModel(model:"github.com/zhanghup/go-app/beans.MsgTemplate") {
+    id: String
+
+    "模板名称"
+    name: String
+    "模板编码"
+    code: String
+    "消息分类{dict:SYS005}"
+    type: String
+    "消息等级{dict:SYS006}"
+    level: String
+    "消息推送平台{dict:SYS007}"
+    target: String
+    "消息超时时间（秒）"
+    expire: Int64
+    "消息是否必须确认{dict:STA005}"
+    must_confirm: String
+    "消息提示图片"
+    img_path: String
+    "备注"
+    remark: String
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+
+input UpdMsgTemplate{
+    "模板名称"
+    name: String
+    "消息分类{dict:SYS005}"
+    type: String
+    "消息等级{dict:SYS006}"
+    level: String
+    "消息推送平台{dict:SYS007}"
+    target: String
+    "消息超时时间（秒）"
+    expire: Int64
+    "消息是否必须确认{dict:STA005}"
+    must_confirm: String
+    "消息提示图片"
+    img_path: String
+    "备注"
+    remark: String
 }

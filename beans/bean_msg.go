@@ -8,13 +8,14 @@ package beans
 type MsgTemplate struct {
 	Bean        `xorm:"extends"`
 	Name        *string `json:"name"`
-	Code        *string `json:"code"`         // 模板编码
-	Type        *string `json:"type"`         // 消息分类 - dict
-	Level       *string `json:"level"`        // 消息等级 [0:严重、1:重要、2:次要、3:普通]
-	Target      *string `json:"target"`       // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
-	Expire      *int64  `json:"timeout"`      // 消息超时时间（秒）
-	MustConfirm *string `json:"must_confirm"` // 消息是否必须确认 - dict
-	ImgPath     *string `json:"img_path"`     // 消息提示图片
+	Code        *string `json:"code" xorm:"index"` // 模板编码
+	Type        *string `json:"type"`              // 消息分类 - dict
+	Level       *string `json:"level"`             // 消息等级 [0:严重、1:重要、2:次要、3:普通]
+	Target      *string `json:"target"`            // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
+	Expire      *int64  `json:"expire"`            // 消息超时时间（秒）
+	MustConfirm *string `json:"must_confirm"`      // 消息是否必须确认 - dict
+	ImgPath     *string `json:"img_path"`          // 消息提示图片
+	Remark      *string `json:"remark"`            // 备注
 }
 
 // 消息体
@@ -23,7 +24,7 @@ type MsgInfo struct {
 	Receiver      *string `json:"receiver" xorm:"index"` // 消息接收者
 	ReceiverName  *string `json:"receiver_name"`         // 接收者名称
 	Template      *string `json:"template"`              // 消息模板
-	Type          *string `json:"type"`                  // 消息分类 - dict
+	Type          *string `json:"type" xorm:"index`      // 消息分类 - dict
 	Level         *string `json:"level"`                 // 消息等级 [0:严重、1:重要、2:次要、3:普通]
 	Target        *string `json:"target"`                // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
 	Timeout       *int64  `json:"timeout"`               // 消息超时时间
@@ -40,6 +41,7 @@ type MsgInfo struct {
 	Title         *string `json:"title"`                 // 消息标题
 	Content       *string `json:"content"`               // 消息体
 	ImgPath       *string `json:"img_path"`              // 消息提示图片
+	Remark        *string `json:"remark"`                // 备注
 }
 
 func msg_tables() []interface{} {

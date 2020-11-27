@@ -13,7 +13,7 @@ import (
 	"github.com/zhanghup/go-app/service/event"
 )
 
-func (r *mutationResolver) MessageConfirm(ctx context.Context, id string, input source.NewMessageConfirm) (bool, error) {
+func (r *mutationResolver) MsgInfoConfirm(ctx context.Context, id string, input source.NewMsgConfirm) (bool, error) {
 	msg, err := r.MsgInfoLoader(ctx, id)
 	if err != nil {
 		return false, err
@@ -33,7 +33,7 @@ func (r *mutationResolver) MessageConfirm(ctx context.Context, id string, input 
 	return err == nil, err
 }
 
-func (r *mutationResolver) MessageRead(ctx context.Context, id string) (bool, error) {
+func (r *mutationResolver) MsgInfoRead(ctx context.Context, id string) (bool, error) {
 	msg, err := r.MsgInfoLoader(ctx, id)
 	if err != nil {
 		return false, err
@@ -50,6 +50,35 @@ func (r *mutationResolver) MessageRead(ctx context.Context, id string) (bool, er
 	}
 
 	return err == nil, err
+}
+
+func (r *mutationResolver) MsgTemplateUpdate(ctx context.Context, id string, input source.UpdMsgTemplate) (bool, error) {
+	return r.Update(ctx, beans.MsgTemplate{}, id, input)
+}
+
+func (r *queryResolver) MsgTemplates(ctx context.Context, query *source.QMsgTemplate) ([]beans.MsgTemplate, error) {
+	if query == nil {
+		query = &source.QMsgTemplate{}
+	}
+	tpls := make([]beans.MsgTemplate, 0)
+	err := r.DBS.SF(`
+		select 
+			tpl.* 
+		from 
+			msg_template tpl
+		where 1 = 1 
+			{{ if .code }} and tpl.code like concat('%',:code,'%') {{ end }} 
+			{{ if .name }} and tpl.name like concat('%',:name,'%') {{ end }} 
+		order by tpl.code`,
+		map[string]interface{}{
+			"name": query.Name,
+			"code": query.Code,
+		}).Find(&tpls)
+	return tpls, err
+}
+
+func (r *queryResolver) MsgTemplate(ctx context.Context, id string) (*beans.MsgTemplate, error) {
+	return r.MsgTemplateLoader(ctx, id)
 }
 
 func (r *subscriptionResolver) Message(ctx context.Context) (<-chan *source.Message, error) {

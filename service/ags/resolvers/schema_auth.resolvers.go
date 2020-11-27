@@ -6,6 +6,7 @@ package resolvers
 import (
 	"context"
 	"errors"
+	"github.com/zhanghup/go-app/service/ca"
 	"net/http"
 	"time"
 
@@ -74,6 +75,11 @@ func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 		return false, nil
 	}
 	_, err := r.DB.Table(beans.Token{}).Where("id = ?", tok).Update(map[string]interface{}{"status": 0})
+	if err != nil {
+		return false, err
+	}
+	ca.UserCache.RemoveByToken(tok)
+
 	return err == nil, err
 }
 

@@ -54,8 +54,16 @@ func (this *Struct) XormInited() *Struct {
 	return this
 }
 
-func (this *Struct) Init(fn func(db *xorm.Engine)) *Struct {
-	fn(this.db)
+// 初始化数据
+func (this *Struct) Init(fns ...func(db *xorm.Engine)) *Struct {
+	initia.InitDict(this.db)
+	initia.InitUser(this.db)
+	initia.InitMsgTemplate(this.db)
+	if fns != nil {
+		for _, fn := range fns {
+			fn(this.db)
+		}
+	}
 	return this
 }
 
@@ -67,22 +75,6 @@ func (this *Struct) SyncTables(fn ...func(db *xorm.Engine)) *Struct {
 			f(this.db)
 		}
 	}
-	return this
-}
-
-// 初始化数据
-func (this *Struct) InitDatas(fn ...func(db *xorm.Engine)) *Struct {
-	initia.InitDict(this.db)
-	initia.InitUser(this.db)
-	if len(fn) > 0 {
-		for _, f := range fn {
-			f(this.db)
-		}
-	}
-	return this
-}
-func (this *Struct) InitDict(ty string, dicts []initia.DictInfo) *Struct {
-	initia.InitDictCode(this.db, ty, dicts)
 	return this
 }
 

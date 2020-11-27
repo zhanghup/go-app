@@ -74,6 +74,7 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, t
 			Title:        &title,
 			Content:      &content,
 			ImgPath:      tpl.ImgPath,
+			Remark:       tpl.Remark,
 		}
 
 		event.MsgNew(uid, event.MsgTarget(tags[j]), event.MsgActionAdd, info)

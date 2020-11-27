@@ -17,13 +17,13 @@ func main() {
 	}
 	_ = boot.Boot(box).
 		SyncTables().
-		//InitDatas().
+		Init().
 		XormInited().
 		JobsInit().
 		JobsInitMessages().
 		Jobs("测试消息推送", "0/5 * * * * * ", func(db *xorm.Engine) error {
 			tpl := beans.MsgTemplate{}
-			ok, err := db.Where("code = ?", "alarm").Get(&tpl)
+			ok, err := db.Where("code = ?", "system").Get(&tpl)
 			if err != nil {
 				return err
 			}

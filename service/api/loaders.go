@@ -45,3 +45,9 @@ func (this *Resolver) MsgInfoLoader(ctx context.Context, id string) (*beans.MsgI
 	err := this.Loader(ctx).Object(result, "select * from msg_info where id in :keys", nil, "Id", "").Load(id, result)
 	return result, err
 }
+
+func (this *Resolver) MsgTemplateLoader(ctx context.Context, id string) (*beans.MsgTemplate, error) {
+	result := new(beans.MsgTemplate)
+	err := this.Loader(ctx).Object(result, "select * from msg_template where id in :keys", nil, "Id", "").Load(id, result)
+	return result, err
+}
