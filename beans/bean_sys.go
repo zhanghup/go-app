@@ -14,6 +14,7 @@ type Dept struct {
 // 用户
 type User struct {
 	Bean   `xorm:"extends"`
+	Dept   *string `json:"dept"`    // 所属部门
 	Type   *string `json:"type"`    // 用户类型
 	Name   *string `json:"name"`    // 用户名称
 	Avatar *string `json:"avatar"`  // 头像

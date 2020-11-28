@@ -1,0 +1,57 @@
+extend type Query{
+    my_info:MyInfo
+    my_msg_infos(query:QMyMsgInfo!):[MsgInfo!]
+}
+
+extend type Mutation {
+    "消息确认"
+    my_msg_info_confirm(id:String!,input: NewMsgConfirm!):Boolean!
+    my_msg_info_read(id:String!):Boolean!
+}
+
+input QMyMsgInfo{
+    "消息类型{dict:SYS005}"
+    type: String
+    "消息级别{dict: SYS006}"
+    level: String
+    "消息接收平台{dict:SYS007}"
+    target: String
+    "弹出消息是否必须确认{dict:STA005}"
+    must_confirm: String
+    "确认平台{dict:SYS007}"
+    confirm_target: String
+    "已读平台{dict:SYS007}"
+    read_target: String
+    "消息状态{ dict:SYS008}"
+    state: String
+
+    index: Int
+    size: Int
+}
+
+input NewMsgConfirm{
+    "确认备注"
+    remark: String
+}
+
+
+type MyInfo @goModel(model:"github.com/zhanghup/go-app/beans.User"){
+    id: String
+
+    "用户类型{dict:BUS002}"
+    type: String
+    "用户名称"
+    name: String
+    "头像"
+    avatar: String
+    "身份证"
+    id_card: String
+    "出生年月"
+    birth: Int
+    "性别{dict:STA002}"
+    sex: String
+    "移动电话"
+    mobile: String
+
+    o_dept:Dept
+}

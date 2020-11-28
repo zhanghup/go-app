@@ -24,9 +24,9 @@ type MsgInfo struct {
 	Receiver      *string `json:"receiver" xorm:"index"` // 消息接收者
 	ReceiverName  *string `json:"receiver_name"`         // 接收者名称
 	Template      *string `json:"template"`              // 消息模板
-	Type          *string `json:"type" xorm:"index`      // 消息分类 - dict
+	Type          *string `json:"type" xorm:"index"`      // 消息分类 - dict
 	Level         *string `json:"level"`                 // 消息等级 [0:严重、1:重要、2:次要、3:普通]
-	Target        *string `json:"target"`                // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
+	Target        *string `json:"target" xorm:"target"`                // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
 	Timeout       *int64  `json:"timeout"`               // 消息超时时间
 	MustConfirm   *string `json:"must_confirm"`          // 弹出消息是否必须确认 - dict
 	ConfirmTarget *string `json:"confirm_target"`        // 确认平台 [web,app,mini,sms...] - dict

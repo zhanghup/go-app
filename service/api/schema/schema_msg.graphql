@@ -1,13 +1,11 @@
 extend type Query{
-    msg_templates(query:QMsgTemplate):[MsgTemplate!]
+    msg_templates(query:QMsgTemplate!):[MsgTemplate!]
     msg_template(id: String!):MsgTemplate
+    "你可以知道下一页有没有数据，但是你不会知道总共有多少页数据"
+    msg_infos(query: QMsgInfo!): [MsgInfo!]
 }
 
 extend type Mutation {
-    "消息确认"
-    msg_info_confirm(id:String!,input: NewMsgConfirm!):Boolean!
-    msg_info_read(id:String!):Boolean!
-
     msg_template_update(id: String!,input:UpdMsgTemplate!):Boolean!
 }
 
@@ -15,16 +13,33 @@ extend type Subscription {
     message: Message
 }
 
+input QMsgInfo{
+    "接收者"
+    receiver: String
+    "消息类型{dict:SYS005}"
+    type: String
+    "消息级别{dict: SYS006}"
+    level: String
+    "消息接收平台{dict:SYS007}"
+    target: String
+    "弹出消息是否必须确认{dict:STA005}"
+    must_confirm: String
+    "确认平台{dict:SYS007}"
+    confirm_target: String
+    "已读平台{dict:SYS007}"
+    read_target: String
+    "消息状态{ dict:SYS008}"
+    state: String
+
+    index: Int
+    size: Int
+}
+
 input QMsgTemplate{
     "名称模糊查询"
     name: String
     "编码模糊查询"
     code: String
-}
-
-input NewMsgConfirm{
-    "确认备注"
-    remark: String
 }
 
 type Message{

@@ -62,6 +62,7 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, t
 			},
 			Receiver:     &uid,
 			ReceiverName: &uname,
+			Type:         tpl.Type,
 			Template:     tpl.Id,
 			Level:        tpl.Level,
 			Target:       &tags[j],
@@ -78,7 +79,7 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, t
 		}
 
 		event.MsgNew(uid, event.MsgTarget(tags[j]), event.MsgActionAdd, info)
-
+		infos = append(infos, info)
 	}
 
 	_, err := this.db.Insert(infos...)

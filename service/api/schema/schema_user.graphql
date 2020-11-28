@@ -30,6 +30,8 @@ type Users{
 type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     id: String
 
+    "所属部门"
+    dept: String
     "用户类型{dict:BUS002}"
     type: String
     "用户名称"
@@ -59,7 +61,9 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
 
 }
 
-input NewUser {
+input NewUser @goModel(model:"map[string]interface{}"){
+    "所属部门"
+    dept: String
     "用户类型{dict:BUS002}"
     type: String
     "用户名称"
@@ -82,7 +86,9 @@ input NewUser {
     remark: String
 }
 
-input UpdUser {
+input UpdUser  @goModel(model:"map[string]interface{}"){
+    "所属部门"
+    dept: String
     "用户类型{dict:BUS002}"
     type: String
     "用户名称"

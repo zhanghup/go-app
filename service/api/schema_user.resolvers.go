@@ -6,7 +6,6 @@ package api
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -15,7 +14,7 @@ import (
 	"github.com/zhanghup/go-tools/tog"
 )
 
-func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser) (string, error) {
+func (r *mutationResolver) UserCreate(ctx context.Context, input map[string]interface{}) (string, error) {
 	id, err := r.Create(ctx, new(beans.User), input)
 	if err != nil {
 		return "", err
@@ -37,7 +36,7 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser)
 	return id, err
 }
 
-func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input source.UpdUser) (bool, error) {
+func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input map[string]interface{}) (bool, error) {
 	user, err := r.UserLoader(ctx, id)
 	if err != nil {
 		return false, err
@@ -97,7 +96,10 @@ func (r *queryResolver) User(ctx context.Context, id string) (*beans.User, error
 }
 
 func (r *userResolver) ODept(ctx context.Context, obj *beans.User) (*beans.Dept, error) {
-	panic(fmt.Errorf("not implemented"))
+	if obj.Dept == nil {
+		return nil, nil
+	}
+	return r.DeptLoader(ctx, *obj.Dept)
 }
 
 // User returns source.UserResolver implementation.

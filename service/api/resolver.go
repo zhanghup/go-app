@@ -33,7 +33,7 @@ func NewResolver(db *xorm.Engine) *Resolver {
 
 func ggin(db *xorm.Engine) func(c *gin.Context) {
 	config := source.Config{
-		Resolvers: NewResolver(db),
+		Resolvers: 	NewResolver(db),
 		Directives: source.DirectiveRoot{
 			Perm: directive.Perm(db),
 		},

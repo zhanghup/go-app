@@ -99,29 +99,6 @@ type NewRole struct {
 	Status *string `json:"status"`
 }
 
-type NewUser struct {
-	// 用户类型{dict:BUS002}
-	Type *string `json:"type"`
-	// 用户名称
-	Name *string `json:"name"`
-	// 头像
-	Avatar *string `json:"avatar"`
-	// 身份证
-	IDCard *string `json:"id_card"`
-	// 出生年月
-	Birth *int `json:"birth"`
-	// 性别{dict:STA002}
-	Sex *string `json:"sex"`
-	// 移动电话
-	Mobile *string `json:"mobile"`
-	// 排序
-	Weight *int `json:"weight"`
-	// 状态{dict:STA001}
-	Status *string `json:"status"`
-	// 备注
-	Remark *string `json:"remark"`
-}
-
 type PermObj struct {
 	// 对象
 	Object string `json:"object"`
@@ -156,11 +133,51 @@ type QDict struct {
 	Type *string `json:"type"`
 }
 
+type QMsgInfo struct {
+	// 接收者
+	Receiver *string `json:"receiver"`
+	// 消息类型{dict:SYS005}
+	Type *string `json:"type"`
+	// 消息级别{dict: SYS006}
+	Level *string `json:"level"`
+	// 消息接收平台{dict:SYS007}
+	Target *string `json:"target"`
+	// 弹出消息是否必须确认{dict:STA005}
+	MustConfirm *string `json:"must_confirm"`
+	// 确认平台{dict:SYS007}
+	ConfirmTarget *string `json:"confirm_target"`
+	// 已读平台{dict:SYS007}
+	ReadTarget *string `json:"read_target"`
+	// 消息状态{ dict:SYS008}
+	State *string `json:"state"`
+	Index *int    `json:"index"`
+	Size  *int    `json:"size"`
+}
+
 type QMsgTemplate struct {
 	// 名称模糊查询
 	Name *string `json:"name"`
 	// 编码模糊查询
 	Code *string `json:"code"`
+}
+
+type QMyMsgInfo struct {
+	// 消息类型{dict:SYS005}
+	Type *string `json:"type"`
+	// 消息级别{dict: SYS006}
+	Level *string `json:"level"`
+	// 消息接收平台{dict:SYS007}
+	Target *string `json:"target"`
+	// 弹出消息是否必须确认{dict:STA005}
+	MustConfirm *string `json:"must_confirm"`
+	// 确认平台{dict:SYS007}
+	ConfirmTarget *string `json:"confirm_target"`
+	// 已读平台{dict:SYS007}
+	ReadTarget *string `json:"read_target"`
+	// 消息状态{ dict:SYS008}
+	State *string `json:"state"`
+	Index *int    `json:"index"`
+	Size  *int    `json:"size"`
 }
 
 type QRole struct {
@@ -255,29 +272,6 @@ type UpdRole struct {
 	Weight *int `json:"weight"`
 	// 状态{dict:STA001}
 	Status *string `json:"status"`
-}
-
-type UpdUser struct {
-	// 用户类型{dict:BUS002}
-	Type *string `json:"type"`
-	// 用户名称
-	Name *string `json:"name"`
-	// 头像
-	Avatar *string `json:"avatar"`
-	// 身份证
-	IDCard *string `json:"id_card"`
-	// 出生年月
-	Birth *int `json:"birth"`
-	// 性别{dict:STA002}
-	Sex *string `json:"sex"`
-	// 移动电话
-	Mobile *string `json:"mobile"`
-	// 排序
-	Weight *int `json:"weight"`
-	// 状态{dict:STA001}
-	Status *string `json:"status"`
-	// 备注
-	Remark *string `json:"remark"`
 }
 
 type Users struct {
