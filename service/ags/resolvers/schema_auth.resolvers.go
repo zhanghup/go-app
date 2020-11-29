@@ -6,11 +6,8 @@ package resolvers
 import (
 	"context"
 	"errors"
-	"github.com/zhanghup/go-app/service/ca"
-	"net/http"
-	"time"
-
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/service/ca"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
@@ -84,28 +81,30 @@ func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 }
 
 func (r *queryResolver) LoginStatus(ctx context.Context) (bool, error) {
-	tok := r.Gin(ctx).GetHeader(directive.GIN_AUTHORIZATION)
-
-	if tok == "" {
-		tokk, err := r.Gin(ctx).Cookie(directive.GIN_TOKEN)
-		if err != nil && err != http.ErrNoCookie {
-			return false, err
-		}
-		tok = tokk
-	}
-	if tok == "" {
-		return false, nil
-	}
-	t := beans.Token{}
-	ok, err := r.DB.Where("id = ? and status = 1", tok).Get(&t)
-	if err != nil {
-		return false, err
-	}
-	if !ok {
-		return false, nil
-	}
-	if time.Now().Unix() > *t.Updated+*t.Expire {
-		return false, nil
-	}
+	_,err := directive.WebAuthFunc(r.DB,r.Gin(ctx))
+	return err == nil,err
+	//tok := r.Gin(ctx).GetHeader(directive.GIN_AUTHORIZATION)
+	//
+	//if tok == "" {
+	//	tokk, err := r.Gin(ctx).Cookie(directive.GIN_TOKEN)
+	//	if err != nil && err != http.ErrNoCookie {
+	//		return false, err
+	//	}
+	//	tok = tokk
+	//}
+	//if tok == "" {
+	//	return false, nil
+	//}
+	//t := beans.Token{}
+	//ok, err := r.DB.Where("id = ? and status = 1", tok).Get(&t)
+	//if err != nil {
+	//	return false, err
+	//}
+	//if !ok {
+	//	return false, nil
+	//}
+	//if time.Now().Unix() > *t.Updated+*t.Expire {
+	//	return false, nil
+	//}
 	return true, nil
 }

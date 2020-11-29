@@ -58,10 +58,16 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     remark: String
 
     o_dept:Dept
+    o_account: Account
 
 }
 
-input NewUser @goModel(model:"map[string]interface{}"){
+input NewUser{
+    user: NewUserInfo!
+    account: NewAccount!
+}
+
+input NewUserInfo @goModel(model:"map[string]interface{}"){
     "所属部门"
     dept: String
     "用户类型{dict:BUS002}"
@@ -86,7 +92,12 @@ input NewUser @goModel(model:"map[string]interface{}"){
     remark: String
 }
 
-input UpdUser  @goModel(model:"map[string]interface{}"){
+input UpdUser{
+    user:UpdUserInfo!
+    account: UpdAccount!
+}
+
+input UpdUserInfo  @goModel(model:"map[string]interface{}"){
     "所属部门"
     dept: String
     "用户类型{dict:BUS002}"

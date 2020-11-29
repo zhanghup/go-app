@@ -34,6 +34,7 @@ type Account struct {
 	Password *string `json:"password"`      // 密码
 	Salt     *string `json:"-" xorm:"salt"` // 加盐
 	Admin    *int    `json:"admin"`         // 是否为管理员账户
+	Default  *int    `json:"default"`       // 是否为默认账户
 }
 
 // 授权

@@ -11,11 +11,17 @@ import (
 	"github.com/zhanghup/go-app/service/api/source"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tog"
 )
 
-func (r *mutationResolver) UserCreate(ctx context.Context, input map[string]interface{}) (string, error) {
-	id, err := r.Create(ctx, new(beans.User), input)
+func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser) (string, error) {
+	id, err := r.Create(ctx, new(beans.User), input.User)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = r.AccountCreate(ctx, *input.Account)
 	if err != nil {
 		return "", err
 	}
@@ -36,7 +42,7 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input map[string]inte
 	return id, err
 }
 
-func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input map[string]interface{}) (bool, error) {
+func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input source.UpdUser) (bool, error) {
 	user, err := r.UserLoader(ctx, id)
 	if err != nil {
 		return false, err
@@ -45,9 +51,32 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input map[
 		return false, errors.New("用户不存在")
 	}
 
-	ok, err := r.Update(ctx, new(beans.User), id, input)
+	ok, err := r.Update(ctx, new(beans.User), id, input.User)
 	if err != nil {
 		return false, err
+	}
+
+	acc, err := r.AccountDefaultLoader(ctx, id)
+	if err != nil {
+		return false, err
+	}
+	if acc == nil {
+		_, err := r.AccountCreate(ctx, source.NewAccount{
+			UID:      id,
+			Type:     input.Account.Type,
+			Username: input.Account.Username,
+			Password: input.Account.Password,
+			Admin:    input.Account.Admin,
+			Default:  tools.Ptr.Int(1),
+		})
+		if err != nil {
+			return false, err
+		}
+	} else {
+		_, err = r.AccountUpdate(ctx, *acc.Id, *input.Account)
+		if err != nil {
+			return false, err
+		}
 	}
 
 	// 用户更新推送
@@ -69,6 +98,14 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 	}
 	ok, err := r.Removes(ctx, new(beans.User), ids)
 	if err != nil || !ok {
+		return false, err
+	}
+
+	// 删除用户下所有的账户
+	err = r.DBS.TS(func(sess *txorm.Session) error {
+		return sess.SF(`delete from account where uid in :ids`, map[string]interface{}{"ids": ids}).Exec()
+	})
+	if err != nil {
 		return false, err
 	}
 
@@ -100,6 +137,10 @@ func (r *userResolver) ODept(ctx context.Context, obj *beans.User) (*beans.Dept,
 		return nil, nil
 	}
 	return r.DeptLoader(ctx, *obj.Dept)
+}
+
+func (r *userResolver) OAccount(ctx context.Context, obj *beans.User) (*beans.Account, error) {
+	return r.AccountDefaultLoader(ctx, *obj.Id)
 }
 
 // User returns source.UserResolver implementation.

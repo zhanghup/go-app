@@ -39,7 +39,9 @@ func (this *Resolver) Create(ctx context.Context, tab interface{}, obj interface
 		if err != nil {
 			return err
 		}
-		_, err = sess.Sess.Table(tab).Where("id = ?", id).Update(obj)
+		if obj != nil {
+			_, err = sess.Sess.Table(tab).Where("id = ?", id).Update(obj)
+		}
 		return err
 	})
 

@@ -7,6 +7,11 @@ import (
 	"github.com/zhanghup/go-app/service/event"
 )
 
+type Accounts struct {
+	Total *int            `json:"total"`
+	Data  []beans.Account `json:"data"`
+}
+
 type CronLogs struct {
 	Total *int            `json:"total"`
 	Data  []beans.CronLog `json:"data"`
@@ -32,6 +37,25 @@ type IPermObj struct {
 type Message struct {
 	Action  event.MsgAction `json:"action"`
 	Message *beans.MsgInfo  `json:"message"`
+}
+
+type NewAccount struct {
+	// 用户ID
+	UID string `json:"uid"`
+	// 账号类型 dict: SYS002
+	Type string `json:"type"`
+	// 用户名
+	Username *string `json:"username"`
+	// 密码
+	Password *string `json:"password"`
+	// 是否为管理员
+	Admin *int `json:"admin"`
+	// 是否为默认账户，默认账户可以在用户列表中可见并且维护
+	Default *int `json:"default"`
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 }
 
 type NewDept struct {
@@ -99,11 +123,23 @@ type NewRole struct {
 	Status *string `json:"status"`
 }
 
+type NewUser struct {
+	User    map[string]interface{} `json:"user"`
+	Account *NewAccount            `json:"account"`
+}
+
 type PermObj struct {
 	// 对象
 	Object string `json:"object"`
 	// 操作权限
 	Mask string `json:"mask"`
+}
+
+type QAccount struct {
+	UID   string `json:"uid"`
+	Index *int   `json:"index"`
+	Size  *int   `json:"size"`
+	Count *bool  `json:"count"`
 }
 
 type QCron struct {
@@ -199,6 +235,23 @@ type Roles struct {
 	Data  []beans.Role `json:"data"`
 }
 
+type UpdAccount struct {
+	// 账号类型 dict: SYS002
+	Type string `json:"type"`
+	// 用户名
+	Username *string `json:"username"`
+	// 密码
+	Password *string `json:"password"`
+	// 是否为管理员
+	Admin *int `json:"admin"`
+	// 是否为默认账户，默认账户可以在用户列表中可见并且维护
+	Default *int `json:"default"`
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
+}
+
 type UpdDept struct {
 	// 组织类型{dict:BUS001}
 	Type *string `json:"type"`
@@ -272,6 +325,11 @@ type UpdRole struct {
 	Weight *int `json:"weight"`
 	// 状态{dict:STA001}
 	Status *string `json:"status"`
+}
+
+type UpdUser struct {
+	User    map[string]interface{} `json:"user"`
+	Account *UpdAccount            `json:"account"`
 }
 
 type Users struct {
