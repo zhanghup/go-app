@@ -26,9 +26,9 @@ func (this *Resolver) Create(ctx context.Context, tab interface{}, obj interface
 					}
 				}
 			case "Status":
-				if t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.Int {
+				if t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.String {
 					if v.Pointer() == 0 {
-						v.Set(reflect.ValueOf(tools.Ptr.Int(1)))
+						v.Set(reflect.ValueOf(tools.Ptr.String("1")))
 					}
 				}
 			}
