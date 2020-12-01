@@ -1,13 +1,13 @@
 extend type Query{
-    depts(query:QDept!):Depts
-    dept(id: String!):Dept
-    dept_tree: Any
+    depts(query:QDept!):Depts  @perm(entity: "dept",perm: "R")
+    dept(id: String!):Dept @perm(entity: "dept",perm: "R")
+    dept_tree: Any @perm(entity: "dept",perm: "R")
 }
 
 extend type Mutation {
-    dept_create(input:NewDept!):String!
-    dept_update(id: String!,input:UpdDept!):Boolean!
-    dept_removes(ids: [String!]):Boolean!
+    dept_create(input:NewDept!):String! @perm(entity: "dept",perm: "C")
+    dept_update(id: String!,input:UpdDept!):Boolean! @perm(entity: "dept",perm: "U")
+    dept_removes(ids: [String!]):Boolean! @perm(entity: "dept",perm: "D")
 }
 
 input QDept{
