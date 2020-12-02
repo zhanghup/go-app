@@ -121,10 +121,14 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.Users, error) {
 	users := make([]beans.User, 0)
 	total, err := r.DBS.SF(`
+		{{ withn ctx }}
 		select * from user u
 		where 1 = 1
 		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
-	`, map[string]interface{}{"keyword": query.Keyword}).Page2(query.Index, query.Size, query.Count, &users)
+	`, map[string]interface{}{
+		"keyword": query.Keyword,
+		"ctx":     ctx,
+	}).Page2(query.Index, query.Size, query.Count, &users)
 	return &source.Users{Data: users, Total: &total}, err
 }
 

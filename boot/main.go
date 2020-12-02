@@ -44,6 +44,7 @@ func (this *Struct) enableXorm() *Struct {
 	}
 	e.ShowSQL(true)
 	this.db = e
+	initia.InitDBTemplate(e)
 	return this
 }
 

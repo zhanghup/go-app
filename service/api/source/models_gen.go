@@ -225,9 +225,13 @@ type QRole struct {
 
 type QUser struct {
 	Keyword *string `json:"keyword"`
-	Index   *int    `json:"index"`
-	Size    *int    `json:"size"`
-	Count   *bool   `json:"count"`
+	// 获取当前权限下的用户
+	Withrole *bool `json:"withrole"`
+	// 状态查询[-1:全部,0:禁止,1:启用]
+	Status *int  `json:"status"`
+	Index  *int  `json:"index"`
+	Size   *int  `json:"size"`
+	Count  *bool `json:"count"`
 }
 
 type Roles struct {

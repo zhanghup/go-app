@@ -16,6 +16,10 @@ extend type Mutation {
 
 input QUser{
     keyword: String
+    "获取当前权限下的用户"
+    withrole: Boolean
+    "状态查询[-1:全部,0:禁止,1:启用]"
+    status: Int
 
     index: Int
     size: Int
