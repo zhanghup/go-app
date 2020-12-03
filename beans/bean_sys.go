@@ -107,6 +107,7 @@ type Resource struct {
 	MD5         string `json:"md5" xorm:"'md5'"`
 	ContentType string `json:"content_type"`
 	Name        string `json:"name"`
+	Date        string `json:"date"`
 	Size        int64  `json:"size"`
 	FileEnd     string `json:"file_end"`
 }
