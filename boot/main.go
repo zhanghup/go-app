@@ -7,7 +7,6 @@ import (
 	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-app/initia"
 	"github.com/zhanghup/go-app/service/ags"
-	"github.com/zhanghup/go-app/service/api"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-app/service/job"
 	"github.com/zhanghup/go-tools/database/txorm"
@@ -79,22 +78,6 @@ func (this *Struct) SyncTables(fn ...func(db *xorm.Engine)) *Struct {
 	return this
 }
 
-// 基础操作接口
-func (this *Struct) RouterAgs() *Struct {
-	this.routerfns = append(this.routerfns, func(g *gin.Engine, db *xorm.Engine) {
-		ags.Gin(g.Group(""), g.Group(""), db)
-	})
-	return this
-}
-
-// 内置api接口
-func (this *Struct) RouterApi() *Struct {
-	this.routerfns = append(this.routerfns, func(g *gin.Engine, db *xorm.Engine) {
-		api.Gin(g.Group(""), this.db)
-	})
-	return this
-}
-
 // 初始化定时任务
 func (this *Struct) JobsInit() *Struct {
 	err := job.InitJobs(this.db)
@@ -123,7 +106,7 @@ func (this *Struct) Jobs(name, spec string, fn func(db *xorm.Engine) error, flag
 }
 
 // 自定义接口
-func (this *Struct) RouterOther(fn ...func(g *gin.Engine, db *xorm.Engine)) *Struct {
+func (this *Struct) Router(fn ...func(g *gin.Engine, db *xorm.Engine)) *Struct {
 	this.routerfns = append(this.routerfns, fn...)
 	return this
 }

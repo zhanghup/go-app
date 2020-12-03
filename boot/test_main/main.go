@@ -1,8 +1,12 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	rice "github.com/giter/go.rice"
 	"github.com/zhanghup/go-app/boot"
+	"github.com/zhanghup/go-app/service/ags"
+	"github.com/zhanghup/go-app/service/api"
+	"xorm.io/xorm"
 )
 
 func main() {
@@ -39,7 +43,9 @@ func main() {
 		//
 		//	return nil
 		//}).
-		RouterAgs().
-		RouterApi().
+		Router(func(g *gin.Engine, db *xorm.Engine) {
+			ags.Gin(g.Group(""), g.Group(""), db)
+			api.Gin(g.Group(""), db)
+		}).
 		StartRouter()
 }
