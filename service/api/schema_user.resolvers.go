@@ -21,6 +21,7 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser)
 		return "", err
 	}
 
+	input.Account.Default = tools.Ptr.Int(1)
 	_, err = r.AccountCreate(ctx, *input.Account)
 	if err != nil {
 		return "", err
@@ -62,7 +63,7 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 	}
 	if acc == nil {
 		_, err := r.AccountCreate(ctx, source.NewAccount{
-			UID:      id,
+			UID:      &id,
 			Type:     input.Account.Type,
 			Username: input.Account.Username,
 			Password: input.Account.Password,
@@ -73,6 +74,7 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 			return false, err
 		}
 	} else {
+		input.Account.Default = tools.Ptr.Int(1)
 		_, err = r.AccountUpdate(ctx, *acc.Id, *input.Account)
 		if err != nil {
 			return false, err
@@ -121,13 +123,20 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.Users, error) {
 	users := make([]beans.User, 0)
 	total, err := r.DBS.SF(`
-		{{ withn ctx }}
-		select * from user u
+		select 
+			u.* 
+		from 
+			user u
+			{{ if .role }} 
+				join role_user ru on ru.uid = u.id and ru.role = :role
+			{{ end }}
 		where 1 = 1
 		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
+		
 	`, map[string]interface{}{
 		"keyword": query.Keyword,
 		"ctx":     ctx,
+		"role":    query.Role,
 	}).Page2(query.Index, query.Size, query.Count, &users)
 	return &source.Users{Data: users, Total: &total}, err
 }

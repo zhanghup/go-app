@@ -2205,7 +2205,9 @@ extend type Mutation {
 }
 
 input QAccount{
-    uid: String!
+    uid: String
+    "用户名查询"
+    username: String
 
     index: Int
     size: Int
@@ -2246,7 +2248,7 @@ type Account @goModel(model:"github.com/zhanghup/go-app/beans.Account") {
 
 input NewAccount {
     "用户ID"
-    uid: String!
+    uid: String
     "账号类型 dict: SYS002"
     type: String!
     "用户名"
@@ -2946,7 +2948,7 @@ extend type Mutation {
 input QUser{
     keyword: String
     "获取当前权限下的用户"
-    withrole: Boolean
+    role: String
     "状态查询[-1:全部,0:禁止,1:启用]"
     status: Int
 
@@ -13206,7 +13208,7 @@ func (ec *executionContext) unmarshalInputNewAccount(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uid"))
-			it.UID, err = ec.unmarshalNString2string(ctx, v)
+			it.UID, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13570,7 +13572,15 @@ func (ec *executionContext) unmarshalInputQAccount(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uid"))
-			it.UID, err = ec.unmarshalNString2string(ctx, v)
+			it.UID, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "username":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			it.Username, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14026,11 +14036,11 @@ func (ec *executionContext) unmarshalInputQUser(ctx context.Context, obj interfa
 			if err != nil {
 				return it, err
 			}
-		case "withrole":
+		case "role":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("withrole"))
-			it.Withrole, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
+			it.Role, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}

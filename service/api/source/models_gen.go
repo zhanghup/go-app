@@ -41,7 +41,7 @@ type Message struct {
 
 type NewAccount struct {
 	// 用户ID
-	UID string `json:"uid"`
+	UID *string `json:"uid"`
 	// 账号类型 dict: SYS002
 	Type string `json:"type"`
 	// 用户名
@@ -136,10 +136,12 @@ type PermObj struct {
 }
 
 type QAccount struct {
-	UID   string `json:"uid"`
-	Index *int   `json:"index"`
-	Size  *int   `json:"size"`
-	Count *bool  `json:"count"`
+	UID *string `json:"uid"`
+	// 用户名查询
+	Username *string `json:"username"`
+	Index    *int    `json:"index"`
+	Size     *int    `json:"size"`
+	Count    *bool   `json:"count"`
 }
 
 type QCron struct {
@@ -226,7 +228,7 @@ type QRole struct {
 type QUser struct {
 	Keyword *string `json:"keyword"`
 	// 获取当前权限下的用户
-	Withrole *bool `json:"withrole"`
+	Role *string `json:"role"`
 	// 状态查询[-1:全部,0:禁止,1:启用]
 	Status *int  `json:"status"`
 	Index  *int  `json:"index"`

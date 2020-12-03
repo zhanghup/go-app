@@ -10,7 +10,9 @@ extend type Mutation {
 }
 
 input QAccount{
-    uid: String!
+    uid: String
+    "用户名查询"
+    username: String
 
     index: Int
     size: Int
@@ -51,7 +53,7 @@ type Account @goModel(model:"github.com/zhanghup/go-app/beans.Account") {
 
 input NewAccount {
     "用户ID"
-    uid: String!
+    uid: String
     "账号类型 dict: SYS002"
     type: String!
     "用户名"

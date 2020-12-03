@@ -6,7 +6,6 @@ package api
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -26,7 +25,7 @@ func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAc
 		input.Password = &password
 	}
 
-	acc.Uid = &input.UID
+	acc.Uid = input.UID
 	acc.Type = &input.Type
 	acc.Username = input.Username
 	acc.Password = input.Password
@@ -93,7 +92,17 @@ func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bo
 }
 
 func (r *queryResolver) Accounts(ctx context.Context, query source.QAccount) (*source.Accounts, error) {
-	panic(fmt.Errorf("not implemented"))
+	account := make([]beans.Account, 0)
+	total, err := r.DBS.SF(`
+		select * from account 
+		where 1 = 1
+		{{ if .uid }} and account.uid = :uid {{ end }}
+		{{ if .username }} and account.username = :username {{ end }}
+	`, map[string]interface{}{
+		"uid":      query.UID,
+		"username": query.Username,
+	}).Page2(query.Index, query.Size, query.Count, &account)
+	return &source.Accounts{Data: account, Total: &total}, err
 }
 
 func (r *queryResolver) Account(ctx context.Context, id string) (*beans.Account, error) {
