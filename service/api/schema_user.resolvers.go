@@ -67,7 +67,6 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 			Type:     input.Account.Type,
 			Username: input.Account.Username,
 			Password: input.Account.Password,
-			Admin:    input.Account.Admin,
 			Default:  tools.Ptr.Int(1),
 		})
 		if err != nil {

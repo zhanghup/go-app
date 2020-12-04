@@ -23,6 +23,7 @@ type User struct {
 	Sex    *string `json:"sex"`     // 人物性别
 	Mobile *string `json:"mobile"`  // 联系电话
 	Remark *string `json:"remark"`  // 备注
+	Admin *string `json:"admin"` // 是否为管理员账户
 }
 
 // 账户
@@ -33,7 +34,6 @@ type Account struct {
 	Username *string `json:"username"`      // 用户名
 	Password *string `json:"password"`      // 密码
 	Salt     *string `json:"-" xorm:"salt"` // 加盐
-	Admin    *int    `json:"admin"`         // 是否为管理员账户
 	Default  *int    `json:"default"`       // 是否为默认账户
 }
 

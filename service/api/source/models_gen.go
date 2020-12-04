@@ -48,8 +48,6 @@ type NewAccount struct {
 	Username *string `json:"username"`
 	// 密码
 	Password *string `json:"password"`
-	// 是否为管理员
-	Admin *int `json:"admin"`
 	// 是否为默认账户，默认账户可以在用户列表中可见并且维护
 	Default *int `json:"default"`
 	// 排序
@@ -248,8 +246,6 @@ type UpdAccount struct {
 	Username *string `json:"username"`
 	// 密码
 	Password *string `json:"password"`
-	// 是否为管理员
-	Admin *int `json:"admin"`
 	// 是否为默认账户，默认账户可以在用户列表中可见并且维护
 	Default *int `json:"default"`
 	// 排序

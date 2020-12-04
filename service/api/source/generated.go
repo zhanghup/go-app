@@ -52,7 +52,6 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Account struct {
-		Admin    func(childComplexity int) int
 		Created  func(childComplexity int) int
 		Default  func(childComplexity int) int
 		Id       func(childComplexity int) int
@@ -299,6 +298,7 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
+		Admin    func(childComplexity int) int
 		Avatar   func(childComplexity int) int
 		Birth    func(childComplexity int) int
 		Created  func(childComplexity int) int
@@ -411,13 +411,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
-
-	case "Account.admin":
-		if e.complexity.Account.Admin == nil {
-			break
-		}
-
-		return e.complexity.Account.Admin(childComplexity), true
 
 	case "Account.created":
 		if e.complexity.Account.Created == nil {
@@ -1956,6 +1949,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subscription.Message(childComplexity), true
 
+	case "User.admin":
+		if e.complexity.User.Admin == nil {
+			break
+		}
+
+		return e.complexity.User.Admin(childComplexity), true
+
 	case "User.avatar":
 		if e.complexity.User.Avatar == nil {
 			break
@@ -2230,8 +2230,6 @@ type Account @goModel(model:"github.com/zhanghup/go-app/beans.Account") {
     username: String
     "密码"
     password:String
-    "是否为管理员"
-    admin: Int
     "是否为默认账户，默认账户可以在用户列表中可见并且维护"
     default: Int
 
@@ -2255,8 +2253,6 @@ input NewAccount {
     username: String
     "密码"
     password:String
-    "是否为管理员"
-    admin: Int
     "是否为默认账户，默认账户可以在用户列表中可见并且维护"
     default: Int
 
@@ -2274,8 +2270,6 @@ input UpdAccount {
     username: String
     "密码"
     password:String
-    "是否为管理员"
-    admin: Int
     "是否为默认账户，默认账户可以在用户列表中可见并且维护"
     default: Int
 
@@ -2991,6 +2985,8 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     status: String
     "备注"
     remark: String
+    "是否为管理员{dict:STA005}"
+    admin: String
 
     o_dept:Dept
     o_account: Account
@@ -3025,6 +3021,8 @@ input NewUserInfo @goModel(model:"map[string]interface{}"){
     status: String
     "备注"
     remark: String
+    "是否为管理员{dict:STA005}"
+    admin: String
 }
 
 input UpdUser{
@@ -3055,6 +3053,8 @@ input UpdUserInfo  @goModel(model:"map[string]interface{}"){
     status: String
     "备注"
     remark: String
+    "是否为管理员{dict:STA005}"
+    admin: String
 }
 
 `, BuiltIn: false},
@@ -4140,38 +4140,6 @@ func (ec *executionContext) _Account_password(ctx context.Context, field graphql
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Account_admin(ctx context.Context, field graphql.CollectedField, obj *beans.Account) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Account",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Admin, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Account_default(ctx context.Context, field graphql.CollectedField, obj *beans.Account) (ret graphql.Marshaler) {
@@ -11955,6 +11923,38 @@ func (ec *executionContext) _User_remark(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _User_admin(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Admin, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _User_o_dept(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -13236,14 +13236,6 @@ func (ec *executionContext) unmarshalInputNewAccount(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "admin":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("admin"))
-			it.Admin, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "default":
 			var err error
 
@@ -14112,14 +14104,6 @@ func (ec *executionContext) unmarshalInputUpdAccount(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "admin":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("admin"))
-			it.Admin, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "default":
 			var err error
 
@@ -14507,8 +14491,6 @@ func (ec *executionContext) _Account(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Account_username(ctx, field, obj)
 		case "password":
 			out.Values[i] = ec._Account_password(ctx, field, obj)
-		case "admin":
-			out.Values[i] = ec._Account_admin(ctx, field, obj)
 		case "default":
 			out.Values[i] = ec._Account_default(ctx, field, obj)
 		case "created":
@@ -15674,6 +15656,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_status(ctx, field, obj)
 		case "remark":
 			out.Values[i] = ec._User_remark(ctx, field, obj)
+		case "admin":
+			out.Values[i] = ec._User_admin(ctx, field, obj)
 		case "o_dept":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {

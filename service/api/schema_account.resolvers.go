@@ -29,7 +29,6 @@ func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAc
 	acc.Type = &input.Type
 	acc.Username = input.Username
 	acc.Password = input.Password
-	acc.Admin = input.Admin
 	acc.Default = input.Default
 
 	session := r.DBS.NewSession(ctx)

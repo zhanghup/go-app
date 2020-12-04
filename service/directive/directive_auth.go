@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/ca"
-	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
 	"strings"
@@ -94,55 +93,14 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 			return nil, errors.New("[10] 未授权")
 		}
 		user.User = u
-	}
-	// 是否为管理员用户
-	{
-		acc := beans.Account{}
-		ok, err := db.Table(acc).Where("id = ? and status = 1", *user.Token.Aid).Get(&acc)
-		if err != nil {
-			return err.Error(), errors.New("[11] 未授权")
+		if u.Admin != nil && *u.Admin == "1" {
+			user.Admin = true
+		} else {
+			user.Admin = false
 		}
-		if !ok {
-			return nil, errors.New("[12] 未授权")
-		}
-		user.Account = acc
-
-		admin := true
-		if acc.Admin == nil || *acc.Admin == 0 {
-			admin = false
-		}
-		user.Admin = admin
 	}
 
 	if !user.Admin {
-		// 读取权限列表
-		myPerms := Perms{}
-		{
-			perms := make([]struct {
-				Type string `json:"type"`
-				Oid  string `json:"oid"`
-			}, 0)
-			err := dbs.SF(`
-						select p.type,p.oid from user u 
-						join role_user ru on u.id = ru.uid
-						join perm p on p.role = ru.id
-					`).Find(&perms)
-			if err != nil {
-				return err.Error(), errors.New("[11] 未授权")
-			}
-			// 去重
-			for _, p := range perms {
-				if o, ok := myPerms[p.Type]; ok {
-					if !tools.Str.Contains(o, p.Oid) {
-						o = append(o, p.Oid)
-						myPerms[p.Type] = o
-					}
-				} else {
-					myPerms[p.Type] = []string{p.Oid}
-				}
-			}
-		}
-
 		// 读取对象权限
 		myPermObj := PermObjects{}
 		{
@@ -181,7 +139,6 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 
 		}
 
-		user.Perms = myPerms
 		user.PermObjects = myPermObj
 	}
 

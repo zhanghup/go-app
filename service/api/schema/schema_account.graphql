@@ -35,8 +35,6 @@ type Account @goModel(model:"github.com/zhanghup/go-app/beans.Account") {
     username: String
     "密码"
     password:String
-    "是否为管理员"
-    admin: Int
     "是否为默认账户，默认账户可以在用户列表中可见并且维护"
     default: Int
 
@@ -60,8 +58,6 @@ input NewAccount {
     username: String
     "密码"
     password:String
-    "是否为管理员"
-    admin: Int
     "是否为默认账户，默认账户可以在用户列表中可见并且维护"
     default: Int
 
@@ -79,8 +75,6 @@ input UpdAccount {
     username: String
     "密码"
     password:String
-    "是否为管理员"
-    admin: Int
     "是否为默认账户，默认账户可以在用户列表中可见并且维护"
     default: Int
 

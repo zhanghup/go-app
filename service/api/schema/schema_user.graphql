@@ -60,6 +60,8 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     status: String
     "备注"
     remark: String
+    "是否为管理员{dict:STA005}"
+    admin: String
 
     o_dept:Dept
     o_account: Account
@@ -94,6 +96,8 @@ input NewUserInfo @goModel(model:"map[string]interface{}"){
     status: String
     "备注"
     remark: String
+    "是否为管理员{dict:STA005}"
+    admin: String
 }
 
 input UpdUser{
@@ -124,5 +128,7 @@ input UpdUserInfo  @goModel(model:"map[string]interface{}"){
     status: String
     "备注"
     remark: String
+    "是否为管理员{dict:STA005}"
+    admin: String
 }
 

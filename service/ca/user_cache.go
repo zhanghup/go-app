@@ -13,7 +13,6 @@ type User struct {
 	Account     beans.Account
 	Token       beans.Token
 	PermObjects map[string]string
-	Perms       map[string][]string
 	Admin       bool
 	TokenString string
 }
