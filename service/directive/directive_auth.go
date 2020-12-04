@@ -50,7 +50,7 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 			return err, errors.New("[3] 未授权")
 		}
 		ca.UserCache.Set(tok, user)
-		c.Set("user_info", user)
+		c.Set(GIN_USER, user)
 		c.SetCookie(GIN_TOKEN, user.TokenString, 2*60*60, "/", "", false, true)
 		return nil, nil
 	}
@@ -142,7 +142,7 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 		user.PermObjects = myPermObj
 	}
 
-	c.Set("user_info", user)
+	c.Set(GIN_USER, user)
 	ca.UserCache.Set(user.TokenString, user)
 	c.SetCookie(GIN_TOKEN, user.TokenString, 2*60*60, "/", "", false, true)
 	c.Next()

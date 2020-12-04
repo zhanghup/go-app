@@ -44,6 +44,7 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser)
 }
 
 func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input source.UpdUser) (bool, error) {
+	// 读取库存用户
 	user, err := r.UserLoader(ctx, id)
 	if err != nil {
 		return false, err
@@ -52,11 +53,13 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 		return false, errors.New("用户不存在")
 	}
 
+	// 更新用户
 	ok, err := r.Update(ctx, new(beans.User), id, input.User)
 	if err != nil {
 		return false, err
 	}
 
+	// 更新账户
 	acc, err := r.AccountDefaultLoader(ctx, id)
 	if err != nil {
 		return false, err

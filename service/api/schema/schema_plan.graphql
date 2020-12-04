@@ -1,0 +1,78 @@
+extend type Query{
+    plans(query:QPlan!):Plans
+    plan(id: String!):Plan
+}
+
+extend type Mutation {
+    plan_create(input:NewPlan!):String!
+    plan_update(id: String!,input:UpdPlan!):Boolean!
+    plan_removes(ids: [String!]):Boolean!
+}
+
+input QPlan{
+    "状态{dict:STA001}"
+    status: String
+
+    index: Int
+    size: Int
+    count: Boolean
+}
+
+type Plans{
+    total: Int
+    data:[Plan!]
+}
+
+type Plan @goModel(model:"github.com/zhanghup/go-app/beans.Plan") {
+    id: String
+
+    "计划名称"
+    name: String
+    "发起人"
+    puid: String
+    "发起人名称"
+    puname: String
+    "计划开始时间"
+    pstime: Int64
+    "计划结束时间"
+    petime: Int64
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+
+}
+
+input NewPlan {
+    "计划名称"
+    name: String
+    "计划开始时间"
+    pstime: Int64
+    "计划结束时间"
+    petime: Int64
+
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+
+input UpdPlan {
+    "计划名称"
+    name: String
+    "计划开始时间"
+    pstime: Int64
+    "计划结束时间"
+    petime: Int64
+
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+

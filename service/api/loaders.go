@@ -63,3 +63,9 @@ func (this *Resolver) AccountDefaultLoader(ctx context.Context, uid string) (*be
 	err := this.Loader(ctx).Object(result, "select * from account where uid in :keys and `default` = 1", nil, "Uid", "").Load(uid, result)
 	return result, err
 }
+
+func (this *Resolver) PlanLoader(ctx context.Context, id string) (*beans.Plan, error) {
+	result := new(beans.Plan)
+	err := this.Loader(ctx).Object(result, "select * from plan where id in :keys", nil, "Id", "").Load(id, result)
+	return result, err
+}

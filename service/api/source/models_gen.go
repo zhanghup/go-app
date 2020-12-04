@@ -110,6 +110,19 @@ type NewMsgConfirm struct {
 	Remark *string `json:"remark"`
 }
 
+type NewPlan struct {
+	// 计划名称
+	Name *string `json:"name"`
+	// 计划开始时间
+	Pstime *int64 `json:"pstime"`
+	// 计划结束时间
+	Petime *int64 `json:"petime"`
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
+}
+
 type NewRole struct {
 	// 角色描述
 	Name *string `json:"name"`
@@ -131,6 +144,11 @@ type PermObj struct {
 	Object string `json:"object"`
 	// 操作权限
 	Mask string `json:"mask"`
+}
+
+type Plans struct {
+	Total *int         `json:"total"`
+	Data  []beans.Plan `json:"data"`
 }
 
 type QAccount struct {
@@ -237,6 +255,14 @@ type QMyMsgInfo struct {
 	Size   *int    `json:"size"`
 }
 
+type QPlan struct {
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
+	Index  *int    `json:"index"`
+	Size   *int    `json:"size"`
+	Count  *bool   `json:"count"`
+}
+
 type QRole struct {
 	Keyword *string `json:"keyword"`
 	// 状态{dict:STA001}
@@ -339,6 +365,19 @@ type UpdMsgTemplate struct {
 	ImgPath *string `json:"img_path"`
 	// 备注
 	Remark *string `json:"remark"`
+}
+
+type UpdPlan struct {
+	// 计划名称
+	Name *string `json:"name"`
+	// 计划开始时间
+	Pstime *int64 `json:"pstime"`
+	// 计划结束时间
+	Petime *int64 `json:"petime"`
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 }
 
 type UpdRole struct {

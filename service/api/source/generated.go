@@ -222,6 +222,9 @@ type ComplexityRoot struct {
 		MsgTemplateUpdate func(childComplexity int, id string, input UpdMsgTemplate) int
 		MyMsgInfoConfirm  func(childComplexity int, id string, input NewMsgConfirm) int
 		MyMsgInfoRead     func(childComplexity int, id string) int
+		PlanCreate        func(childComplexity int, input NewPlan) int
+		PlanRemoves       func(childComplexity int, ids []string) int
+		PlanUpdate        func(childComplexity int, id string, input UpdPlan) int
 		RoleCreate        func(childComplexity int, input NewRole) int
 		RolePermCreate    func(childComplexity int, id string, typeArg string, perms []string) int
 		RolePermObjCreate func(childComplexity int, id string, perms []IPermObj) int
@@ -251,6 +254,24 @@ type ComplexityRoot struct {
 		Object func(childComplexity int) int
 	}
 
+	Plan struct {
+		Created func(childComplexity int) int
+		Id      func(childComplexity int) int
+		Name    func(childComplexity int) int
+		Petime  func(childComplexity int) int
+		Pstime  func(childComplexity int) int
+		Puid    func(childComplexity int) int
+		Puname  func(childComplexity int) int
+		Status  func(childComplexity int) int
+		Updated func(childComplexity int) int
+		Weight  func(childComplexity int) int
+	}
+
+	Plans struct {
+		Data  func(childComplexity int) int
+		Total func(childComplexity int) int
+	}
+
 	Query struct {
 		Account         func(childComplexity int, id string) int
 		Accounts        func(childComplexity int, query QAccount) int
@@ -268,6 +289,8 @@ type ComplexityRoot struct {
 		MsgTemplates    func(childComplexity int, query QMsgTemplate) int
 		MyInfo          func(childComplexity int) int
 		MyMsgInfos      func(childComplexity int, query QMyMsgInfo) int
+		Plan            func(childComplexity int, id string) int
+		Plans           func(childComplexity int, query QPlan) int
 		Role            func(childComplexity int, id string) int
 		RolePermObjects func(childComplexity int, id string) int
 		RolePerms       func(childComplexity int, id string, typeArg *string) int
@@ -350,6 +373,9 @@ type MutationResolver interface {
 	MyMsgInfoConfirm(ctx context.Context, id string, input NewMsgConfirm) (bool, error)
 	MyMsgInfoRead(ctx context.Context, id string) (bool, error)
 	MsgTemplateUpdate(ctx context.Context, id string, input UpdMsgTemplate) (bool, error)
+	PlanCreate(ctx context.Context, input NewPlan) (string, error)
+	PlanUpdate(ctx context.Context, id string, input UpdPlan) (bool, error)
+	PlanRemoves(ctx context.Context, ids []string) (bool, error)
 	RoleCreate(ctx context.Context, input NewRole) (bool, error)
 	RoleUpdate(ctx context.Context, id string, input UpdRole) (bool, error)
 	RoleRemoves(ctx context.Context, ids []string) (bool, error)
@@ -381,6 +407,8 @@ type QueryResolver interface {
 	MsgTemplates(ctx context.Context, query QMsgTemplate) ([]beans.MsgTemplate, error)
 	MsgTemplate(ctx context.Context, id string) (*beans.MsgTemplate, error)
 	MsgInfos(ctx context.Context, query QMsgInfo) ([]beans.MsgInfo, error)
+	Plans(ctx context.Context, query QPlan) (*Plans, error)
+	Plan(ctx context.Context, id string) (*beans.Plan, error)
 	Roles(ctx context.Context, query QRole) (*Roles, error)
 	Role(ctx context.Context, id string) (*beans.Role, error)
 	RolePerms(ctx context.Context, id string, typeArg *string) ([]string, error)
@@ -1424,6 +1452,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.MyMsgInfoRead(childComplexity, args["id"].(string)), true
 
+	case "Mutation.plan_create":
+		if e.complexity.Mutation.PlanCreate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_plan_create_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PlanCreate(childComplexity, args["input"].(NewPlan)), true
+
+	case "Mutation.plan_removes":
+		if e.complexity.Mutation.PlanRemoves == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_plan_removes_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PlanRemoves(childComplexity, args["ids"].([]string)), true
+
+	case "Mutation.plan_update":
+		if e.complexity.Mutation.PlanUpdate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_plan_update_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PlanUpdate(childComplexity, args["id"].(string), args["input"].(UpdPlan)), true
+
 	case "Mutation.role_create":
 		if e.complexity.Mutation.RoleCreate == nil {
 			break
@@ -1616,6 +1680,90 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PermObj.Object(childComplexity), true
 
+	case "Plan.created":
+		if e.complexity.Plan.Created == nil {
+			break
+		}
+
+		return e.complexity.Plan.Created(childComplexity), true
+
+	case "Plan.id":
+		if e.complexity.Plan.Id == nil {
+			break
+		}
+
+		return e.complexity.Plan.Id(childComplexity), true
+
+	case "Plan.name":
+		if e.complexity.Plan.Name == nil {
+			break
+		}
+
+		return e.complexity.Plan.Name(childComplexity), true
+
+	case "Plan.petime":
+		if e.complexity.Plan.Petime == nil {
+			break
+		}
+
+		return e.complexity.Plan.Petime(childComplexity), true
+
+	case "Plan.pstime":
+		if e.complexity.Plan.Pstime == nil {
+			break
+		}
+
+		return e.complexity.Plan.Pstime(childComplexity), true
+
+	case "Plan.puid":
+		if e.complexity.Plan.Puid == nil {
+			break
+		}
+
+		return e.complexity.Plan.Puid(childComplexity), true
+
+	case "Plan.puname":
+		if e.complexity.Plan.Puname == nil {
+			break
+		}
+
+		return e.complexity.Plan.Puname(childComplexity), true
+
+	case "Plan.status":
+		if e.complexity.Plan.Status == nil {
+			break
+		}
+
+		return e.complexity.Plan.Status(childComplexity), true
+
+	case "Plan.updated":
+		if e.complexity.Plan.Updated == nil {
+			break
+		}
+
+		return e.complexity.Plan.Updated(childComplexity), true
+
+	case "Plan.weight":
+		if e.complexity.Plan.Weight == nil {
+			break
+		}
+
+		return e.complexity.Plan.Weight(childComplexity), true
+
+	case "Plans.data":
+		if e.complexity.Plans.Data == nil {
+			break
+		}
+
+		return e.complexity.Plans.Data(childComplexity), true
+
+	case "Plans.total":
+		if e.complexity.Plans.Total == nil {
+			break
+		}
+
+		return e.complexity.Plans.Total(childComplexity), true
+
 	case "Query.account":
 		if e.complexity.Query.Account == nil {
 			break
@@ -1792,6 +1940,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.MyMsgInfos(childComplexity, args["query"].(QMyMsgInfo)), true
+
+	case "Query.plan":
+		if e.complexity.Query.Plan == nil {
+			break
+		}
+
+		args, err := ec.field_Query_plan_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Plan(childComplexity, args["id"].(string)), true
+
+	case "Query.plans":
+		if e.complexity.Query.Plans == nil {
+			break
+		}
+
+		args, err := ec.field_Query_plans_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Plans(childComplexity, args["query"].(QPlan)), true
 
 	case "Query.role":
 		if e.complexity.Query.Role == nil {
@@ -2848,6 +3020,85 @@ input UpdMsgTemplate{
     "备注"
     remark: String
 }`, BuiltIn: false},
+	{Name: "schema/schema_plan.graphql", Input: `extend type Query{
+    plans(query:QPlan!):Plans
+    plan(id: String!):Plan
+}
+
+extend type Mutation {
+    plan_create(input:NewPlan!):String!
+    plan_update(id: String!,input:UpdPlan!):Boolean!
+    plan_removes(ids: [String!]):Boolean!
+}
+
+input QPlan{
+    "状态{dict:STA001}"
+    status: String
+
+    index: Int
+    size: Int
+    count: Boolean
+}
+
+type Plans{
+    total: Int
+    data:[Plan!]
+}
+
+type Plan @goModel(model:"github.com/zhanghup/go-app/beans.Plan") {
+    id: String
+
+    "计划名称"
+    name: String
+    "发起人"
+    puid: String
+    "发起人名称"
+    puname: String
+    "计划开始时间"
+    pstime: Int64
+    "计划结束时间"
+    petime: Int64
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+
+}
+
+input NewPlan {
+    "计划名称"
+    name: String
+    "计划开始时间"
+    pstime: Int64
+    "计划结束时间"
+    petime: Int64
+
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+
+input UpdPlan {
+    "计划名称"
+    name: String
+    "计划开始时间"
+    pstime: Int64
+    "计划结束时间"
+    petime: Int64
+
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+
+`, BuiltIn: false},
 	{Name: "schema/schema_role.graphql", Input: `extend type Query {
     "角色列表（分页）"
     roles(query: QRole!): Roles @perm(entity: "role",perm: "R")
@@ -3469,6 +3720,60 @@ func (ec *executionContext) field_Mutation_my_msg_info_read_args(ctx context.Con
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_plan_create_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 NewPlan
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewPlan2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewPlan(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_plan_removes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["ids"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ids"))
+		arg0, err = ec.unmarshalOString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["ids"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_plan_update_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 UpdPlan
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdPlan2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐUpdPlan(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_role_create_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3860,6 +4165,36 @@ func (ec *executionContext) field_Query_my_msg_infos_args(ctx context.Context, r
 	if tmp, ok := rawArgs["query"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("query"))
 		arg0, err = ec.unmarshalNQMyMsgInfo2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐQMyMsgInfo(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["query"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_plan_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_plans_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 QPlan
+	if tmp, ok := rawArgs["query"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("query"))
+		arg0, err = ec.unmarshalNQPlan2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐQPlan(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -8786,6 +9121,132 @@ func (ec *executionContext) _Mutation_msg_template_update(ctx context.Context, f
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_plan_create(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_plan_create_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PlanCreate(rctx, args["input"].(NewPlan))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_plan_update(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_plan_update_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PlanUpdate(rctx, args["id"].(string), args["input"].(UpdPlan))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_plan_removes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_plan_removes_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PlanRemoves(rctx, args["ids"].([]string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_role_create(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9786,6 +10247,390 @@ func (ec *executionContext) _PermObj_mask(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Plan_id(ctx context.Context, field graphql.CollectedField, obj *beans.Plan) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Plan",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Id, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Plan_name(ctx context.Context, field graphql.CollectedField, obj *beans.Plan) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Plan",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Plan_puid(ctx context.Context, field graphql.CollectedField, obj *beans.Plan) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Plan",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Puid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Plan_puname(ctx context.Context, field graphql.CollectedField, obj *beans.Plan) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Plan",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Puname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Plan_pstime(ctx context.Context, field graphql.CollectedField, obj *beans.Plan) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Plan",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Pstime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Plan_petime(ctx context.Context, field graphql.CollectedField, obj *beans.Plan) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Plan",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Petime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Plan_created(ctx context.Context, field graphql.CollectedField, obj *beans.Plan) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Plan",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Created, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Plan_updated(ctx context.Context, field graphql.CollectedField, obj *beans.Plan) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Plan",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Updated, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Plan_weight(ctx context.Context, field graphql.CollectedField, obj *beans.Plan) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Plan",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Weight, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Plan_status(ctx context.Context, field graphql.CollectedField, obj *beans.Plan) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Plan",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Plans_total(ctx context.Context, field graphql.CollectedField, obj *Plans) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Plans",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Plans_data(ctx context.Context, field graphql.CollectedField, obj *Plans) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Plans",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Data, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]beans.Plan)
+	fc.Result = res
+	return ec.marshalOPlan2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐPlanᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_stat(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -10643,6 +11488,84 @@ func (ec *executionContext) _Query_msg_infos(ctx context.Context, field graphql.
 	res := resTmp.([]beans.MsgInfo)
 	fc.Result = res
 	return ec.marshalOMsgInfo2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfoᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_plans(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_plans_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Plans(rctx, args["query"].(QPlan))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Plans)
+	fc.Result = res
+	return ec.marshalOPlans2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐPlans(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_plan(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_plan_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Plan(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*beans.Plan)
+	fc.Result = res
+	return ec.marshalOPlan2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐPlan(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_roles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -13505,6 +14428,58 @@ func (ec *executionContext) unmarshalInputNewMsgConfirm(ctx context.Context, obj
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewPlan(ctx context.Context, obj interface{}) (NewPlan, error) {
+	var it NewPlan
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pstime":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pstime"))
+			it.Pstime, err = ec.unmarshalOInt642ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "petime":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("petime"))
+			it.Petime, err = ec.unmarshalOInt642ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "weight":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weight"))
+			it.Weight, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewRole(ctx context.Context, obj interface{}) (NewRole, error) {
 	var it NewRole
 	var asMap = obj.(map[string]interface{})
@@ -14073,6 +15048,50 @@ func (ec *executionContext) unmarshalInputQMyMsgInfo(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputQPlan(ctx context.Context, obj interface{}) (QPlan, error) {
+	var it QPlan
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "index":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("index"))
+			it.Index, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "size":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("size"))
+			it.Size, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "count":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("count"))
+			it.Count, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputQRole(ctx context.Context, obj interface{}) (QRole, error) {
 	var it QRole
 	var asMap = obj.(map[string]interface{})
@@ -14492,6 +15511,58 @@ func (ec *executionContext) unmarshalInputUpdMsgTemplate(ctx context.Context, ob
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remark"))
 			it.Remark, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdPlan(ctx context.Context, obj interface{}) (UpdPlan, error) {
+	var it UpdPlan
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pstime":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pstime"))
+			it.Pstime, err = ec.unmarshalOInt642ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "petime":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("petime"))
+			it.Petime, err = ec.unmarshalOInt642ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "weight":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weight"))
+			it.Weight, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15224,6 +16295,21 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "plan_create":
+			out.Values[i] = ec._Mutation_plan_create(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "plan_update":
+			out.Values[i] = ec._Mutation_plan_update(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "plan_removes":
+			out.Values[i] = ec._Mutation_plan_removes(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "role_create":
 			out.Values[i] = ec._Mutation_role_create(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -15350,6 +16436,74 @@ func (ec *executionContext) _PermObj(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var planImplementors = []string{"Plan"}
+
+func (ec *executionContext) _Plan(ctx context.Context, sel ast.SelectionSet, obj *beans.Plan) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, planImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Plan")
+		case "id":
+			out.Values[i] = ec._Plan_id(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._Plan_name(ctx, field, obj)
+		case "puid":
+			out.Values[i] = ec._Plan_puid(ctx, field, obj)
+		case "puname":
+			out.Values[i] = ec._Plan_puname(ctx, field, obj)
+		case "pstime":
+			out.Values[i] = ec._Plan_pstime(ctx, field, obj)
+		case "petime":
+			out.Values[i] = ec._Plan_petime(ctx, field, obj)
+		case "created":
+			out.Values[i] = ec._Plan_created(ctx, field, obj)
+		case "updated":
+			out.Values[i] = ec._Plan_updated(ctx, field, obj)
+		case "weight":
+			out.Values[i] = ec._Plan_weight(ctx, field, obj)
+		case "status":
+			out.Values[i] = ec._Plan_status(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var plansImplementors = []string{"Plans"}
+
+func (ec *executionContext) _Plans(ctx context.Context, sel ast.SelectionSet, obj *Plans) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, plansImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Plans")
+		case "total":
+			out.Values[i] = ec._Plans_total(ctx, field, obj)
+		case "data":
+			out.Values[i] = ec._Plans_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15561,6 +16715,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_msg_infos(ctx, field)
+				return res
+			})
+		case "plans":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_plans(ctx, field)
+				return res
+			})
+		case "plan":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_plan(ctx, field)
 				return res
 			})
 		case "roles":
@@ -16192,6 +17368,11 @@ func (ec *executionContext) unmarshalNNewMsgConfirm2githubᚗcomᚋzhanghupᚋgo
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNNewPlan2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewPlan(ctx context.Context, v interface{}) (NewPlan, error) {
+	res, err := ec.unmarshalInputNewPlan(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNNewRole2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewRole(ctx context.Context, v interface{}) (NewRole, error) {
 	res, err := ec.unmarshalInputNewRole(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -16208,6 +17389,10 @@ func (ec *executionContext) unmarshalNNewUserInfo2map(ctx context.Context, v int
 
 func (ec *executionContext) marshalNPermObj2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐPermObj(ctx context.Context, sel ast.SelectionSet, v PermObj) graphql.Marshaler {
 	return ec._PermObj(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPlan2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐPlan(ctx context.Context, sel ast.SelectionSet, v beans.Plan) graphql.Marshaler {
+	return ec._Plan(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalNQAccount2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐQAccount(ctx context.Context, v interface{}) (QAccount, error) {
@@ -16242,6 +17427,11 @@ func (ec *executionContext) unmarshalNQMsgTemplate2githubᚗcomᚋzhanghupᚋgo�
 
 func (ec *executionContext) unmarshalNQMyMsgInfo2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐQMyMsgInfo(ctx context.Context, v interface{}) (QMyMsgInfo, error) {
 	res, err := ec.unmarshalInputQMyMsgInfo(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNQPlan2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐQPlan(ctx context.Context, v interface{}) (QPlan, error) {
+	res, err := ec.unmarshalInputQPlan(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -16331,6 +17521,11 @@ func (ec *executionContext) unmarshalNUpdDictItem2githubᚗcomᚋzhanghupᚋgo�
 
 func (ec *executionContext) unmarshalNUpdMsgTemplate2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐUpdMsgTemplate(ctx context.Context, v interface{}) (UpdMsgTemplate, error) {
 	res, err := ec.unmarshalInputUpdMsgTemplate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdPlan2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐUpdPlan(ctx context.Context, v interface{}) (UpdPlan, error) {
+	res, err := ec.unmarshalInputUpdPlan(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -17107,6 +18302,60 @@ func (ec *executionContext) marshalOPermObj2ᚕgithubᚗcomᚋzhanghupᚋgoᚑap
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) marshalOPlan2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐPlanᚄ(ctx context.Context, sel ast.SelectionSet, v []beans.Plan) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPlan2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐPlan(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOPlan2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐPlan(ctx context.Context, sel ast.SelectionSet, v *beans.Plan) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Plan(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOPlans2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐPlans(ctx context.Context, sel ast.SelectionSet, v *Plans) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Plans(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOQDict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐQDict(ctx context.Context, v interface{}) (*QDict, error) {

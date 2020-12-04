@@ -10,6 +10,7 @@ const (
 	GIN_CONTEXT       = "gin-context"
 	GIN_TOKEN         = "gin-token"
 	GIN_AUTHORIZATION = "Authorization"
+	GIN_USER          = "user_info"
 )
 
 type Me struct {
@@ -20,6 +21,6 @@ type Me struct {
 func MyInfo(g context.Context) Me {
 	gg := g.Value(GIN_CONTEXT)
 	ggg := gg.(*gin.Context)
-	user, _ := ggg.Get("user_info")
+	user, _ := ggg.Get(GIN_USER)
 	return Me{ggg, user.(ca.User)}
 }

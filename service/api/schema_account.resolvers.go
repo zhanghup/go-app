@@ -9,6 +9,7 @@ import (
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
+	"github.com/zhanghup/go-app/service/ca"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
 )
@@ -83,10 +84,22 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 		}
 	}
 
+	// 删除登录状态缓存
+	ca.UserCache.RemoveByUser(*acc.Uid)
+
 	return r.Update(session.Context(), acc, id, input)
 }
 
 func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bool, error) {
+	uids := make([]string, 0)
+	err := r.DB.In("id", ids).Cols("uid").Find(&uids)
+	if err != nil {
+		return false, err
+	}
+	for _, s := range uids {
+		// 删除登录状态缓存
+		ca.UserCache.RemoveByUser(s)
+	}
 	return r.Removes(ctx, new(beans.Account), ids)
 }
 
