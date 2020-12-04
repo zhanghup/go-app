@@ -7,6 +7,11 @@ import (
 	"github.com/zhanghup/go-app/service/event"
 )
 
+type Accounts struct {
+	Total *int            `json:"total"`
+	Data  []beans.Account `json:"data"`
+}
+
 type CronLogs struct {
 	Total *int            `json:"total"`
 	Data  []beans.CronLog `json:"data"`
@@ -32,6 +37,25 @@ type IPermObj struct {
 type Message struct {
 	Action  event.MsgAction `json:"action"`
 	Message *beans.MsgInfo  `json:"message"`
+}
+
+type NewAccount struct {
+	// 用户ID
+	UID *string `json:"uid"`
+	// 账号类型 dict: SYS002
+	Type string `json:"type"`
+	// 用户名
+	Username *string `json:"username"`
+	// 密码
+	Password *string `json:"password"`
+	// 是否为管理员
+	Admin *int `json:"admin"`
+	// 是否为默认账户，默认账户可以在用户列表中可见并且维护
+	Default *int `json:"default"`
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 }
 
 type NewDept struct {
@@ -83,7 +107,7 @@ type NewDictItem struct {
 	Status *string `json:"status"`
 }
 
-type NewMessageConfirm struct {
+type NewMsgConfirm struct {
 	// 确认备注
 	Remark *string `json:"remark"`
 }
@@ -100,26 +124,8 @@ type NewRole struct {
 }
 
 type NewUser struct {
-	// 用户类型{dict:BUS002}
-	Type *string `json:"type"`
-	// 用户名称
-	Name *string `json:"name"`
-	// 头像
-	Avatar *string `json:"avatar"`
-	// 身份证
-	IDCard *string `json:"id_card"`
-	// 出生年月
-	Birth *int `json:"birth"`
-	// 性别{dict:STA002}
-	Sex *string `json:"sex"`
-	// 移动电话
-	Mobile *string `json:"mobile"`
-	// 排序
-	Weight *int `json:"weight"`
-	// 状态{dict:STA001}
-	Status *string `json:"status"`
-	// 备注
-	Remark *string `json:"remark"`
+	User    map[string]interface{} `json:"user"`
+	Account *NewAccount            `json:"account"`
 }
 
 type PermObj struct {
@@ -127,6 +133,15 @@ type PermObj struct {
 	Object string `json:"object"`
 	// 操作权限
 	Mask string `json:"mask"`
+}
+
+type QAccount struct {
+	UID *string `json:"uid"`
+	// 用户名查询
+	Username *string `json:"username"`
+	Index    *int    `json:"index"`
+	Size     *int    `json:"size"`
+	Count    *bool   `json:"count"`
 }
 
 type QCron struct {
@@ -156,6 +171,53 @@ type QDict struct {
 	Type *string `json:"type"`
 }
 
+type QMsgInfo struct {
+	// 接收者
+	Receiver *string `json:"receiver"`
+	// 消息类型{dict:SYS005}
+	Type *string `json:"type"`
+	// 消息级别{dict: SYS006}
+	Level *string `json:"level"`
+	// 消息接收平台{dict:SYS007}
+	Target *string `json:"target"`
+	// 弹出消息是否必须确认{dict:STA005}
+	MustConfirm *string `json:"must_confirm"`
+	// 确认平台{dict:SYS007}
+	ConfirmTarget *string `json:"confirm_target"`
+	// 已读平台{dict:SYS007}
+	ReadTarget *string `json:"read_target"`
+	// 消息状态{ dict:SYS008}
+	State *string `json:"state"`
+	Index *int    `json:"index"`
+	Size  *int    `json:"size"`
+}
+
+type QMsgTemplate struct {
+	// 名称模糊查询
+	Name *string `json:"name"`
+	// 编码模糊查询
+	Code *string `json:"code"`
+}
+
+type QMyMsgInfo struct {
+	// 消息类型{dict:SYS005}
+	Type *string `json:"type"`
+	// 消息级别{dict: SYS006}
+	Level *string `json:"level"`
+	// 消息接收平台{dict:SYS007}
+	Target *string `json:"target"`
+	// 弹出消息是否必须确认{dict:STA005}
+	MustConfirm *string `json:"must_confirm"`
+	// 确认平台{dict:SYS007}
+	ConfirmTarget *string `json:"confirm_target"`
+	// 已读平台{dict:SYS007}
+	ReadTarget *string `json:"read_target"`
+	// 消息状态{ dict:SYS008}
+	State *string `json:"state"`
+	Index *int    `json:"index"`
+	Size  *int    `json:"size"`
+}
+
 type QRole struct {
 	Keyword *string `json:"keyword"`
 	Index   *int    `json:"index"`
@@ -165,14 +227,35 @@ type QRole struct {
 
 type QUser struct {
 	Keyword *string `json:"keyword"`
-	Index   *int    `json:"index"`
-	Size    *int    `json:"size"`
-	Count   *bool   `json:"count"`
+	// 获取当前权限下的用户
+	Role *string `json:"role"`
+	// 状态查询[-1:全部,0:禁止,1:启用]
+	Status *int  `json:"status"`
+	Index  *int  `json:"index"`
+	Size   *int  `json:"size"`
+	Count  *bool `json:"count"`
 }
 
 type Roles struct {
 	Total *int         `json:"total"`
 	Data  []beans.Role `json:"data"`
+}
+
+type UpdAccount struct {
+	// 账号类型 dict: SYS002
+	Type string `json:"type"`
+	// 用户名
+	Username *string `json:"username"`
+	// 密码
+	Password *string `json:"password"`
+	// 是否为管理员
+	Admin *int `json:"admin"`
+	// 是否为默认账户，默认账户可以在用户列表中可见并且维护
+	Default *int `json:"default"`
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
 }
 
 type UpdDept struct {
@@ -220,6 +303,25 @@ type UpdDictItem struct {
 	Status *string `json:"status"`
 }
 
+type UpdMsgTemplate struct {
+	// 模板名称
+	Name *string `json:"name"`
+	// 消息分类{dict:SYS005}
+	Type *string `json:"type"`
+	// 消息等级{dict:SYS006}
+	Level *string `json:"level"`
+	// 消息推送平台{dict:SYS007}
+	Target *string `json:"target"`
+	// 消息超时时间（秒）
+	Expire *int64 `json:"expire"`
+	// 消息是否必须确认{dict:STA005}
+	MustConfirm *string `json:"must_confirm"`
+	// 消息提示图片
+	ImgPath *string `json:"img_path"`
+	// 备注
+	Remark *string `json:"remark"`
+}
+
 type UpdRole struct {
 	// 角色描述
 	Name *string `json:"name"`
@@ -232,26 +334,8 @@ type UpdRole struct {
 }
 
 type UpdUser struct {
-	// 用户类型{dict:BUS002}
-	Type *string `json:"type"`
-	// 用户名称
-	Name *string `json:"name"`
-	// 头像
-	Avatar *string `json:"avatar"`
-	// 身份证
-	IDCard *string `json:"id_card"`
-	// 出生年月
-	Birth *int `json:"birth"`
-	// 性别{dict:STA002}
-	Sex *string `json:"sex"`
-	// 移动电话
-	Mobile *string `json:"mobile"`
-	// 排序
-	Weight *int `json:"weight"`
-	// 状态{dict:STA001}
-	Status *string `json:"status"`
-	// 备注
-	Remark *string `json:"remark"`
+	User    map[string]interface{} `json:"user"`
+	Account *UpdAccount            `json:"account"`
 }
 
 type Users struct {

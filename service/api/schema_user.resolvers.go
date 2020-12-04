@@ -6,17 +6,23 @@ package api
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tog"
 )
 
 func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser) (string, error) {
-	id, err := r.Create(ctx, new(beans.User), input)
+	id, err := r.Create(ctx, new(beans.User), input.User)
+	if err != nil {
+		return "", err
+	}
+
+	input.Account.Default = tools.Ptr.Int(1)
+	_, err = r.AccountCreate(ctx, *input.Account)
 	if err != nil {
 		return "", err
 	}
@@ -46,9 +52,33 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 		return false, errors.New("用户不存在")
 	}
 
-	ok, err := r.Update(ctx, new(beans.User), id, input)
+	ok, err := r.Update(ctx, new(beans.User), id, input.User)
 	if err != nil {
 		return false, err
+	}
+
+	acc, err := r.AccountDefaultLoader(ctx, id)
+	if err != nil {
+		return false, err
+	}
+	if acc == nil {
+		_, err := r.AccountCreate(ctx, source.NewAccount{
+			UID:      &id,
+			Type:     input.Account.Type,
+			Username: input.Account.Username,
+			Password: input.Account.Password,
+			Admin:    input.Account.Admin,
+			Default:  tools.Ptr.Int(1),
+		})
+		if err != nil {
+			return false, err
+		}
+	} else {
+		input.Account.Default = tools.Ptr.Int(1)
+		_, err = r.AccountUpdate(ctx, *acc.Id, *input.Account)
+		if err != nil {
+			return false, err
+		}
 	}
 
 	// 用户更新推送
@@ -73,6 +103,14 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 		return false, err
 	}
 
+	// 删除用户下所有的账户
+	err = r.DBS.TS(func(sess *txorm.Session) error {
+		return sess.SF(`delete from account where uid in :ids`, map[string]interface{}{"ids": ids}).Exec()
+	})
+	if err != nil {
+		return false, err
+	}
+
 	go func() {
 		for _, user := range users {
 			event.UserRemove(user)
@@ -85,10 +123,21 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.Users, error) {
 	users := make([]beans.User, 0)
 	total, err := r.DBS.SF(`
-		select * from user u
+		select 
+			u.* 
+		from 
+			user u
+			{{ if .role }} 
+				join role_user ru on ru.uid = u.id and ru.role = :role
+			{{ end }}
 		where 1 = 1
 		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
-	`, map[string]interface{}{"keyword": query.Keyword}).Page2(query.Index, query.Size, query.Count, &users)
+		
+	`, map[string]interface{}{
+		"keyword": query.Keyword,
+		"ctx":     ctx,
+		"role":    query.Role,
+	}).Page2(query.Index, query.Size, query.Count, &users)
 	return &source.Users{Data: users, Total: &total}, err
 }
 
@@ -97,7 +146,14 @@ func (r *queryResolver) User(ctx context.Context, id string) (*beans.User, error
 }
 
 func (r *userResolver) ODept(ctx context.Context, obj *beans.User) (*beans.Dept, error) {
-	panic(fmt.Errorf("not implemented"))
+	if obj.Dept == nil {
+		return nil, nil
+	}
+	return r.DeptLoader(ctx, *obj.Dept)
+}
+
+func (r *userResolver) OAccount(ctx context.Context, obj *beans.User) (*beans.Account, error) {
+	return r.AccountDefaultLoader(ctx, *obj.Id)
 }
 
 // User returns source.UserResolver implementation.

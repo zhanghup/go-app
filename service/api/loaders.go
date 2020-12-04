@@ -45,3 +45,21 @@ func (this *Resolver) MsgInfoLoader(ctx context.Context, id string) (*beans.MsgI
 	err := this.Loader(ctx).Object(result, "select * from msg_info where id in :keys", nil, "Id", "").Load(id, result)
 	return result, err
 }
+
+func (this *Resolver) MsgTemplateLoader(ctx context.Context, id string) (*beans.MsgTemplate, error) {
+	result := new(beans.MsgTemplate)
+	err := this.Loader(ctx).Object(result, "select * from msg_template where id in :keys", nil, "Id", "").Load(id, result)
+	return result, err
+}
+
+func (this *Resolver) AccountLoader(ctx context.Context, id string) (*beans.Account, error) {
+	result := new(beans.Account)
+	err := this.Loader(ctx).Object(result, "select * from account where id in :keys", nil, "Id", "").Load(id, result)
+	return result, err
+}
+
+func (this *Resolver) AccountDefaultLoader(ctx context.Context, uid string) (*beans.Account, error) {
+	result := new(beans.Account)
+	err := this.Loader(ctx).Object(result, "select * from account where uid in :keys and `default` = 1", nil, "Uid", "").Load(uid, result)
+	return result, err
+}

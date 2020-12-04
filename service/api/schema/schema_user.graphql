@@ -16,6 +16,10 @@ extend type Mutation {
 
 input QUser{
     keyword: String
+    "获取当前权限下的用户"
+    role: String
+    "状态查询[-1:全部,0:禁止,1:启用]"
+    status: Int
 
     index: Int
     size: Int
@@ -30,6 +34,8 @@ type Users{
 type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     id: String
 
+    "所属部门"
+    dept: String
     "用户类型{dict:BUS002}"
     type: String
     "用户名称"
@@ -56,10 +62,18 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     remark: String
 
     o_dept:Dept
+    o_account: Account
 
 }
 
-input NewUser {
+input NewUser{
+    user: NewUserInfo!
+    account: NewAccount!
+}
+
+input NewUserInfo @goModel(model:"map[string]interface{}"){
+    "所属部门"
+    dept: String
     "用户类型{dict:BUS002}"
     type: String
     "用户名称"
@@ -82,7 +96,14 @@ input NewUser {
     remark: String
 }
 
-input UpdUser {
+input UpdUser{
+    user:UpdUserInfo!
+    account: UpdAccount!
+}
+
+input UpdUserInfo  @goModel(model:"map[string]interface{}"){
+    "所属部门"
+    dept: String
     "用户类型{dict:BUS002}"
     type: String
     "用户名称"

@@ -16,6 +16,7 @@ resolver:
   dir: .
   package: api
 omit_slice_element_pointers: true
+
 models:
   Int:
     model:
@@ -24,3 +25,8 @@ models:
   Int64:
     model:
       - github.com/99designs/gqlgen/graphql.Int64
+  NewAccount:
+    fields:
+      uid:
+        fieldName: Uid
+

@@ -7,7 +7,6 @@ import (
 	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-app/initia"
 	"github.com/zhanghup/go-app/service/ags"
-	"github.com/zhanghup/go-app/service/api"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-app/service/job"
 	"github.com/zhanghup/go-tools/database/txorm"
@@ -44,6 +43,7 @@ func (this *Struct) enableXorm() *Struct {
 	}
 	e.ShowSQL(true)
 	this.db = e
+	initia.InitDBTemplate(e)
 	return this
 }
 
@@ -54,8 +54,16 @@ func (this *Struct) XormInited() *Struct {
 	return this
 }
 
-func (this *Struct) Init(fn func(db *xorm.Engine)) *Struct {
-	fn(this.db)
+// 初始化数据
+func (this *Struct) Init(fns ...func(db *xorm.Engine)) *Struct {
+	initia.InitDict(this.db)
+	initia.InitUser(this.db)
+	initia.InitMsgTemplate(this.db)
+	if fns != nil {
+		for _, fn := range fns {
+			fn(this.db)
+		}
+	}
 	return this
 }
 
@@ -67,38 +75,6 @@ func (this *Struct) SyncTables(fn ...func(db *xorm.Engine)) *Struct {
 			f(this.db)
 		}
 	}
-	return this
-}
-
-// 初始化数据
-func (this *Struct) InitDatas(fn ...func(db *xorm.Engine)) *Struct {
-	initia.InitDict(this.db)
-	initia.InitUser(this.db)
-	if len(fn) > 0 {
-		for _, f := range fn {
-			f(this.db)
-		}
-	}
-	return this
-}
-func (this *Struct) InitDict(ty string, dicts []initia.DictInfo) *Struct {
-	initia.InitDictCode(this.db, ty, dicts)
-	return this
-}
-
-// 基础操作接口
-func (this *Struct) RouterAgs() *Struct {
-	this.routerfns = append(this.routerfns, func(g *gin.Engine, db *xorm.Engine) {
-		ags.Gin(g.Group(""), g.Group(""), db)
-	})
-	return this
-}
-
-// 内置api接口
-func (this *Struct) RouterApi() *Struct {
-	this.routerfns = append(this.routerfns, func(g *gin.Engine, db *xorm.Engine) {
-		api.Gin(g.Group(""), this.db)
-	})
 	return this
 }
 
@@ -130,7 +106,7 @@ func (this *Struct) Jobs(name, spec string, fn func(db *xorm.Engine) error, flag
 }
 
 // 自定义接口
-func (this *Struct) RouterOther(fn ...func(g *gin.Engine, db *xorm.Engine)) *Struct {
+func (this *Struct) Router(fn ...func(g *gin.Engine, db *xorm.Engine)) *Struct {
 	this.routerfns = append(this.routerfns, fn...)
 	return this
 }

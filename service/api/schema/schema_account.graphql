@@ -1,0 +1,92 @@
+extend type Query{
+    accounts(query:QAccount!):Accounts
+    account(id: String!):Account
+}
+
+extend type Mutation {
+    account_create(input:NewAccount!):String!
+    account_update(id: String!,input:UpdAccount!):Boolean!
+    account_removes(ids: [String!]):Boolean!
+}
+
+input QAccount{
+    uid: String
+    "用户名查询"
+    username: String
+
+    index: Int
+    size: Int
+    count: Boolean
+}
+
+type Accounts{
+    total: Int
+    data:[Account!]
+}
+
+type Account @goModel(model:"github.com/zhanghup/go-app/beans.Account") {
+    id: String
+
+    "用户ID"
+    uid: String
+    "账号类型 dict: SYS002"
+    type: String
+    "用户名"
+    username: String
+    "密码"
+    password:String
+    "是否为管理员"
+    admin: Int
+    "是否为默认账户，默认账户可以在用户列表中可见并且维护"
+    default: Int
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+
+}
+
+input NewAccount {
+    "用户ID"
+    uid: String
+    "账号类型 dict: SYS002"
+    type: String!
+    "用户名"
+    username: String
+    "密码"
+    password:String
+    "是否为管理员"
+    admin: Int
+    "是否为默认账户，默认账户可以在用户列表中可见并且维护"
+    default: Int
+
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+
+input UpdAccount {
+
+    "账号类型 dict: SYS002"
+    type: String!
+    "用户名"
+    username: String
+    "密码"
+    password:String
+    "是否为管理员"
+    admin: Int
+    "是否为默认账户，默认账户可以在用户列表中可见并且维护"
+    default: Int
+
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+

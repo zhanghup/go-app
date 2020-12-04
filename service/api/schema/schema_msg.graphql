@@ -1,16 +1,45 @@
+extend type Query{
+    msg_templates(query:QMsgTemplate!):[MsgTemplate!]
+    msg_template(id: String!):MsgTemplate
+    "你可以知道下一页有没有数据，但是你不会知道总共有多少页数据"
+    msg_infos(query: QMsgInfo!): [MsgInfo!]
+}
+
 extend type Mutation {
-    "消息确认"
-    message_confirm(id:String!,input: NewMessageConfirm!):Boolean!
-    message_read(id:String!):Boolean!
+    msg_template_update(id: String!,input:UpdMsgTemplate!):Boolean!
 }
 
 extend type Subscription {
     message: Message
 }
 
-input NewMessageConfirm{
-    "确认备注"
-    remark: String
+input QMsgInfo{
+    "接收者"
+    receiver: String
+    "消息类型{dict:SYS005}"
+    type: String
+    "消息级别{dict: SYS006}"
+    level: String
+    "消息接收平台{dict:SYS007}"
+    target: String
+    "弹出消息是否必须确认{dict:STA005}"
+    must_confirm: String
+    "确认平台{dict:SYS007}"
+    confirm_target: String
+    "已读平台{dict:SYS007}"
+    read_target: String
+    "消息状态{ dict:SYS008}"
+    state: String
+
+    index: Int
+    size: Int
+}
+
+input QMsgTemplate{
+    "名称模糊查询"
+    name: String
+    "编码模糊查询"
+    code: String
 }
 
 type Message{
@@ -67,6 +96,8 @@ type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
     content: String
     "消息提示图片"
     img_path: String
+    "备注"
+    remark: String
 
     "创建时间"
     created: Int
@@ -77,4 +108,55 @@ type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
     "状态{dict:STA001}"
     status: String
 
+}
+
+type MsgTemplate @goModel(model:"github.com/zhanghup/go-app/beans.MsgTemplate") {
+    id: String
+
+    "模板名称"
+    name: String
+    "模板编码"
+    code: String
+    "消息分类{dict:SYS005}"
+    type: String
+    "消息等级{dict:SYS006}"
+    level: String
+    "消息推送平台{dict:SYS007}"
+    target: String
+    "消息超时时间（秒）"
+    expire: Int64
+    "消息是否必须确认{dict:STA005}"
+    must_confirm: String
+    "消息提示图片"
+    img_path: String
+    "备注"
+    remark: String
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+
+input UpdMsgTemplate{
+    "模板名称"
+    name: String
+    "消息分类{dict:SYS005}"
+    type: String
+    "消息等级{dict:SYS006}"
+    level: String
+    "消息推送平台{dict:SYS007}"
+    target: String
+    "消息超时时间（秒）"
+    expire: Int64
+    "消息是否必须确认{dict:STA005}"
+    must_confirm: String
+    "消息提示图片"
+    img_path: String
+    "备注"
+    remark: String
 }
