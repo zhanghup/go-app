@@ -97,9 +97,13 @@ func (r *queryResolver) Accounts(ctx context.Context, query source.QAccount) (*s
 		where 1 = 1
 		{{ if .uid }} and account.uid = :uid {{ end }}
 		{{ if .username }} and account.username = :username {{ end }}
+		{{ if .type }} and account.type = :type {{ end }}
+		{{ if .status }} and account.status = :status {{ end }}
 	`, map[string]interface{}{
 		"uid":      query.UID,
 		"username": query.Username,
+		"type":     query.Type,
+		"status":   query.Status,
 	}).Page2(query.Index, query.Size, query.Count, &account)
 	return &source.Accounts{Data: account, Total: &total}, err
 }

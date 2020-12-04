@@ -50,6 +50,7 @@ func (r *queryResolver) MsgInfos(ctx context.Context, query source.QMsgInfo) ([]
 		{{ if .must_confirm }} and info.must_confirm = :must_confirm {{ end }}
 		{{ if .confirm_target }} and info.confirm_target = :level {{ end }}
 		{{ if .read_target }} and info.read_target = :level {{ end }}
+		{{ if .status }} and info.status = :status {{ end }}
 		order by info.created desc
 	`, map[string]interface{}{
 		"receiver":       query.Receiver,
@@ -59,6 +60,7 @@ func (r *queryResolver) MsgInfos(ctx context.Context, query source.QMsgInfo) ([]
 		"must_confirm":   query.MustConfirm,
 		"confirm_target": query.ConfirmTarget,
 		"read_target":    query.ReadTarget,
+		"status":         query.Status,
 	}).Page2(query.Index, query.Size, tools.Ptr.Bool(false), &infos)
 	return infos, err
 }

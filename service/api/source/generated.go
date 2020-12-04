@@ -2205,9 +2205,14 @@ extend type Mutation {
 }
 
 input QAccount{
+    "账号类型{dict:SYS002}"
+    type: String
+    "用户id"
     uid: String
     "用户名查询"
     username: String
+    "状态{dict:STA001}"
+    status: String
 
     index: Int
     size: Int
@@ -2224,7 +2229,7 @@ type Account @goModel(model:"github.com/zhanghup/go-app/beans.Account") {
 
     "用户ID"
     uid: String
-    "账号类型 dict: SYS002"
+    "账号类型{dict:SYS002}"
     type: String
     "用户名"
     username: String
@@ -2297,6 +2302,14 @@ extend type Mutation {
 
 input QCron{
     keyword: String
+    "是否启动定时任务{dict:STA003}"
+    state: String
+    "任务名称 - 模糊查询"
+    name: String
+    "任务结果状态{dict:STA004}"
+    result: String
+    "状态{dict:STA001}"
+    status: String
 
     index: Int
     size: Int
@@ -2385,6 +2398,8 @@ extend type Mutation {
 
 input QDept{
     pid: String
+    "状态{dict:STA001}"
+    status: String
 
     index: Int
     size: Int
@@ -2496,6 +2511,8 @@ extend type Mutation {
 input QDict{
     "字典类型"
     type: String
+    "状态{dict:STA001}"
+    status: String
 }
 
 type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
@@ -2634,6 +2651,8 @@ input QMyMsgInfo{
     read_target: String
     "消息状态{ dict:SYS008}"
     state: String
+    "状态{dict:STA001}"
+    status: String
 
     index: Int
     size: Int
@@ -2697,6 +2716,8 @@ input QMsgInfo{
     read_target: String
     "消息状态{ dict:SYS008}"
     state: String
+    "状态{dict:STA001}"
+    status: String
 
     index: Int
     size: Int
@@ -2869,6 +2890,8 @@ type PermObj{
 
 input QRole {
     keyword: String
+    "状态{dict:STA001}"
+    status: String
 
     index: Int
     size: Int
@@ -2943,8 +2966,8 @@ input QUser{
     keyword: String
     "获取当前权限下的用户"
     role: String
-    "状态查询[-1:全部,0:禁止,1:启用]"
-    status: Int
+    "状态{dict:STA001}"
+    status: String
 
     index: Int
     size: Int
@@ -13560,6 +13583,14 @@ func (ec *executionContext) unmarshalInputQAccount(ctx context.Context, obj inte
 
 	for k, v := range asMap {
 		switch k {
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "uid":
 			var err error
 
@@ -13573,6 +13604,14 @@ func (ec *executionContext) unmarshalInputQAccount(ctx context.Context, obj inte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
 			it.Username, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13617,6 +13656,38 @@ func (ec *executionContext) unmarshalInputQCron(ctx context.Context, obj interfa
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keyword"))
 			it.Keyword, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "state":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("state"))
+			it.State, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "result":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("result"))
+			it.Result, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13716,6 +13787,14 @@ func (ec *executionContext) unmarshalInputQDept(ctx context.Context, obj interfa
 			if err != nil {
 				return it, err
 			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "index":
 			var err error
 
@@ -13757,6 +13836,14 @@ func (ec *executionContext) unmarshalInputQDict(ctx context.Context, obj interfa
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
 			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13833,6 +13920,14 @@ func (ec *executionContext) unmarshalInputQMsgInfo(ctx context.Context, obj inte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("state"))
 			it.State, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13948,6 +14043,14 @@ func (ec *executionContext) unmarshalInputQMyMsgInfo(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "index":
 			var err error
 
@@ -13981,6 +14084,14 @@ func (ec *executionContext) unmarshalInputQRole(ctx context.Context, obj interfa
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keyword"))
 			it.Keyword, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14040,7 +14151,7 @@ func (ec *executionContext) unmarshalInputQUser(ctx context.Context, obj interfa
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}

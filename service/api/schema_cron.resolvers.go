@@ -42,7 +42,15 @@ func (r *queryResolver) Crons(ctx context.Context, query source.QCron) (*source.
 		select * from cron u
 		where 1 = 1
 		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
-	`, map[string]interface{}{"keyword": query.Keyword}).Page2(query.Index, query.Size, query.Count, &users)
+		{{ if .state }} and u.state = :state {{ end }}
+		{{ if .name }} and u.name like concat("%",:name,"%") {{ end }}
+		{{ if .result }} and u.result = :result {{ end }}
+	`, map[string]interface{}{
+		"keyword": query.Keyword,
+		"state":   query.State,
+		"name":    query.Name,
+		"result":  query.Result,
+	}).Page2(query.Index, query.Size, query.Count, &users)
 	return &source.Crons{Data: users, Total: &total}, err
 }
 

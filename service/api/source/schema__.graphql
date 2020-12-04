@@ -10,6 +10,9 @@
 #}
 #
 #input QUser{
+#    "状态{dict:STA001}"
+#    status: String
+#
 #    index: Int
 #    size: Int
 #    count: Boolean

@@ -26,6 +26,8 @@ extend type Mutation {
 input QDict{
     "字典类型"
     type: String
+    "状态{dict:STA001}"
+    status: String
 }
 
 type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {

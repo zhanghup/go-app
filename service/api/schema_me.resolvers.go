@@ -76,6 +76,7 @@ func (r *queryResolver) MyMsgInfos(ctx context.Context, query source.QMyMsgInfo)
 		State:         query.State,
 		Index:         query.Index,
 		Size:          query.Size,
+		Status:        query.Status,
 	})
 }
 

@@ -15,6 +15,14 @@ extend type Mutation {
 
 input QCron{
     keyword: String
+    "是否启动定时任务{dict:STA003}"
+    state: String
+    "任务名称 - 模糊查询"
+    name: String
+    "任务结果状态{dict:STA004}"
+    result: String
+    "状态{dict:STA001}"
+    status: String
 
     index: Int
     size: Int

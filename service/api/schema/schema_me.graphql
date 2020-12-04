@@ -24,6 +24,8 @@ input QMyMsgInfo{
     read_target: String
     "消息状态{ dict:SYS008}"
     state: String
+    "状态{dict:STA001}"
+    status: String
 
     index: Int
     size: Int

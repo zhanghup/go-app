@@ -12,6 +12,8 @@ extend type Mutation {
 
 input QDept{
     pid: String
+    "状态{dict:STA001}"
+    status: String
 
     index: Int
     size: Int

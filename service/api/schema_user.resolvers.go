@@ -131,11 +131,13 @@ func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.
 			{{ end }}
 		where 1 = 1
 		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
+		{{ if .status }} and u.status = :status {{ end }}
 		
 	`, map[string]interface{}{
 		"keyword": query.Keyword,
 		"ctx":     ctx,
 		"role":    query.Role,
+		"status":  query.Status,
 	}).Page2(query.Index, query.Size, query.Count, &users)
 	return &source.Users{Data: users, Total: &total}, err
 }

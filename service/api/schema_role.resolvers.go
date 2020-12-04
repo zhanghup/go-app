@@ -133,7 +133,11 @@ func (r *queryResolver) Roles(ctx context.Context, query source.QRole) (*source.
 		select * from role u
 		where 1 = 1
 		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
-	`, map[string]interface{}{"keyword": query.Keyword}).Page2(query.Index, query.Size, query.Count, &roles)
+		{{ if .status }} and u.status = :status {{ end }}
+	`, map[string]interface{}{
+		"keyword": query.Keyword,
+		"status":  query.Status,
+	}).Page2(query.Index, query.Size, query.Count, &roles)
 	return &source.Roles{Data: roles, Total: &total}, err
 }
 

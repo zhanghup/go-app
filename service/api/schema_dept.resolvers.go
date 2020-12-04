@@ -39,10 +39,12 @@ func (r *queryResolver) Depts(ctx context.Context, query source.QDept) (*source.
 			dept d 
 		where 1 = 1 
 			{{ if .pid }} and d.pid = :pid {{ end }} 
+			{{ if .status }} and d.status = :status {{ end }}
 		order by d.weight
 		`,
 		map[string]interface{}{
-			"pid": query.Pid,
+			"pid":    query.Pid,
+			"status": query.Status,
 		}).Page2(query.Index, query.Size, query.Count, &depts)
 	return &source.Depts{Total: &i, Data: depts}, err
 }
