@@ -16,18 +16,26 @@ import (
 )
 
 func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser) (string, error) {
-	id, err := r.Create(ctx, new(beans.User), input.User)
+	sess := r.DBS.NewSession(ctx)
+	user := new(beans.User)
+	if input.User["name"] != nil {
+		name := input.User["name"].(string)
+		user.Py = tools.Ptr.String(tools.Pin.Py(name))
+		user.Py = tools.Ptr.String(tools.Pin.Pinyin(name))
+	}
+	id, err := r.Create(sess.Context(), user, input.User)
 	if err != nil {
 		return "", err
 	}
 
 	input.Account.Default = tools.Ptr.Int(1)
-	_, err = r.AccountCreate(ctx, *input.Account)
+	input.Account.UID = &id
+	_, err = r.AccountCreate(sess.Context(), *input.Account)
 	if err != nil {
 		return "", err
 	}
 
-	//// 用户新增推送
+	// 用户新增推送
 	go func() {
 		user, err := r.UserLoader(ctx, id)
 		if err != nil {
@@ -52,9 +60,16 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 	if user == nil {
 		return false, errors.New("用户不存在")
 	}
+	sess := r.DBS.NewSession(ctx)
 
 	// 更新用户
-	ok, err := r.Update(ctx, new(beans.User), id, input.User)
+	upduser := beans.User{}
+	if input.User["name"] != nil {
+		name := input.User["name"].(string)
+		upduser.Py = tools.Ptr.String(tools.Pin.Py(name))
+		upduser.Pinyin = tools.Ptr.String(tools.Pin.Pinyin(name))
+	}
+	ok, err := r.Update(sess.Context(), &upduser, id, input.User)
 	if err != nil {
 		return false, err
 	}
@@ -65,7 +80,7 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 		return false, err
 	}
 	if acc == nil {
-		_, err := r.AccountCreate(ctx, source.NewAccount{
+		_, err := r.AccountCreate(sess.Context(), source.NewAccount{
 			UID:      &id,
 			Type:     input.Account.Type,
 			Username: input.Account.Username,
@@ -77,7 +92,7 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 		}
 	} else {
 		input.Account.Default = tools.Ptr.Int(1)
-		_, err = r.AccountUpdate(ctx, *acc.Id, *input.Account)
+		_, err = r.AccountUpdate(sess.Context(), *acc.Id, *input.Account)
 		if err != nil {
 			return false, err
 		}
@@ -100,13 +115,14 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 	if err != nil {
 		return false, err
 	}
-	ok, err := r.Removes(ctx, new(beans.User), ids)
+	sess := r.DBS.NewSession(ctx)
+	ok, err := r.Removes(sess.Context(), new(beans.User), ids)
 	if err != nil || !ok {
 		return false, err
 	}
 
 	// 删除用户下所有的账户
-	err = r.DBS.TS(func(sess *txorm.Session) error {
+	err = sess.TS(func(sess *txorm.Session) error {
 		return sess.SF(`delete from account where uid in :ids`, map[string]interface{}{"ids": ids}).Exec()
 	})
 	if err != nil {
@@ -129,17 +145,20 @@ func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.
 			u.* 
 		from 
 			user u
-			{{ if .role }} 
-				join role_user ru on ru.uid = u.id and ru.role = :role
-			{{ end }}
 		where 1 = 1
-		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
+		{{ if .keyword }} 
+			and (
+				1 = 0
+				or u.name like concat('%',:keyword,'%')
+				or u.py like concat('%',:keyword,'%')
+				or u.pinyin like concat('%',:keyword,'%')
+			) 
+		{{ end }}
 		{{ if .status }} and u.status = :status {{ end }}
 		
 	`, map[string]interface{}{
 		"keyword": query.Keyword,
 		"ctx":     ctx,
-		"role":    query.Role,
 		"status":  query.Status,
 	}).Page2(query.Index, query.Size, query.Count, &users)
 	return &source.Users{Data: users, Total: &total}, err

@@ -17,6 +17,7 @@ func main() {
 	_ = boot.Boot(box).
 		SyncTables().
 		Init().
+		//InitTestData().
 		XormInited().
 		//JobsInit().
 		//JobsInitMessages().

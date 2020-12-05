@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"reflect"
@@ -50,7 +49,7 @@ func (this *Resolver) Create(ctx context.Context, tab interface{}, obj interface
 
 func (this *Resolver) Update(ctx context.Context, tab interface{}, id string, obj interface{}) (bool, error) {
 	err := this.DBS.NewSession(ctx).TS(func(sess *txorm.Session) error {
-		_, err := sess.Sess.Table(tab).Where("id = ?", id).Update(beans.Bean{})
+		_, err := sess.Sess.Table(tab).Where("id = ?", id).Update(tab)
 		if err != nil {
 			return err
 		}

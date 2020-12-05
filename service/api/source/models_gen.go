@@ -69,6 +69,8 @@ type NewDept struct {
 	Pid *string `json:"pid"`
 	// 备注
 	Remark *string `json:"remark"`
+	// 负责人
+	Leader *string `json:"leader"`
 	// 排序
 	Weight *int `json:"weight"`
 	// 状态{dict:STA001}
@@ -192,9 +194,11 @@ type QDept struct {
 	Pid *string `json:"pid"`
 	// 状态{dict:STA001}
 	Status *string `json:"status"`
-	Index  *int    `json:"index"`
-	Size   *int    `json:"size"`
-	Count  *bool   `json:"count"`
+	// 名称模糊查询
+	Name  *string `json:"name"`
+	Index *int    `json:"index"`
+	Size  *int    `json:"size"`
+	Count *bool   `json:"count"`
 }
 
 type QDict struct {
@@ -316,6 +320,8 @@ type UpdDept struct {
 	Pid *string `json:"pid"`
 	// 备注
 	Remark *string `json:"remark"`
+	// 负责人
+	Leader *string `json:"leader"`
 	// 排序
 	Weight *int `json:"weight"`
 	// 状态{dict:STA001}

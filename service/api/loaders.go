@@ -49,23 +49,35 @@ func (this *Resolver) MsgInfoLoader(ctx context.Context, id string) (*beans.MsgI
 func (this *Resolver) MsgTemplateLoader(ctx context.Context, id string) (*beans.MsgTemplate, error) {
 	result := new(beans.MsgTemplate)
 	err := this.Loader(ctx).Object(result, "select * from msg_template where id in :keys", nil, "Id", "").Load(id, result)
+	if result.Id == nil {
+		return nil, err
+	}
 	return result, err
 }
 
 func (this *Resolver) AccountLoader(ctx context.Context, id string) (*beans.Account, error) {
 	result := new(beans.Account)
 	err := this.Loader(ctx).Object(result, "select * from account where id in :keys", nil, "Id", "").Load(id, result)
+	if result.Id == nil {
+		return nil, err
+	}
 	return result, err
 }
 
 func (this *Resolver) AccountDefaultLoader(ctx context.Context, uid string) (*beans.Account, error) {
 	result := new(beans.Account)
 	err := this.Loader(ctx).Object(result, "select * from account where uid in :keys and `default` = 1", nil, "Uid", "").Load(uid, result)
+	if result.Id == nil {
+		return nil, err
+	}
 	return result, err
 }
 
 func (this *Resolver) PlanLoader(ctx context.Context, id string) (*beans.Plan, error) {
 	result := new(beans.Plan)
 	err := this.Loader(ctx).Object(result, "select * from plan where id in :keys", nil, "Id", "").Load(id, result)
+	if result.Id == nil {
+		return nil, err
+	}
 	return result, err
 }

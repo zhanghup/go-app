@@ -3,6 +3,8 @@ extend type Query {
     roles(query: QRole!): Roles @perm(entity: "role",perm: "R")
     "角色获取单个"
     role(id: String!): Role @perm(entity: "role",perm: "R")
+    "角色用户列表"
+    role_users(id: String!): [String!] @perm(entity: "role",perm: "R")
     "权限列表"
     role_perms(id: String!,type: String): [String!] @perm(entity: "role",perm: "R",remark:"角色权限查询")
     "对象权限列表"
@@ -22,6 +24,8 @@ extend type Mutation {
     role_perm_obj_create(id: String!, perms:[IPermObj!]!): Boolean! @perm(entity: "role",perm: "M",remark:"角色对象权限新增")
     "角色分配"
     role_to_user(uid: String!,roles:[String!]!): Boolean! @perm(entity: "role",perm: "M",remark:"角色分配")
+    "角色分配"
+    role_with_user(role: String!,uids:[String!]!): Boolean! @perm(entity: "role",perm: "M",remark:"角色分配")
 }
 
 input IPermObj{

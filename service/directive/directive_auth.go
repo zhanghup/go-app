@@ -45,9 +45,14 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 		}
 		*user.Token.Ops += 1
 		*user.Token.Expire = 7200
-		_, err := db.Table(user.Token).Where("id = ?", user.TokenString).Update(user.Token)
-		if err != nil {
-			return err, errors.New("[3] 未授权")
+
+		// 5秒内的token变化不记录
+		if time.Now().Unix()-*user.Token.Updated > 5 {
+			*user.Token.Updated = time.Now().Unix()
+			_, err := db.Table(user.Token).Where("id = ?", user.TokenString).Update(user.Token)
+			if err != nil {
+				return err, errors.New("[3] 未授权")
+			}
 		}
 		ca.UserCache.Set(tok, user)
 		c.Set(GIN_USER, user)

@@ -62,10 +62,14 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 			}
 		}
 
-		input := graphql.GetOperationContext(ctx)
-		lg.Gql = &input.RawQuery
-		lg.GqlVariables = tools.Ptr.String(tools.Str.JSONString(input.Variables))
-		go db.Insert(lg)
+		// 不记录查询操作
+		if perm != "R"{
+			input := graphql.GetOperationContext(ctx)
+			lg.Gql = &input.RawQuery
+			lg.GqlVariables = tools.Ptr.String(tools.Str.JSONString(input.Variables))
+			go db.Insert(lg)
+		}
+
 		return
 	}
 }

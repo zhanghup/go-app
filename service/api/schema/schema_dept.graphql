@@ -14,6 +14,8 @@ input QDept{
     pid: String
     "状态{dict:STA001}"
     status: String
+    "名称模糊查询"
+    name: String
 
     index: Int
     size: Int
@@ -40,6 +42,8 @@ type Dept @goModel(model:"github.com/zhanghup/go-app/beans.Dept") {
     pid: String
     "备注"
     remark: String
+    "负责人"
+    leader: String
 
     "创建时间"
     created: Int
@@ -51,7 +55,7 @@ type Dept @goModel(model:"github.com/zhanghup/go-app/beans.Dept") {
     status: String
 
     o_dept: Dept
-
+    o_leader: User
 }
 
 input NewDept {
@@ -68,6 +72,8 @@ input NewDept {
     pid: String
     "备注"
     remark: String
+    "负责人"
+    leader: String
 
     "排序"
     weight: Int
@@ -89,6 +95,8 @@ input UpdDept {
     pid: String
     "备注"
     remark: String
+    "负责人"
+    leader: String
 
     "排序"
     weight: Int

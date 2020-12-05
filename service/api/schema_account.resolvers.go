@@ -11,7 +11,6 @@ import (
 	"github.com/zhanghup/go-app/service/api/source"
 	"github.com/zhanghup/go-app/service/ca"
 	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-tools/database/txorm"
 )
 
 func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAccount) (string, error) {
@@ -32,17 +31,15 @@ func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAc
 	acc.Password = input.Password
 	acc.Default = input.Default
 
-	session := r.DBS.NewSession(ctx)
+	sess := r.DBS.NewSession(ctx)
 	if input.Default != nil && *input.Default == 1 {
-		err := session.TS(func(sess *txorm.Session) error {
-			return sess.SF("update account set `default` = 0 where uid = :uid", map[string]interface{}{"uid": input.UID}).Exec()
-		})
+		err := sess.SF("update account set `default` = 0 where uid = :uid", map[string]interface{}{"uid": input.UID}).Exec()
 		if err != nil {
 			return "", err
 		}
 	}
 
-	return r.Create(session.Context(), acc, nil)
+	return r.Create(sess.Context(), acc, nil)
 }
 
 func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input source.UpdAccount) (bool, error) {
@@ -54,10 +51,10 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 		return false, errors.New("账户不存在")
 	}
 
-	session := r.DBS.NewSession(ctx)
+	sess := r.DBS.NewSession(ctx)
 	if acc.Salt == nil {
 		acc.Salt = tools.Ptr.Uid()
-		err = session.SF("update account set salt = :salt", map[string]interface{}{"salt": acc.Salt}).Exec()
+		err = sess.SF("update account set salt = :salt", map[string]interface{}{"salt": acc.Salt}).Exec()
 		if err != nil {
 			return false, err
 		}
@@ -76,9 +73,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 	}
 
 	if input.Default != nil && *input.Default == 1 {
-		err := session.TS(func(sess *txorm.Session) error {
-			return sess.SF("update account set `default` = 0 where uid = :uid", map[string]interface{}{"uid": acc.Uid}).Exec()
-		})
+		err := sess.SF("update account set `default` = 0 where uid = :uid", map[string]interface{}{"uid": acc.Uid}).Exec()
 		if err != nil {
 			return false, err
 		}
@@ -87,7 +82,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 	// 删除登录状态缓存
 	ca.UserCache.RemoveByUser(*acc.Uid)
 
-	return r.Update(session.Context(), acc, id, input)
+	return r.Update(sess.Context(), acc, id, input)
 }
 
 func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bool, error) {
@@ -100,7 +95,7 @@ func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bo
 		// 删除登录状态缓存
 		ca.UserCache.RemoveByUser(s)
 	}
-	return r.Removes(ctx, new(beans.Account), ids)
+	return r.Removes(r.DBS.NewSession(ctx).Context(), new(beans.Account), ids)
 }
 
 func (r *queryResolver) Accounts(ctx context.Context, query source.QAccount) (*source.Accounts, error) {

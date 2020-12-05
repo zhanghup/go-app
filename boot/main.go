@@ -67,6 +67,16 @@ func (this *Struct) Init(fns ...func(db *xorm.Engine)) *Struct {
 	return this
 }
 
+func (this *Struct) InitTestData(fns ...func(db *xorm.Engine)) *Struct {
+	initia.InitTest(this.db)
+	if fns != nil {
+		for _, fn := range fns {
+			fn(this.db)
+		}
+	}
+	return this
+}
+
 //  同步表结构
 func (this *Struct) SyncTables(fn ...func(db *xorm.Engine)) *Struct {
 	beans.Sync(this.db)

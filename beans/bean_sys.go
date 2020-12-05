@@ -9,6 +9,7 @@ type Dept struct {
 	Avatar *string `json:"avatar"` // 组织头像
 	Pid    *string `json:"pid"`    // 父级组织ID
 	Remark *string `json:"remark"` // 备注
+	Leader *string `json:"leader"` // 负责人
 }
 
 // 用户
@@ -17,13 +18,15 @@ type User struct {
 	Dept   *string `json:"dept"`    // 所属部门
 	Type   *string `json:"type"`    // 用户类型
 	Name   *string `json:"name"`    // 用户名称
+	Py     *string `json:"py"`      // 拼音
+	Pinyin *string `json:"pinyin"`  // 拼音
 	Avatar *string `json:"avatar"`  // 头像
 	IdCard *string `json:"id_card"` // 身份证ID
 	Birth  *int64  `json:"birth"`   // 出生日期
 	Sex    *string `json:"sex"`     // 人物性别
 	Mobile *string `json:"mobile"`  // 联系电话
 	Remark *string `json:"remark"`  // 备注
-	Admin *string `json:"admin"` // 是否为管理员账户
+	Admin  *string `json:"admin"`   // 是否为管理员账户
 }
 
 // 账户
