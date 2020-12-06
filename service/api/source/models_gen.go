@@ -278,8 +278,6 @@ type QRole struct {
 
 type QUser struct {
 	Keyword *string `json:"keyword"`
-	// 获取当前权限下的用户
-	Role *string `json:"role"`
 	// 状态{dict:STA001}
 	Status *string `json:"status"`
 	Index  *int    `json:"index"`

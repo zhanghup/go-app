@@ -179,6 +179,15 @@ func (r *userResolver) OAccount(ctx context.Context, obj *beans.User) (*beans.Ac
 	return r.AccountDefaultLoader(ctx, *obj.Id)
 }
 
+func (r *userResolver) ORoles(ctx context.Context, obj *beans.User) ([]beans.Role, error) {
+	if obj.Id == nil {
+		return nil, nil
+	}
+	c := make([]beans.Role, 0)
+	err := r.Loader(ctx).Slice(c, "select * from role_user where uid in :keys order by weight", nil, "Code", "").Load(*obj.Id, &c)
+	return c, err
+}
+
 // User returns source.UserResolver implementation.
 func (r *Resolver) User() source.UserResolver { return &userResolver{r} }
 

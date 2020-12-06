@@ -336,6 +336,7 @@ type ComplexityRoot struct {
 		Name     func(childComplexity int) int
 		OAccount func(childComplexity int) int
 		ODept    func(childComplexity int) int
+		ORoles   func(childComplexity int) int
 		Remark   func(childComplexity int) int
 		Sex      func(childComplexity int) int
 		Status   func(childComplexity int) int
@@ -430,6 +431,7 @@ type SubscriptionResolver interface {
 type UserResolver interface {
 	ODept(ctx context.Context, obj *beans.User) (*beans.Dept, error)
 	OAccount(ctx context.Context, obj *beans.User) (*beans.Account, error)
+	ORoles(ctx context.Context, obj *beans.User) ([]beans.Role, error)
 }
 
 type executableSchema struct {
@@ -2243,6 +2245,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.ODept(childComplexity), true
 
+	case "User.o_roles":
+		if e.complexity.User.ORoles == nil {
+			break
+		}
+
+		return e.complexity.User.ORoles(childComplexity), true
+
 	case "User.remark":
 		if e.complexity.User.Remark == nil {
 			break
@@ -3272,8 +3281,6 @@ extend type Mutation {
 
 input QUser{
     keyword: String
-    "获取当前权限下的用户"
-    role: String
     "状态{dict:STA001}"
     status: String
 
@@ -3321,6 +3328,7 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
 
     o_dept:Dept
     o_account: Account
+    o_roles:[Role!]
 
 }
 
@@ -13266,6 +13274,38 @@ func (ec *executionContext) _User_o_account(ctx context.Context, field graphql.C
 	return ec.marshalOAccount2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐAccount(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _User_o_roles(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.User().ORoles(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]beans.Role)
+	fc.Result = res
+	return ec.marshalORole2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐRoleᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Users_total(ctx context.Context, field graphql.CollectedField, obj *Users) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -15475,14 +15515,6 @@ func (ec *executionContext) unmarshalInputQUser(ctx context.Context, obj interfa
 			if err != nil {
 				return it, err
 			}
-		case "role":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
-			it.Role, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "status":
 			var err error
 
@@ -17319,6 +17351,17 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._User_o_account(ctx, field, obj)
+				return res
+			})
+		case "o_roles":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_o_roles(ctx, field, obj)
 				return res
 			})
 		default:

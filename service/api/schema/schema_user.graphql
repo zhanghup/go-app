@@ -63,6 +63,7 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
 
     o_dept:Dept
     o_account: Account
+    o_roles:[Role!]
 
 }
 
