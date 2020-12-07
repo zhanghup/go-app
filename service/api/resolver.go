@@ -17,18 +17,20 @@ import (
 func NewResolver(db *xorm.Engine) *Resolver {
 	dbs := txorm.NewEngine(db)
 	return &Resolver{
-		DB: db,
-		DBS: func() *txorm.Engine {
-			return dbs
+		&ResolverTools{
+			DB: db,
+			DBS: func() *txorm.Engine {
+				return dbs
+			},
+			Sess: func(ctx context.Context) txorm.ISession {
+				return dbs.NewSession(ctx)
+			},
+			SessCtx: func(ctx context.Context) context.Context {
+				return dbs.NewSession(ctx).Context()
+			},
+			Loader: tgql.DataLoaden,
+			Me:     directive.MyInfo,
 		},
-		Sess: func(ctx context.Context) txorm.ISession {
-			return dbs.NewSession(ctx)
-		},
-		SessCtx: func(ctx context.Context) context.Context {
-			return dbs.NewSession(ctx).Context()
-		},
-		Loader: tgql.DataLoaden,
-		Me:     directive.MyInfo,
 	}
 }
 
@@ -43,6 +45,10 @@ func Gin(g gin.IRouter, db *xorm.Engine) {
 }
 
 type Resolver struct {
+	*ResolverTools
+}
+
+type ResolverTools struct {
 	DB        *xorm.Engine
 	DBS       func() *txorm.Engine
 	Sess      func(ctx context.Context) txorm.ISession
