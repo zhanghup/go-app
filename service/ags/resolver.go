@@ -14,6 +14,7 @@ import (
 	"github.com/zhanghup/go-app/service/ags/resolvers"
 	"github.com/zhanghup/go-app/service/ags/source"
 	"github.com/zhanghup/go-app/service/directive"
+	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgql"
 	"net/http"
 	"time"
@@ -44,9 +45,18 @@ func gqlschemaFmt(db *xorm.Engine, schema graphql.ExecutableSchema) func(c *gin.
 	hu := tgql.DataLoadenMiddleware(db, srv)
 
 	return func(c *gin.Context) {
-		ctx := context.WithValue(c.Request.Context(), directive.GIN_CONTEXT, c)
+		ctx := c.Request.Context()
+		ctx = context.WithValue(ctx,txorm.CONTEXT_SESSION,txorm.NewEngine(db).NewSession(ctx))
+		ctx = context.WithValue(ctx, directive.GIN_CONTEXT, c)
+
 		c.Header("Content-Type", "application/json")
 		hu.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
+		val := ctx.Value(txorm.CONTEXT_SESSION)
+		sess,ok := val.(txorm.ISession)
+		if ok{
+			sess.SetMustCommit(true)
+			sess.Commit()
+		}
 	}
 }
 

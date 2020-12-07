@@ -6,7 +6,6 @@ package api
 import (
 	"context"
 	"errors"
-
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
 	"github.com/zhanghup/go-app/service/event"
@@ -18,27 +17,44 @@ import (
 func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser) (string, error) {
 	sess := r.Sess(ctx)
 
-	user := new(beans.User)
-	if input.User["name"] != nil {
-		name := input.User["name"].(string)
-		user.Py = tools.Ptr.String(tools.Pin.Py(name))
-		user.Py = tools.Ptr.String(tools.Pin.Pinyin(name))
-	}
-	id, err := r.Create(sess.Context(), user, input.User)
-	if err != nil {
-		return "", err
+	uid := ""
+
+	{ // 添加用户
+		user := new(beans.User)
+		if input.User["name"] != nil {
+			name := input.User["name"].(string)
+			user.Py = tools.Ptr.String(tools.Pin.Py(name))
+			user.Py = tools.Ptr.String(tools.Pin.Pinyin(name))
+		}
+		id, err := r.Create(sess.Context(), user, input.User)
+		if err != nil {
+			return "", err
+		}
+		uid = id
 	}
 
-	input.Account.Default = tools.Ptr.Int(1)
-	input.Account.UID = &id
-	_, err = r.AccountCreate(sess.Context(), *input.Account)
-	if err != nil {
-		return "", err
+	{ // 添加账户
+		input.Account.Default = tools.Ptr.Int(1)
+		input.Account.UID = &uid
+		_, err := r.AccountCreate(sess.Context(), *input.Account)
+		if err != nil {
+			return "", err
+		}
 	}
 
-	// 用户新增推送
-	go func() {
-		user, err := r.UserLoader(ctx, id)
+	{ // 角色添加
+		if len(input.Roles) > 0 {
+			for _, str := range input.Roles {
+				_, err := r.Create(sess.Context(), &beans.RoleUser{}, map[string]interface{}{"role": str, "uid": uid})
+				if err != nil {
+					return "", err
+				}
+			}
+		}
+	}
+
+	go func() { // 用户新增事件推送
+		user, err := r.UserLoader(ctx, uid)
 		if err != nil {
 			tog.Error(err.Error())
 			return
@@ -49,54 +65,78 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser)
 		}
 		event.UserCreate(*user)
 	}()
-	return id, err
+	return uid, nil
 }
 
 func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input source.UpdUser) (bool, error) {
 	sess := r.Sess(ctx)
 
-	// 读取库存用户
-	user, err := r.UserLoader(ctx, id)
-	if err != nil {
-		return false, err
-	}
-	if user == nil {
-		return false, errors.New("用户不存在")
-	}
-
-	// 更新用户
-	upduser := beans.User{}
-	if input.User["name"] != nil {
-		name := input.User["name"].(string)
-		upduser.Py = tools.Ptr.String(tools.Pin.Py(name))
-		upduser.Pinyin = tools.Ptr.String(tools.Pin.Pinyin(name))
-	}
-	ok, err := r.Update(sess.Context(), &upduser, id, input.User)
-	if err != nil {
-		return false, err
-	}
-
-	// 更新账户
-	acc, err := r.AccountDefaultLoader(ctx, id)
-	if err != nil {
-		return false, err
-	}
-	if acc == nil {
-		_, err := r.AccountCreate(sess.Context(), source.NewAccount{
-			UID:      &id,
-			Type:     input.Account.Type,
-			Username: input.Account.Username,
-			Password: input.Account.Password,
-			Default:  tools.Ptr.Int(1),
-		})
+	var user *beans.User
+	{ // 读取库存用户
+		u, err := r.UserLoader(ctx, id)
 		if err != nil {
 			return false, err
 		}
-	} else {
-		input.Account.Default = tools.Ptr.Int(1)
-		_, err = r.AccountUpdate(sess.Context(), *acc.Id, *input.Account)
+		if u == nil {
+			return false, errors.New("用户不存在")
+		}
+		user = u
+	}
+
+	{ // 更新用户
+		upduser := beans.User{}
+		if input.User["name"] != nil {
+			name := input.User["name"].(string)
+			upduser.Py = tools.Ptr.String(tools.Pin.Py(name))
+			upduser.Pinyin = tools.Ptr.String(tools.Pin.Pinyin(name))
+		}
+		ok, err := r.Update(sess.Context(), &upduser, id, input.User)
 		if err != nil {
 			return false, err
+		}
+		if !ok {
+			return false, errors.New("用户更新失败")
+		}
+	}
+
+	{ // 更新账户
+		acc, err := r.AccountDefaultLoader(ctx, id)
+		if err != nil {
+			return false, err
+		}
+		if acc == nil {
+			_, err := r.AccountCreate(sess.Context(), source.NewAccount{
+				UID:      &id,
+				Type:     input.Account.Type,
+				Username: input.Account.Username,
+				Password: input.Account.Password,
+				Default:  tools.Ptr.Int(1),
+			})
+			if err != nil {
+				return false, err
+			}
+		} else {
+			input.Account.Default = tools.Ptr.Int(1)
+
+			_, err = r.AccountUpdate(sess.Context(), *acc.Id, *input.Account)
+			if err != nil {
+				return false, err
+			}
+		}
+	}
+
+	{ // 更新角色
+		err := sess.SF(`delete from role_user where uid = :uid`, map[string]interface{}{"uid": id}).Exec()
+		if err != nil {
+			return false, err
+		}
+		if len(input.Roles) > 0 {
+			for _, str := range input.Roles {
+				_, err := r.Create(sess.Context(), &beans.RoleUser{}, map[string]interface{}{"role": str, "uid": id})
+				if err != nil {
+					return false, err
+				}
+			}
 		}
 	}
 
@@ -105,7 +145,7 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 		event.UserUpdate(*user)
 	}()
 
-	return ok, nil
+	return true, nil
 }
 
 func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool, error) {
@@ -114,23 +154,38 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 	if tools.Str.Contains(ids, "root") {
 		return false, errors.New("root用户无法删除")
 	}
+
 	users := make([]beans.User, 0)
-	err := r.DB.In("id", ids).Find(&users)
-	if err != nil {
-		return false, err
+	{ // 查找当前需要删除的用户
+		err := r.DB.In("id", ids).Find(&users)
+		if err != nil {
+			return false, err
+		}
 	}
 
-	ok, err := r.Removes(sess.Context(), new(beans.User), ids)
-	if err != nil || !ok {
-		return false, err
+	{ // 删除用户
+		ok, err := r.Removes(sess.Context(), new(beans.User), ids)
+		if err != nil || !ok {
+			return false, err
+		}
 	}
 
-	// 删除用户下所有的账户
-	err = sess.TS(func(sess txorm.ISession) error {
-		return sess.SF(`delete from account where uid in :ids`, map[string]interface{}{"ids": ids}).Exec()
-	})
-	if err != nil {
-		return false, err
+	{ // 删除用户下所有的账户
+		err := sess.TS(func(sess txorm.ISession) error {
+			return sess.SF(`delete from account where uid in :ids`, map[string]interface{}{"ids": ids}).Exec()
+		})
+		if err != nil {
+			return false, err
+		}
+	}
+
+	{ // 删除用户下所有的角色
+		err := sess.TS(func(sess txorm.ISession) error {
+			return sess.SF(`delete from role_user where uid in :ids`, map[string]interface{}{"ids": ids}).Exec()
+		})
+		if err != nil {
+			return false, err
+		}
 	}
 
 	go func() {
@@ -188,7 +243,10 @@ func (r *userResolver) ORoles(ctx context.Context, obj *beans.User) ([]beans.Rol
 		return nil, nil
 	}
 	c := make([]beans.Role, 0)
-	err := r.Loader(ctx).Slice(c, "select * from role_user where uid in :keys order by weight", nil, "Code", "").Load(*obj.Id, &c)
+	err := r.Loader(ctx).Slice(struct {
+		beans.Role `xorm:"extends"`
+		Uid        *string `xorm:"uid"`
+	}{}, "select role.*,role_user.uid from role_user join role on role.id = role_user.role where role_user.uid in :keys ", nil, "Uid", "Role").Load(*obj.Id, &c)
 	return c, err
 }
 

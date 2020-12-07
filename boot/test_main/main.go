@@ -15,8 +15,8 @@ func main() {
 		panic(err)
 	}
 	_ = boot.Boot(box).
-		SyncTables().
-		Init().
+		//SyncTables().
+		//Init().
 		//InitTestData().
 		XormInited().
 		//JobsInit().
