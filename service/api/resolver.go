@@ -15,22 +15,8 @@ import (
 )
 
 func NewResolver(db *xorm.Engine) *Resolver {
-	dbs := txorm.NewEngine(db)
 	return &Resolver{
-		&ResolverTools{
-			DB: db,
-			DBS: func() *txorm.Engine {
-				return dbs
-			},
-			Sess: func(ctx context.Context) txorm.ISession {
-				return dbs.NewSession(ctx)
-			},
-			SessCtx: func(ctx context.Context) context.Context {
-				return dbs.NewSession(ctx).Context()
-			},
-			Loader: tgql.DataLoaden,
-			Me:     directive.MyInfo,
-		},
+		NewResolverTools(db),
 	}
 }
 
@@ -56,4 +42,22 @@ type ResolverTools struct {
 	Loader    func(ctx context.Context) tgql.Loader
 	Me        func(ctx context.Context) directive.Me
 	DictCache func(dict string) (*beans.Dict, []beans.DictItem, bool)
+}
+
+func NewResolverTools(db *xorm.Engine) *ResolverTools {
+	dbs := txorm.NewEngine(db)
+	return &ResolverTools{
+		DB: db,
+		DBS: func() *txorm.Engine {
+			return dbs
+		},
+		Sess: func(ctx context.Context) txorm.ISession {
+			return dbs.NewSession(ctx)
+		},
+		SessCtx: func(ctx context.Context) context.Context {
+			return dbs.NewSession(ctx).Context()
+		},
+		Loader: tgql.DataLoaden,
+		Me:     directive.MyInfo,
+	}
 }
