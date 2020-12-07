@@ -21,19 +21,6 @@ type message struct {
 	dbs *txorm.Engine
 }
 
-var localmsg *message
-
-func NewMessage(db *xorm.Engine) IMessage {
-	if localmsg != nil {
-		return localmsg
-	}
-	localmsg = &message{
-		db:  db,
-		dbs: txorm.NewEngine(db),
-	}
-	return localmsg
-}
-
 /*
 	实时消息推送
 */

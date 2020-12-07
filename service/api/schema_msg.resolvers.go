@@ -18,7 +18,7 @@ func (r *mutationResolver) MsgTemplateUpdate(ctx context.Context, id string, inp
 
 func (r *queryResolver) MsgTemplates(ctx context.Context, query source.QMsgTemplate) ([]beans.MsgTemplate, error) {
 	tpls := make([]beans.MsgTemplate, 0)
-	err := r.DBS.SF(`
+	err := r.DBS().SF(`
 		select 
 			tpl.* 
 		from 
@@ -40,7 +40,7 @@ func (r *queryResolver) MsgTemplate(ctx context.Context, id string) (*beans.MsgT
 
 func (r *queryResolver) MsgInfos(ctx context.Context, query source.QMsgInfo) ([]beans.MsgInfo, error) {
 	infos := make([]beans.MsgInfo, 0)
-	_, err := r.DBS.SF(`
+	_, err := r.DBS().SF(`
 		select info.* from msg_info info
 		where 1 = 1
 		{{ if .receiver }} and info.receiver = :receiver {{ end }}

@@ -14,9 +14,10 @@ import (
 )
 
 func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAccount) (string, error) {
+	sess := r.Sess(ctx)
+
 	acc := new(beans.Account)
 	acc.Salt = tools.Ptr.Uid()
-
 	if input.Type == "password" {
 		if input.Username == nil || input.Password == nil {
 			return "", errors.New("用户名密码不能为空")
@@ -30,8 +31,6 @@ func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAc
 	acc.Username = input.Username
 	acc.Password = input.Password
 	acc.Default = input.Default
-
-	sess := r.DBS.NewSession(ctx)
 	if input.Default != nil && *input.Default == 1 {
 		err := sess.SF("update account set `default` = 0 where uid = :uid", map[string]interface{}{"uid": input.UID}).Exec()
 		if err != nil {
@@ -43,6 +42,8 @@ func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAc
 }
 
 func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input source.UpdAccount) (bool, error) {
+	sess := r.Sess(ctx)
+
 	acc, err := r.AccountLoader(ctx, id)
 	if err != nil {
 		return false, err
@@ -51,7 +52,6 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 		return false, errors.New("账户不存在")
 	}
 
-	sess := r.DBS.NewSession(ctx)
 	if acc.Salt == nil {
 		acc.Salt = tools.Ptr.Uid()
 		err = sess.SF("update account set salt = :salt", map[string]interface{}{"salt": acc.Salt}).Exec()
@@ -95,12 +95,12 @@ func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bo
 		// 删除登录状态缓存
 		ca.UserCache.RemoveByUser(s)
 	}
-	return r.Removes(r.DBS.NewSession(ctx).Context(), new(beans.Account), ids)
+	return r.Removes(r.SessCtx(ctx), new(beans.Account), ids)
 }
 
 func (r *queryResolver) Accounts(ctx context.Context, query source.QAccount) (*source.Accounts, error) {
 	account := make([]beans.Account, 0)
-	total, err := r.DBS.SF(`
+	total, err := r.DBS().SF(`
 		select * from account 
 		where 1 = 1
 		{{ if .uid }} and account.uid = :uid {{ end }}

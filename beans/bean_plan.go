@@ -71,3 +71,15 @@ type AssignForm struct {
 	Fid    *string `json:"fid"`    // 表单字段id
 	Value  *string `json:"value"`  // 字段值
 }
+
+func plan_tables() []interface{} {
+	return []interface{}{
+		new(Plan),
+		new(PlanStep),
+		new(PlanRole),
+		new(PlanForm),
+		new(Assign),
+		new(AssignForm),
+		new(AssignStep),
+	}
+}

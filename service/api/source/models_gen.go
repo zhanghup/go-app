@@ -125,6 +125,13 @@ type NewPlan struct {
 	Status *string `json:"status"`
 }
 
+type NewPlanStep struct {
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
+}
+
 type NewRole struct {
 	// 角色描述
 	Name *string `json:"name"`
@@ -139,6 +146,7 @@ type NewRole struct {
 type NewUser struct {
 	User    map[string]interface{} `json:"user"`
 	Account *NewAccount            `json:"account"`
+	Roles   []string               `json:"roles"`
 }
 
 type PermObj struct {
@@ -146,6 +154,11 @@ type PermObj struct {
 	Object string `json:"object"`
 	// 操作权限
 	Mask string `json:"mask"`
+}
+
+type PlanSteps struct {
+	Total *int             `json:"total"`
+	Data  []beans.PlanStep `json:"data"`
 }
 
 type Plans struct {
@@ -260,6 +273,14 @@ type QMyMsgInfo struct {
 }
 
 type QPlan struct {
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
+	Index  *int    `json:"index"`
+	Size   *int    `json:"size"`
+	Count  *bool   `json:"count"`
+}
+
+type QPlanStep struct {
 	// 状态{dict:STA001}
 	Status *string `json:"status"`
 	Index  *int    `json:"index"`
@@ -384,6 +405,13 @@ type UpdPlan struct {
 	Status *string `json:"status"`
 }
 
+type UpdPlanStep struct {
+	// 排序
+	Weight *int `json:"weight"`
+	// 状态{dict:STA001}
+	Status *string `json:"status"`
+}
+
 type UpdRole struct {
 	// 角色描述
 	Name *string `json:"name"`
@@ -398,6 +426,7 @@ type UpdRole struct {
 type UpdUser struct {
 	User    map[string]interface{} `json:"user"`
 	Account *UpdAccount            `json:"account"`
+	Roles   []string               `json:"roles"`
 }
 
 type Users struct {

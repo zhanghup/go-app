@@ -15,8 +15,7 @@ import (
 )
 
 func (r *mutationResolver) RoleCreate(ctx context.Context, input source.NewRole) (bool, error) {
-	sess := r.DBS.NewSession(ctx)
-	_, err := r.Create(sess.Context(), new(beans.Role), input)
+	_, err := r.Create(r.SessCtx(ctx), new(beans.Role), input)
 	if err != nil {
 		return false, err
 	}
@@ -24,18 +23,16 @@ func (r *mutationResolver) RoleCreate(ctx context.Context, input source.NewRole)
 }
 
 func (r *mutationResolver) RoleUpdate(ctx context.Context, id string, input source.UpdRole) (bool, error) {
-	sess := r.DBS.NewSession(ctx)
-	return r.Update(sess.Context(), new(beans.Role), id, input)
+	return r.Update(r.SessCtx(ctx), new(beans.Role), id, input)
 }
 
 func (r *mutationResolver) RoleRemoves(ctx context.Context, ids []string) (bool, error) {
-	sess := r.DBS.NewSession(ctx)
-	return r.Removes(sess.Context(), new(beans.Role), ids)
+	return r.Removes(r.SessCtx(ctx), new(beans.Role), ids)
 }
 
 func (r *mutationResolver) RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error) {
-	sess := r.DBS.NewSession(ctx)
-	err := sess.TS(func(sess *txorm.Session) error {
+	sess := r.Sess(ctx)
+	err := sess.TS(func(sess txorm.ISession) error {
 		err := sess.SF(`delete from perm where role = :id and type = :type`, map[string]interface{}{
 			"type": typeArg,
 			"id":   id,
@@ -66,9 +63,9 @@ func (r *mutationResolver) RolePermCreate(ctx context.Context, id string, typeAr
 }
 
 func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, perms []source.IPermObj) (bool, error) {
-	sess := r.DBS.NewSession(ctx)
+	sess := r.Sess(ctx)
 
-	err := sess.TS(func(sess *txorm.Session) error {
+	err := sess.TS(func(sess txorm.ISession) error {
 		err := sess.SF(`delete from perm_object where role = :id`, map[string]interface{}{
 			"id": id,
 		}).Exec()
@@ -99,8 +96,8 @@ func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, per
 }
 
 func (r *mutationResolver) RoleToUser(ctx context.Context, uid string, roles []string) (bool, error) {
-	sess := r.DBS.NewSession(ctx)
-	err := sess.TS(func(sess *txorm.Session) error {
+	sess := r.Sess(ctx)
+	err := sess.TS(func(sess txorm.ISession) error {
 		err := sess.SF(`delete from role_user where uid = :uid`, map[string]interface{}{
 			"uid": uid,
 		}).Exec()
@@ -143,8 +140,8 @@ func (r *mutationResolver) RoleToUser(ctx context.Context, uid string, roles []s
 }
 
 func (r *mutationResolver) RoleWithUser(ctx context.Context, role string, uids []string) (bool, error) {
-	sess := r.DBS.NewSession(ctx)
-	err := sess.TS(func(sess *txorm.Session) error {
+	sess := r.Sess(ctx)
+	err := sess.TS(func(sess txorm.ISession) error {
 		err := sess.SF(`delete from role_user where role = :role`, map[string]interface{}{
 			"role": role,
 		}).Exec()
@@ -175,7 +172,7 @@ func (r *mutationResolver) RoleWithUser(ctx context.Context, role string, uids [
 
 func (r *queryResolver) Roles(ctx context.Context, query source.QRole) (*source.Roles, error) {
 	roles := make([]beans.Role, 0)
-	total, err := r.DBS.SF(`
+	total, err := r.DBS().SF(`
 		select * from role u
 		where 1 = 1
 		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
@@ -193,13 +190,13 @@ func (r *queryResolver) Role(ctx context.Context, id string) (*beans.Role, error
 
 func (r *queryResolver) RoleUsers(ctx context.Context, id string) ([]string, error) {
 	res := make([]string, 0)
-	err := r.DBS.SF(`select uid from role_user where role = :id`, map[string]interface{}{"id": id}).Find(&res)
+	err := r.DBS().SF(`select uid from role_user where role = :id`, map[string]interface{}{"id": id}).Find(&res)
 	return res, err
 }
 
 func (r *queryResolver) RolePerms(ctx context.Context, id string, typeArg *string) ([]string, error) {
 	result := make([]string, 0)
-	err := r.DBS.SF(`
+	err := r.DBS().SF(`
 		select oid from perm where role = :role 
 		{{ if .type }} and type = :type {{ end }}
 	`, map[string]interface{}{
@@ -211,7 +208,7 @@ func (r *queryResolver) RolePerms(ctx context.Context, id string, typeArg *strin
 
 func (r *queryResolver) RolePermObjects(ctx context.Context, id string) ([]source.PermObj, error) {
 	result := make([]source.PermObj, 0)
-	err := r.DBS.SF(`
+	err := r.DBS().SF(`
 		select object,mask from perm_object where role = :role 
 	`, map[string]interface{}{
 		"role": id,

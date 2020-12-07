@@ -23,24 +23,21 @@ func (r *deptResolver) OLeader(ctx context.Context, obj *beans.Dept) (*beans.Use
 }
 
 func (r *mutationResolver) DeptCreate(ctx context.Context, input source.NewDept) (string, error) {
-	sess := r.DBS.NewSession(ctx)
-	return r.Create(sess.Context(), new(beans.Dept), input)
+	return r.Create(r.SessCtx(ctx), new(beans.Dept), input)
 }
 
 func (r *mutationResolver) DeptUpdate(ctx context.Context, id string, input source.UpdDept) (bool, error) {
-	sess := r.DBS.NewSession(ctx)
-	return r.Update(sess.Context(), new(beans.Dept), id, input)
+	return r.Update(r.SessCtx(ctx), new(beans.Dept), id, input)
 }
 
 func (r *mutationResolver) DeptRemoves(ctx context.Context, ids []string) (bool, error) {
-	sess := r.DBS.NewSession(ctx)
-	return r.Removes(sess.Context(), new(beans.Dept), ids)
+	return r.Removes(r.SessCtx(ctx), new(beans.Dept), ids)
 }
 
 func (r *queryResolver) Depts(ctx context.Context, query source.QDept) (*source.Depts, error) {
 	depts := make([]beans.Dept, 0)
 
-	i, err := r.DBS.SF(`
+	i, err := r.DBS().SF(`
 		select 
 			* 
 		from 

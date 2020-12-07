@@ -21,15 +21,21 @@ import (
 	"xorm.io/xorm"
 )
 
-func NewUploader(db *xorm.Engine) *Uploader {
-	return &Uploader{db: db}
+type IUploader interface {
+	UploadIO(read io.Reader, name, contentType string) (string, error)
+	GetFile(id string) (*beans.Resource, *os.File, error)
+
+	GinUpload() func(c *gin.Context)
+	GinGet() func(c *gin.Context)
+	GinResize() func(c *gin.Context)
+	GinRouter(auth gin.IRouter, any gin.IRouter)
 }
 
-type Uploader struct {
+type uploader struct {
 	db *xorm.Engine
 }
 
-func (this *Uploader) UploadIO(read io.Reader, name, contentType string) (string, error) {
+func (this *uploader) UploadIO(read io.Reader, name, contentType string) (string, error) {
 	data, err := ioutil.ReadAll(read)
 	if err != nil {
 		return "[UploadIO] 读取文件失败【1】", err
@@ -80,8 +86,20 @@ func (this *Uploader) UploadIO(read io.Reader, name, contentType string) (string
 		return *old.Id, nil
 	}
 }
+func (this *uploader) GetFile(id string) (*beans.Resource, *os.File, error) {
+	res := new(beans.Resource)
+	ok, err := this.db.Where("id = ?", id).Get(res)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !ok {
+		return nil, nil, errors.New("文件不存在")
+	}
+	f, err := os.Open(fmt.Sprintf("upload/%s/%s.%s", res.ContentType, *res.Id, res.FileEnd))
+	return res, f, err
+}
 
-func (this *Uploader) Upload() func(c *gin.Context) {
+func (this *uploader) GinUpload() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		tgin.Do(c, func(c *gin.Context) (interface{}, string) {
 			hd, err := c.FormFile("file")
@@ -105,20 +123,7 @@ func (this *Uploader) Upload() func(c *gin.Context) {
 	}
 
 }
-func (this *Uploader) GetFile(id string) (*beans.Resource, *os.File, error) {
-	res := new(beans.Resource)
-	ok, err := this.db.Where("id = ?", id).Get(res)
-	if err != nil {
-		return nil, nil, err
-	}
-	if !ok {
-		return nil, nil, errors.New("文件不存在")
-	}
-	f, err := os.Open(fmt.Sprintf("upload/%s/%s.%s", res.ContentType, *res.Id, res.FileEnd))
-	return res, f, err
-}
-
-func (this *Uploader) Get() func(c *gin.Context) {
+func (this *uploader) GinGet() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		tgin.DoCustom(c, func(c *gin.Context) (interface{}, string) {
 			id := c.Param("id")
@@ -141,8 +146,7 @@ func (this *Uploader) Get() func(c *gin.Context) {
 
 	}
 }
-
-func (this *Uploader) Resize() func(c *gin.Context) {
+func (this *uploader) GinResize() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		tgin.DoCustom(c, func(c *gin.Context) (interface{}, string) {
 			id := c.Param("id")
@@ -218,5 +222,9 @@ func (this *Uploader) Resize() func(c *gin.Context) {
 		})
 	}
 }
-
-
+func (this *uploader) GinRouter(auth gin.IRouter, any gin.IRouter) {
+	auth.POST("/upload", this.GinUpload())
+	any.GET("/upload/:id", this.GinGet())
+	any.GET("/upload/:id/:width/:height", this.GinResize())
+	any.GET("/upload/:id/:width", this.GinResize())
+}

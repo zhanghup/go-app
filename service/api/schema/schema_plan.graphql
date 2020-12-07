@@ -7,6 +7,8 @@ extend type Mutation {
     plan_create(input:NewPlan!):String!
     plan_update(id: String!,input:UpdPlan!):Boolean!
     plan_removes(ids: [String!]):Boolean!
+
+
 }
 
 input QPlan{

@@ -70,6 +70,7 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
 input NewUser{
     user: NewUserInfo!
     account: NewAccount!
+    roles:[String!]
 }
 
 input NewUserInfo @goModel(model:"map[string]interface{}"){
@@ -102,6 +103,7 @@ input NewUserInfo @goModel(model:"map[string]interface{}"){
 input UpdUser{
     user:UpdUserInfo!
     account: UpdAccount!
+    roles:[String!]
 }
 
 input UpdUserInfo  @goModel(model:"map[string]interface{}"){

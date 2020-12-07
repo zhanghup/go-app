@@ -36,7 +36,7 @@ func NewResolver(db *xorm.Engine) source.ResolverRoot {
 
 func (this *mutationResolver) Token(ctx context.Context, uid, aid string) (string, error) {
 	token := new(beans.Token)
-	err := this.DBS.TS(func(sess *txorm.Session) error {
+	err := this.DBS.TS(func(sess txorm.ISession) error {
 		e := sess.SF(`update token set status = '0' where uid = :uid and aid = :aid`, map[string]interface{}{
 			"uid": uid,
 			"aid": aid,

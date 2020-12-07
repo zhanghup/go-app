@@ -9,8 +9,7 @@ import (
 
 func (this *Resolver) Create(ctx context.Context, tab interface{}, obj interface{}) (string, error) {
 	id := ""
-	sess := this.DBS.NewSession(ctx)
-	err := sess.TS(func(sess *txorm.Session) error {
+	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
 		tools.Rft.DeepSet(tab, func(t reflect.Type, v reflect.Value, tf reflect.StructField) bool {
 			switch tf.Name {
 			case "Id":
@@ -34,12 +33,12 @@ func (this *Resolver) Create(ctx context.Context, tab interface{}, obj interface
 			return true
 		})
 
-		_, err := sess.Sess.Insert(tab)
+		_, err := sess.Session().Insert(tab)
 		if err != nil {
 			return err
 		}
 		if obj != nil {
-			_, err = sess.Sess.Table(tab).Where("id = ?", id).Update(obj)
+			_, err = sess.Session().Table(tab).Where("id = ?", id).Update(obj)
 		}
 		return err
 	})
@@ -48,12 +47,12 @@ func (this *Resolver) Create(ctx context.Context, tab interface{}, obj interface
 }
 
 func (this *Resolver) Update(ctx context.Context, tab interface{}, id string, obj interface{}) (bool, error) {
-	err := this.DBS.NewSession(ctx).TS(func(sess *txorm.Session) error {
-		_, err := sess.Sess.Table(tab).Where("id = ?", id).Update(tab)
+	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
+		_, err := sess.Session().Table(tab).Where("id = ?", id).Update(tab)
 		if err != nil {
 			return err
 		}
-		_, err = sess.Sess.Table(tab).Where("id = ?", id).AllCols().Update(obj)
+		_, err = sess.Session().Table(tab).Where("id = ?", id).AllCols().Update(obj)
 		return err
 	})
 
@@ -61,8 +60,8 @@ func (this *Resolver) Update(ctx context.Context, tab interface{}, id string, ob
 }
 
 func (this *Resolver) Removes(ctx context.Context, table interface{}, ids []string) (bool, error) {
-	err := this.DBS.NewSession(ctx).TS(func(sess *txorm.Session) error {
-		_, err := sess.Sess.Table(table).In("id", ids).Delete(table)
+	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
+		_, err := sess.Session().Table(table).In("id", ids).Delete(table)
 		return err
 	})
 	return err == nil, err

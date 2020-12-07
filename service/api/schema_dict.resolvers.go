@@ -84,7 +84,7 @@ func (r *mutationResolver) DictItemRemoves(ctx context.Context, ids []string) (b
 }
 
 func (r *mutationResolver) DictItemSort(ctx context.Context, code string, items []string) (bool, error) {
-	err := r.DBS.NewSession(ctx).TS(func(sess *txorm.Session) error {
+	err := r.Sess(ctx).TS(func(sess txorm.ISession) error {
 		for i, o := range items {
 			err := sess.SF(`update dict_item set weight = :weight where id = :id and code = :code`, map[string]interface{}{"weight": i, "id": o, "code": code}).Exec()
 			if err != nil {
@@ -101,7 +101,7 @@ func (r *queryResolver) Dicts(ctx context.Context, query *source.QDict) ([]beans
 		query = &source.QDict{}
 	}
 	dicts := make([]beans.Dict, 0)
-	err := r.DBS.SF(`
+	err := r.DBS().SF(`
 		select 
 			* 
 		from 

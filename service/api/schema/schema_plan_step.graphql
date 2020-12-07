@@ -1,0 +1,58 @@
+extend type Query{
+    plan_steps(query:QPlanStep!):PlanSteps
+    plan_step(id: String!):PlanStep
+}
+
+extend type Mutation {
+    plan_step_create(input:NewPlanStep!):String!
+    plan_step_update(id: String!,input:UpdPlanStep!):Boolean!
+    plan_step_removes(ids: [String!]):Boolean!
+}
+
+input QPlanStep{
+    "状态{dict:STA001}"
+    status: String
+
+    index: Int
+    size: Int
+    count: Boolean
+}
+
+type PlanSteps{
+    total: Int
+    data:[PlanStep!]
+}
+
+type PlanStep @goModel(model:"github.com/zhanghup/go-app/beans.PlanStep") {
+    id: String
+
+
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+
+}
+
+input NewPlanStep {
+
+
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+
+input UpdPlanStep {
+
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+

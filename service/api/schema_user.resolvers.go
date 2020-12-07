@@ -16,7 +16,8 @@ import (
 )
 
 func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser) (string, error) {
-	sess := r.DBS.NewSession(ctx)
+	sess := r.Sess(ctx)
+
 	user := new(beans.User)
 	if input.User["name"] != nil {
 		name := input.User["name"].(string)
@@ -52,6 +53,8 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser)
 }
 
 func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input source.UpdUser) (bool, error) {
+	sess := r.Sess(ctx)
+
 	// 读取库存用户
 	user, err := r.UserLoader(ctx, id)
 	if err != nil {
@@ -60,7 +63,6 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 	if user == nil {
 		return false, errors.New("用户不存在")
 	}
-	sess := r.DBS.NewSession(ctx)
 
 	// 更新用户
 	upduser := beans.User{}
@@ -107,6 +109,8 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 }
 
 func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool, error) {
+	sess := r.Sess(ctx)
+
 	if tools.Str.Contains(ids, "root") {
 		return false, errors.New("root用户无法删除")
 	}
@@ -115,14 +119,14 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 	if err != nil {
 		return false, err
 	}
-	sess := r.DBS.NewSession(ctx)
+
 	ok, err := r.Removes(sess.Context(), new(beans.User), ids)
 	if err != nil || !ok {
 		return false, err
 	}
 
 	// 删除用户下所有的账户
-	err = sess.TS(func(sess *txorm.Session) error {
+	err = sess.TS(func(sess txorm.ISession) error {
 		return sess.SF(`delete from account where uid in :ids`, map[string]interface{}{"ids": ids}).Exec()
 	})
 	if err != nil {
@@ -140,7 +144,7 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 
 func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.Users, error) {
 	users := make([]beans.User, 0)
-	total, err := r.DBS.SF(`
+	total, err := r.DBS().SF(`
 		select 
 			u.* 
 		from 

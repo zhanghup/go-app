@@ -81,3 +81,12 @@ func (this *Resolver) PlanLoader(ctx context.Context, id string) (*beans.Plan, e
 	}
 	return result, err
 }
+
+func (this *Resolver) PlanStepLoader(ctx context.Context, id string) (*beans.PlanStep, error) {
+	result := new(beans.PlanStep)
+	err := this.Loader(ctx).Object(result, "select * from plan_step where id in :keys", nil, "Id", "").Load(id, result)
+	if result.Id == nil {
+		return nil, err
+	}
+	return result, err
+}

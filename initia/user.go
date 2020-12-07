@@ -18,7 +18,7 @@ func InitUser(db *xorm.Engine) {
 		return
 	}
 
-	err = txorm.NewEngine(db).TS(func(sess *txorm.Session) error {
+	err = txorm.NewEngine(db).TS(func(sess txorm.ISession) error {
 
 		user := beans.User{
 			Bean: beans.Bean{
