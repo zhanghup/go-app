@@ -7,7 +7,7 @@ import (
 	"reflect"
 )
 
-func (this *Resolver) Create(ctx context.Context, tab interface{}, obj interface{}) (string, error) {
+func (this *ResolverTools) Create(ctx context.Context, tab interface{}, obj interface{}) (string, error) {
 	id := ""
 	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
 		tools.Rft.DeepSet(tab, func(t reflect.Type, v reflect.Value, tf reflect.StructField) bool {
@@ -46,7 +46,7 @@ func (this *Resolver) Create(ctx context.Context, tab interface{}, obj interface
 	return id, err
 }
 
-func (this *Resolver) Update(ctx context.Context, tab interface{}, id string, obj interface{}) (bool, error) {
+func (this *ResolverTools) Update(ctx context.Context, tab interface{}, id string, obj interface{}) (bool, error) {
 	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
 		_, err := sess.Session().Table(tab).Where("id = ?", id).Update(tab)
 		if err != nil {
@@ -59,7 +59,7 @@ func (this *Resolver) Update(ctx context.Context, tab interface{}, id string, ob
 	return err == nil, err
 }
 
-func (this *Resolver) Removes(ctx context.Context, table interface{}, ids []string) (bool, error) {
+func (this *ResolverTools) Removes(ctx context.Context, table interface{}, ids []string) (bool, error) {
 	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
 		_, err := sess.Session().Table(table).In("id", ids).Delete(table)
 		return err
