@@ -124,6 +124,44 @@ func InitDict(db *xorm.Engine) {
 	}
 }
 
+func InitDictItem(db *xorm.Engine, code, id, name, value, ext string, weight, disabled int) {
+	itemid := code + "-" + id
+
+	dictItem := beans.DictItem{}
+	ok, err := db.Where("id = ?", itemid).Get(&dictItem)
+	if err != nil {
+		tog.Error(err.Error())
+		return
+	}
+
+	newItem := beans.DictItem{
+		Bean: beans.Bean{
+			Id:     &itemid,
+			Weight: &weight,
+			Status: tools.Ptr.String("1"),
+		},
+		Code:     &id,
+		Name:     &name,
+		Value:    &value,
+		Disabled: &disabled,
+		Ext:      &ext,
+	}
+
+	if ok {
+		_, err = db.Where("id = ?", itemid).Update(newItem)
+		if err != nil {
+			tog.Error(err.Error())
+			return
+		}
+	} else {
+		_, err = db.Insert(newItem)
+		if err != nil {
+			tog.Error(err.Error())
+			return
+		}
+	}
+}
+
 func InitDictCode(db *xorm.Engine, typeArg, code, name string, items []DictInfoItem) {
 	hisDict := beans.Dict{}
 	id := typeArg + code
@@ -169,37 +207,27 @@ func InitDictCode(db *xorm.Engine, typeArg, code, name string, items []DictInfoI
 			return
 		}
 
+		newItem := beans.DictItem{
+			Bean: beans.Bean{
+				Id:     &itemid,
+				Weight: &i,
+				Status: tools.Ptr.String("1"),
+			},
+			Code:     &id,
+			Name:     &item.Name,
+			Value:    &item.Value,
+			Disabled: &item.Disabled,
+			Ext:      &item.Ext,
+		}
 
 		if ok {
-			_, err = db.Where("id = ?", itemid).Update(beans.DictItem{
-				Bean: beans.Bean{
-					Id:     &itemid,
-					Weight: &i,
-					Status: tools.Ptr.String("1"),
-				},
-				Code:     &id,
-				Name:     &item.Name,
-				Value:    &item.Value,
-				Disabled: &item.Disabled,
-				Ext:      &item.Ext,
-			})
+			_, err = db.Where("id = ?", itemid).Update(newItem)
 			if err != nil {
 				tog.Error(err.Error())
 				return
 			}
 		} else {
-			_, err = db.Insert(beans.DictItem{
-				Bean: beans.Bean{
-					Id:     &itemid,
-					Weight: &i,
-					Status: tools.Ptr.String("1"),
-				},
-				Code:     &id,
-				Name:     &item.Name,
-				Value:    &item.Value,
-				Disabled: &item.Disabled,
-				Ext:      &item.Ext,
-			})
+			_, err = db.Insert(newItem)
 			if err != nil {
 				tog.Error(err.Error())
 				return
