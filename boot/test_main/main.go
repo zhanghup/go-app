@@ -14,7 +14,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	_ = boot.Boot(box).
+	_ = boot.Boot(box,"测试系统").
 		//SyncTables().
 		//Init().
 		//InitTestData().

@@ -46,16 +46,16 @@ func gqlschemaFmt(db *xorm.Engine, schema graphql.ExecutableSchema) func(c *gin.
 
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
-		ctx = context.WithValue(ctx,txorm.CONTEXT_SESSION,txorm.NewEngine(db).NewSession(ctx))
+		ctx = context.WithValue(ctx, txorm.CONTEXT_SESSION, txorm.NewEngine(db).NewSession(ctx))
 		ctx = context.WithValue(ctx, directive.GIN_CONTEXT, c)
 
 		c.Header("Content-Type", "application/json")
 		hu.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
 		val := ctx.Value(txorm.CONTEXT_SESSION)
-		sess,ok := val.(txorm.ISession)
-		if ok{
-			sess.SetMustCommit(true)
+		sess, ok := val.(txorm.ISession)
+		if ok {
 			sess.Commit()
+			sess.AutoClose()
 		}
 	}
 }

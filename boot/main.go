@@ -16,25 +16,28 @@ import (
 )
 
 type Struct struct {
+	name      string
 	box       *rice.Box
 	db        *xorm.Engine
 	msg       ags.IMessage
 	routerfns []func(g *gin.Engine, db *xorm.Engine)
 }
 
-func Boot(box *rice.Box, initdb ...bool) *Struct {
+/*
+	box 配置文件位置
+	name 服务名称
+	initdb 是否初始化数据库
+*/
+func Boot(box *rice.Box, name string, initdb ...bool) *Struct {
 	cfg.InitConfig(box)
-	s := &Struct{box: box}
+	s := &Struct{box: box, name: name}
 	if len(initdb) > 0 && !initdb[0] {
 		return s
 	}
-	return s.enableXorm()
-}
 
-// 初始化数据库
-func (this *Struct) enableXorm() *Struct {
-	if this.db != nil {
-		return this
+	// 初始化数据库
+	if s.db != nil {
+		return s
 	}
 	e, err := txorm.NewXorm(cfg.DB)
 	if err != nil {
@@ -42,12 +45,13 @@ func (this *Struct) enableXorm() *Struct {
 		panic(err)
 	}
 	e.ShowSQL(true)
-	this.db = e
+	s.db = e
 	initia.InitDBTemplate(e)
-	return this
+	return s
 }
 
-// 通知数据库完成初始化
+
+// 通知数据库完成初始化 - 需要在同步完成表结构的时候推送
 func (this *Struct) XormInited() *Struct {
 	// 数据库初始化完成事件
 	event.XormDefaultInit(this.db)
@@ -101,7 +105,7 @@ func (this *Struct) JobsInit() *Struct {
 // 初始化内置的消息任务
 func (this *Struct) JobsInitMessages() *Struct {
 	this.msg = ags.NewMessage(this.db)
-	this.Jobs("消息超时处理任务", "* * * * * *", func(db *xorm.Engine) error {
+	this.Jobs("消息超时处理任务", "0 * * * * *", func(db *xorm.Engine) error {
 		return this.msg.TimeoutMark()
 	})
 	return this
