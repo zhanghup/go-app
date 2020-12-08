@@ -62,7 +62,7 @@ func (r *queryResolver) Dept(ctx context.Context, id string) (*beans.Dept, error
 
 func (r *queryResolver) DeptTree(ctx context.Context) (interface{}, error) {
 	depts := make([]beans.Dept, 0)
-	err := r.DB.Find(&depts)
+	err := r.DBS().DB.Find(&depts)
 	if err != nil {
 		return nil, err
 	}

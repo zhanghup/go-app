@@ -83,7 +83,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 
 func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bool, error) {
 	uids := make([]string, 0)
-	err := r.DB.In("id", ids).Cols("uid").Find(&uids)
+	err := r.DBS().DB.In("id", ids).Cols("uid").Find(&uids)
 	if err != nil {
 		return false, err
 	}

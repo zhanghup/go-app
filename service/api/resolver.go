@@ -36,7 +36,6 @@ type Resolver struct {
 }
 
 type ResolverTools struct {
-	DB        *xorm.Engine
 	DBS       func() *txorm.Engine
 	Sess      func(ctx context.Context) txorm.ISession
 	Loader    func(ctx context.Context) tgql.Loader
@@ -47,7 +46,6 @@ type ResolverTools struct {
 func NewResolverTools(db *xorm.Engine) *ResolverTools {
 	dbs := txorm.NewEngine(db)
 	return &ResolverTools{
-		DB: db,
 		DBS: func() *txorm.Engine {
 			return dbs
 		},
