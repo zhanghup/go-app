@@ -5,7 +5,6 @@ package api
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -19,19 +18,22 @@ func (r *deptResolver) ODept(ctx context.Context, obj *beans.Dept) (*beans.Dept,
 }
 
 func (r *deptResolver) OLeader(ctx context.Context, obj *beans.Dept) (*beans.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	if obj.Leader == nil {
+		return nil, nil
+	}
+	return r.Resolver.UserLoader(ctx, *obj.Leader)
 }
 
 func (r *mutationResolver) DeptCreate(ctx context.Context, input source.NewDept) (string, error) {
-	return r.Create(r.SessCtx(ctx), new(beans.Dept), input)
+	return r.Create(ctx, new(beans.Dept), input)
 }
 
 func (r *mutationResolver) DeptUpdate(ctx context.Context, id string, input source.UpdDept) (bool, error) {
-	return r.Update(r.SessCtx(ctx), new(beans.Dept), id, input)
+	return r.Update(ctx, new(beans.Dept), id, input)
 }
 
 func (r *mutationResolver) DeptRemoves(ctx context.Context, ids []string) (bool, error) {
-	return r.Removes(r.SessCtx(ctx), new(beans.Dept), ids)
+	return r.Removes(ctx, new(beans.Dept), ids)
 }
 
 func (r *queryResolver) Depts(ctx context.Context, query source.QDept) (*source.Depts, error) {

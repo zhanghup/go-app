@@ -15,7 +15,7 @@ import (
 )
 
 func (r *mutationResolver) RoleCreate(ctx context.Context, input source.NewRole) (bool, error) {
-	_, err := r.Create(r.SessCtx(ctx), new(beans.Role), input)
+	_, err := r.Create(ctx, new(beans.Role), input)
 	if err != nil {
 		return false, err
 	}
@@ -23,43 +23,39 @@ func (r *mutationResolver) RoleCreate(ctx context.Context, input source.NewRole)
 }
 
 func (r *mutationResolver) RoleUpdate(ctx context.Context, id string, input source.UpdRole) (bool, error) {
-	return r.Update(r.SessCtx(ctx), new(beans.Role), id, input)
+	return r.Update(ctx, new(beans.Role), id, input)
 }
 
 func (r *mutationResolver) RoleRemoves(ctx context.Context, ids []string) (bool, error) {
-	return r.Removes(r.SessCtx(ctx), new(beans.Role), ids)
+	return r.Removes(ctx, new(beans.Role), ids)
 }
 
 func (r *mutationResolver) RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error) {
-	sess := r.Sess(ctx)
-	err := sess.TS(func(sess txorm.ISession) error {
-		err := sess.SF(`delete from perm where role = :id and type = :type`, map[string]interface{}{
-			"type": typeArg,
-			"id":   id,
-		}).Exec()
-		if err != nil {
-			return err
-		}
+	err := r.Sess(ctx).SF(`delete from perm where role = :id and type = :type`, map[string]interface{}{
+		"type": typeArg,
+		"id":   id,
+	}).Exec()
+	if err != nil {
+		return false, err
+	}
 
-		for i, o := range perms {
-			p := beans.Perm{
-				Bean: beans.Bean{
-					Id:     tools.Ptr.Uid(),
-					Status: tools.Ptr.String("1"),
-					Weight: &i,
-				},
-				Type: &typeArg,
-				Role: &id,
-				Oid:  &o,
-			}
-			err := sess.Insert(p)
-			if err != nil {
-				return err
-			}
+	for i, o := range perms {
+		p := beans.Perm{
+			Bean: beans.Bean{
+				Id:     tools.Ptr.Uid(),
+				Status: tools.Ptr.String("1"),
+				Weight: &i,
+			},
+			Type: &typeArg,
+			Role: &id,
+			Oid:  &o,
 		}
-		return nil
-	})
-	return err == nil, err
+		err := r.Sess(ctx).Insert(p)
+		if err != nil {
+			return false, err
+		}
+	}
+	return true, nil
 }
 
 func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, perms []source.IPermObj) (bool, error) {

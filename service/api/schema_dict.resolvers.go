@@ -9,7 +9,6 @@ import (
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
 	"github.com/zhanghup/go-app/service/event"
-	"github.com/zhanghup/go-tools/database/txorm"
 )
 
 func (r *dictResolver) Values(ctx context.Context, obj *beans.Dict) ([]beans.DictItem, error) {
@@ -84,16 +83,13 @@ func (r *mutationResolver) DictItemRemoves(ctx context.Context, ids []string) (b
 }
 
 func (r *mutationResolver) DictItemSort(ctx context.Context, code string, items []string) (bool, error) {
-	err := r.Sess(ctx).TS(func(sess txorm.ISession) error {
-		for i, o := range items {
-			err := sess.SF(`update dict_item set weight = :weight where id = :id and code = :code`, map[string]interface{}{"weight": i, "id": o, "code": code}).Exec()
-			if err != nil {
-				return err
-			}
+	for i, o := range items {
+		err := r.Sess(ctx).SF(`update dict_item set weight = :weight where id = :id and code = :code`, map[string]interface{}{"weight": i, "id": o, "code": code}).Exec()
+		if err != nil {
+			return false, err
 		}
-		return nil
-	})
-	return err == nil, err
+	}
+	return true, nil
 }
 
 func (r *queryResolver) Dicts(ctx context.Context, query *source.QDict) ([]beans.Dict, error) {

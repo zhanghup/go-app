@@ -14,8 +14,6 @@ import (
 )
 
 func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAccount) (string, error) {
-	sess := r.Sess(ctx)
-
 	acc := new(beans.Account)
 	acc.Salt = tools.Ptr.Uid()
 	if input.Type == "password" {
@@ -32,18 +30,16 @@ func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAc
 	acc.Password = input.Password
 	acc.Default = input.Default
 	if input.Default != nil && *input.Default == 1 {
-		err := sess.SF("update account set `default` = 0 where uid = :uid", map[string]interface{}{"uid": input.UID}).Exec()
+		err := r.Sess(ctx).SF("update account set `default` = 0 where uid = :uid", map[string]interface{}{"uid": input.UID}).Exec()
 		if err != nil {
 			return "", err
 		}
 	}
 
-	return r.Create(sess.Context(), acc, nil)
+	return r.Create(ctx, acc, nil)
 }
 
 func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input source.UpdAccount) (bool, error) {
-	sess := r.Sess(ctx)
-
 	acc, err := r.AccountLoader(ctx, id)
 	if err != nil {
 		return false, err
@@ -54,7 +50,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 
 	if acc.Salt == nil {
 		acc.Salt = tools.Ptr.Uid()
-		err = sess.SF("update account set salt = :salt", map[string]interface{}{"salt": acc.Salt}).Exec()
+		err := r.Sess(ctx).SF("update account set salt = :salt", map[string]interface{}{"salt": acc.Salt}).Exec()
 		if err != nil {
 			return false, err
 		}
@@ -73,7 +69,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 	}
 
 	if input.Default != nil && *input.Default == 1 {
-		err := sess.SF("update account set `default` = 0 where uid = :uid", map[string]interface{}{"uid": acc.Uid}).Exec()
+		err := r.Sess(ctx).SF("update account set `default` = 0 where uid = :uid", map[string]interface{}{"uid": acc.Uid}).Exec()
 		if err != nil {
 			return false, err
 		}
@@ -82,7 +78,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 	// 删除登录状态缓存
 	ca.UserCache.RemoveByUser(*acc.Uid)
 
-	return r.Update(sess.Context(), acc, id, input)
+	return r.Update(ctx, acc, id, input)
 }
 
 func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bool, error) {
@@ -95,7 +91,7 @@ func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bo
 		// 删除登录状态缓存
 		ca.UserCache.RemoveByUser(s)
 	}
-	return r.Removes(r.SessCtx(ctx), new(beans.Account), ids)
+	return r.Removes(ctx, new(beans.Account), ids)
 }
 
 func (r *queryResolver) Accounts(ctx context.Context, query source.QAccount) (*source.Accounts, error) {

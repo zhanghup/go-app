@@ -11,6 +11,7 @@ import (
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgql"
+	"github.com/zhanghup/go-tools/tog"
 	"xorm.io/xorm"
 )
 
@@ -38,7 +39,6 @@ type ResolverTools struct {
 	DB        *xorm.Engine
 	DBS       func() *txorm.Engine
 	Sess      func(ctx context.Context) txorm.ISession
-	SessCtx   func(ctx context.Context) context.Context
 	Loader    func(ctx context.Context) tgql.Loader
 	Me        func(ctx context.Context) directive.Me
 	DictCache func(dict string) (*beans.Dict, []beans.DictItem, bool)
@@ -52,10 +52,12 @@ func NewResolverTools(db *xorm.Engine) *ResolverTools {
 			return dbs
 		},
 		Sess: func(ctx context.Context) txorm.ISession {
-			return dbs.NewSession(ctx)
-		},
-		SessCtx: func(ctx context.Context) context.Context {
-			return dbs.NewSession(ctx).Context()
+			sess := dbs.NewSession(ctx)
+			err := sess.Begin()
+			if err != nil {
+				tog.Error("【开启事务异常！！！】")
+			}
+			return sess
 		},
 		Loader: tgql.DataLoaden,
 		Me:     directive.MyInfo,

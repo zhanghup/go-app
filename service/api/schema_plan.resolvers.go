@@ -16,15 +16,15 @@ func (r *mutationResolver) PlanCreate(ctx context.Context, input source.NewPlan)
 		Puid:   user.Id,
 		Puname: user.Name,
 	}
-	return r.Create(r.SessCtx(ctx), &plan, input)
+	return r.Create(ctx, &plan, input)
 }
 
 func (r *mutationResolver) PlanUpdate(ctx context.Context, id string, input source.UpdPlan) (bool, error) {
-	return r.Update(r.SessCtx(ctx), new(beans.Plan), id, input)
+	return r.Update(ctx, new(beans.Plan), id, input)
 }
 
 func (r *mutationResolver) PlanRemoves(ctx context.Context, ids []string) (bool, error) {
-	return r.Removes(r.SessCtx(ctx), new(beans.Dept), ids)
+	return r.Removes(ctx, new(beans.Dept), ids)
 }
 
 func (r *queryResolver) Plans(ctx context.Context, query source.QPlan) (*source.Plans, error) {

@@ -11,6 +11,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 	"github.com/zhanghup/go-app/service/ags/resolvers"
 	"github.com/zhanghup/go-app/service/ags/source"
 	"github.com/zhanghup/go-app/service/directive"
@@ -30,8 +31,16 @@ func gqlschemaFmt(db *xorm.Engine, schema graphql.ExecutableSchema) func(c *gin.
 			CheckOrigin: func(r *http.Request) bool {
 				return true
 			},
-			Error: func(w http.ResponseWriter, r *http.Request, status int, reason error) {
-
+			Error: func(w http.ResponseWriter, r *http.Request, status int, e error) {
+				if e != nil {
+					// 【事务】 统一提交关闭回归事务
+					val := r.Context().Value(txorm.CONTEXT_SESSION)
+					sess, ok := val.(txorm.ISession)
+					if ok {
+						sess.Rollback()
+						sess.AutoClose()
+					}
+				}
 			},
 		},
 		InitFunc: func(ctx context.Context, initPayload transport.InitPayload) (context.Context, error) {
@@ -40,17 +49,35 @@ func gqlschemaFmt(db *xorm.Engine, schema graphql.ExecutableSchema) func(c *gin.
 			return ctx, err
 		},
 	})
+	// 【graphql】 错误处理
+	srv.SetErrorPresenter(func(ctx context.Context, e error) *gqlerror.Error {
+		if e != nil {
+			// 【事务】 统一提交关闭回归事务
+			val := ctx.Value(txorm.CONTEXT_SESSION)
+			sess, ok := val.(txorm.ISession)
+			if ok {
+				sess.Rollback()
+				sess.AutoClose()
+			}
+		}
+		err := graphql.DefaultErrorPresenter(ctx, e)
+
+		return err
+	})
 	srv.Use(extension.Introspection{})
 
 	hu := tgql.DataLoadenMiddleware(db, srv)
-
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
+		// 统一建立session
 		ctx = context.WithValue(ctx, txorm.CONTEXT_SESSION, txorm.NewEngine(db).NewSession(ctx))
+		// 统一关联gin对象
 		ctx = context.WithValue(ctx, directive.GIN_CONTEXT, c)
 
 		c.Header("Content-Type", "application/json")
 		hu.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
+
+		// 【事务】 统一提交关闭事务
 		val := ctx.Value(txorm.CONTEXT_SESSION)
 		sess, ok := val.(txorm.ISession)
 		if ok {

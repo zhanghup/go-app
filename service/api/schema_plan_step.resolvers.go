@@ -5,20 +5,21 @@ package api
 
 import (
 	"context"
+
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
 )
 
 func (r *mutationResolver) PlanStepCreate(ctx context.Context, input source.NewPlanStep) (string, error) {
-	return r.Create(r.SessCtx(ctx), new(beans.PlanStep), input)
+	return r.Create(ctx, new(beans.PlanStep), input)
 }
 
 func (r *mutationResolver) PlanStepUpdate(ctx context.Context, id string, input source.UpdPlanStep) (bool, error) {
-	return r.Update(r.SessCtx(ctx), new(beans.PlanStep), id, input)
+	return r.Update(ctx, new(beans.PlanStep), id, input)
 }
 
 func (r *mutationResolver) PlanStepRemoves(ctx context.Context, ids []string) (bool, error) {
-	return r.Removes(r.SessCtx(ctx), new(beans.PlanStep), ids)
+	return r.Removes(ctx, new(beans.PlanStep), ids)
 }
 
 func (r *queryResolver) PlanSteps(ctx context.Context, query source.QPlanStep) (*source.PlanSteps, error) {

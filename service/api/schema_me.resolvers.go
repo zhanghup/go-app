@@ -22,14 +22,14 @@ func (r *mutationResolver) MyMsgInfoConfirm(ctx context.Context, id string, inpu
 		return false, errors.New("消息id不存在,id:" + id)
 	}
 
-	_, err = r.DB.Table(beans.MsgInfo{}).Where("id = ?", id).Update(map[string]interface{}{
+	err = r.Sess(ctx).SF("update msg_info set confirm_remark = :confirm_remark,confirm_time = :confirm_time where id = :id", map[string]interface{}{
 		"confirm_remark": input.Remark,
 		"confirm_time":   time.Now().Unix(),
-	})
+		"id":             id,
+	}).Exec()
 	if err == nil {
 		go event.MsgNew(*r.Me(ctx).Info.User.Id, event.MsgTargetWeb, event.MsgActionConfirm, *msg)
 	}
-
 	return err == nil, err
 }
 
@@ -42,9 +42,10 @@ func (r *mutationResolver) MyMsgInfoRead(ctx context.Context, id string) (bool, 
 		return false, errors.New("消息id不存在,id:" + id)
 	}
 
-	_, err = r.DB.Table(beans.MsgInfo{}).Where("id = ?", id).Update(map[string]interface{}{
+	err = r.Sess(ctx).SF("update msg_info set read_time = :read_time where id = :id", map[string]interface{}{
 		"read_time": time.Now().Unix(),
-	})
+		"id":        id,
+	}).Exec()
 	if err == nil {
 		go event.MsgNew(*r.Me(ctx).Info.User.Id, event.MsgTargetWeb, event.MsgActionRead, *msg)
 	}

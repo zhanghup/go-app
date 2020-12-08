@@ -10,12 +10,10 @@ import (
 	"github.com/zhanghup/go-app/service/api/source"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tog"
 )
 
 func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser) (string, error) {
-	sess := r.Sess(ctx)
 
 	uid := ""
 
@@ -26,7 +24,7 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser)
 			user.Py = tools.Ptr.String(tools.Pin.Py(name))
 			user.Py = tools.Ptr.String(tools.Pin.Pinyin(name))
 		}
-		id, err := r.Create(sess.Context(), user, input.User)
+		id, err := r.Create(ctx, user, input.User)
 		if err != nil {
 			return "", err
 		}
@@ -36,7 +34,7 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser)
 	{ // 添加账户
 		input.Account.Default = tools.Ptr.Int(1)
 		input.Account.UID = &uid
-		_, err := r.AccountCreate(sess.Context(), *input.Account)
+		_, err := r.AccountCreate(ctx, *input.Account)
 		if err != nil {
 			return "", err
 		}
@@ -45,7 +43,7 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser)
 	{ // 角色添加
 		if len(input.Roles) > 0 {
 			for _, str := range input.Roles {
-				_, err := r.Create(sess.Context(), &beans.RoleUser{}, map[string]interface{}{"role": str, "uid": uid})
+				_, err := r.Create(ctx, &beans.RoleUser{}, map[string]interface{}{"role": str, "uid": uid})
 				if err != nil {
 					return "", err
 				}
@@ -69,8 +67,6 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser)
 }
 
 func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input source.UpdUser) (bool, error) {
-	sess := r.Sess(ctx)
-
 	var user *beans.User
 	{ // 读取库存用户
 		u, err := r.UserLoader(ctx, id)
@@ -90,7 +86,7 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 			upduser.Py = tools.Ptr.String(tools.Pin.Py(name))
 			upduser.Pinyin = tools.Ptr.String(tools.Pin.Pinyin(name))
 		}
-		ok, err := r.Update(sess.Context(), &upduser, id, input.User)
+		ok, err := r.Update(ctx, &upduser, id, input.User)
 		if err != nil {
 			return false, err
 		}
@@ -105,7 +101,7 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 			return false, err
 		}
 		if acc == nil {
-			_, err := r.AccountCreate(sess.Context(), source.NewAccount{
+			_, err := r.AccountCreate(ctx, source.NewAccount{
 				UID:      &id,
 				Type:     input.Account.Type,
 				Username: input.Account.Username,
@@ -118,7 +114,7 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 		} else {
 			input.Account.Default = tools.Ptr.Int(1)
 
-			_, err = r.AccountUpdate(sess.Context(), *acc.Id, *input.Account)
+			_, err = r.AccountUpdate(ctx, *acc.Id, *input.Account)
 			if err != nil {
 				return false, err
 			}
@@ -126,13 +122,13 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 	}
 
 	{ // 更新角色
-		err := sess.SF(`delete from role_user where uid = :uid`, map[string]interface{}{"uid": id}).Exec()
+		err := r.Sess(ctx).SF(`delete from role_user where uid = :uid`, map[string]interface{}{"uid": id}).Exec()
 		if err != nil {
 			return false, err
 		}
 		if len(input.Roles) > 0 {
 			for _, str := range input.Roles {
-				_, err := r.Create(sess.Context(), &beans.RoleUser{}, map[string]interface{}{"role": str, "uid": id})
+				_, err := r.Create(ctx, &beans.RoleUser{}, map[string]interface{}{"role": str, "uid": id})
 				if err != nil {
 					return false, err
 				}
@@ -164,25 +160,21 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 	}
 
 	{ // 删除用户
-		ok, err := r.Removes(sess.Context(), new(beans.User), ids)
+		ok, err := r.Removes(ctx, new(beans.User), ids)
 		if err != nil || !ok {
 			return false, err
 		}
 	}
 
 	{ // 删除用户下所有的账户
-		err := sess.TS(func(sess txorm.ISession) error {
-			return sess.SF(`delete from account where uid in :ids`, map[string]interface{}{"ids": ids}).Exec()
-		})
+		err := sess.SF(`delete from account where uid in :ids`, map[string]interface{}{"ids": ids}).Exec()
 		if err != nil {
 			return false, err
 		}
 	}
 
 	{ // 删除用户下所有的角色
-		err := sess.TS(func(sess txorm.ISession) error {
-			return sess.SF(`delete from role_user where uid in :ids`, map[string]interface{}{"ids": ids}).Exec()
-		})
+		err := sess.SF(`delete from role_user where uid in :ids`, map[string]interface{}{"ids": ids}).Exec()
 		if err != nil {
 			return false, err
 		}
