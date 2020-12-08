@@ -16,7 +16,7 @@ func main() {
 	}
 	_ = boot.Boot(box,"测试系统").
 		//SyncTables().
-		//Init().
+		Init().
 		//InitTestData().
 		XormInited().
 		//JobsInit().
