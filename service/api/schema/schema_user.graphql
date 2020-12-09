@@ -73,7 +73,7 @@ input NewUser{
     roles:[String!]
 }
 
-input NewUserInfo @goModel(model:"map[string]interface{}"){
+input NewUserInfo{
     "所属部门"
     dept: String
     "用户类型{dict:BUS002}"
@@ -106,7 +106,7 @@ input UpdUser{
     roles:[String!]
 }
 
-input UpdUserInfo  @goModel(model:"map[string]interface{}"){
+input UpdUserInfo{
     "所属部门"
     dept: String
     "用户类型{dict:BUS002}"

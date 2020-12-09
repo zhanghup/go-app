@@ -3531,7 +3531,7 @@ input NewUser{
     roles:[String!]
 }
 
-input NewUserInfo @goModel(model:"map[string]interface{}"){
+input NewUserInfo{
     "所属部门"
     dept: String
     "用户类型{dict:BUS002}"
@@ -3564,7 +3564,7 @@ input UpdUser{
     roles:[String!]
 }
 
-input UpdUserInfo  @goModel(model:"map[string]interface{}"){
+input UpdUserInfo{
     "所属部门"
     dept: String
     "用户类型{dict:BUS002}"
@@ -15618,7 +15618,7 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
-			it.User, err = ec.unmarshalNNewUserInfo2map(ctx, v)
+			it.User, err = ec.unmarshalNNewUserInfo2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewUserInfo(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15635,6 +15635,114 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
 			it.Roles, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewUserInfo(ctx context.Context, obj interface{}) (NewUserInfo, error) {
+	var it NewUserInfo
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "dept":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dept"))
+			it.Dept, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "avatar":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
+			it.Avatar, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "id_card":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id_card"))
+			it.IDCard, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "birth":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("birth"))
+			it.Birth, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sex":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sex"))
+			it.Sex, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "mobile":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mobile"))
+			it.Mobile, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "weight":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weight"))
+			it.Weight, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remark":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remark"))
+			it.Remark, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "admin":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("admin"))
+			it.Admin, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16798,7 +16906,7 @@ func (ec *executionContext) unmarshalInputUpdUser(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
-			it.User, err = ec.unmarshalNUpdUserInfo2map(ctx, v)
+			it.User, err = ec.unmarshalNUpdUserInfo2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐUpdUserInfo(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16815,6 +16923,114 @@ func (ec *executionContext) unmarshalInputUpdUser(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
 			it.Roles, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdUserInfo(ctx context.Context, obj interface{}) (UpdUserInfo, error) {
+	var it UpdUserInfo
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "dept":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dept"))
+			it.Dept, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "avatar":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
+			it.Avatar, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "id_card":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id_card"))
+			it.IDCard, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "birth":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("birth"))
+			it.Birth, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sex":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sex"))
+			it.Sex, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "mobile":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mobile"))
+			it.Mobile, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "weight":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weight"))
+			it.Weight, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remark":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remark"))
+			it.Remark, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "admin":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("admin"))
+			it.Admin, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18703,8 +18919,9 @@ func (ec *executionContext) unmarshalNNewUser2githubᚗcomᚋzhanghupᚋgoᚑapp
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNewUserInfo2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
-	return v.(map[string]interface{}), nil
+func (ec *executionContext) unmarshalNNewUserInfo2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewUserInfo(ctx context.Context, v interface{}) (*NewUserInfo, error) {
+	res, err := ec.unmarshalInputNewUserInfo(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNPermObj2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐPermObj(ctx context.Context, sel ast.SelectionSet, v PermObj) graphql.Marshaler {
@@ -18873,8 +19090,9 @@ func (ec *executionContext) unmarshalNUpdUser2githubᚗcomᚋzhanghupᚋgoᚑapp
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdUserInfo2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
-	return v.(map[string]interface{}), nil
+func (ec *executionContext) unmarshalNUpdUserInfo2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐUpdUserInfo(ctx context.Context, v interface{}) (*UpdUserInfo, error) {
+	res, err := ec.unmarshalInputUpdUserInfo(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNUser2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐUser(ctx context.Context, sel ast.SelectionSet, v beans.User) graphql.Marshaler {

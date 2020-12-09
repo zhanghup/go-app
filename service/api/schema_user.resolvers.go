@@ -6,6 +6,7 @@ package api
 import (
 	"context"
 	"errors"
+
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
 	"github.com/zhanghup/go-app/service/event"
@@ -14,13 +15,12 @@ import (
 )
 
 func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser) (string, error) {
-
 	uid := ""
 
 	{ // 添加用户
 		user := new(beans.User)
-		if input.User["name"] != nil {
-			name := input.User["name"].(string)
+		if input.User.Name != nil {
+			name := *input.User.Name
 			user.Py = tools.Ptr.String(tools.Pin.Py(name))
 			user.Py = tools.Ptr.String(tools.Pin.Pinyin(name))
 		}
@@ -81,8 +81,8 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 
 	{ // 更新用户
 		upduser := beans.User{}
-		if input.User["name"] != nil {
-			name := input.User["name"].(string)
+		if input.User.Name != nil {
+			name := *input.User.Name
 			upduser.Py = tools.Ptr.String(tools.Pin.Py(name))
 			upduser.Pinyin = tools.Ptr.String(tools.Pin.Pinyin(name))
 		}
