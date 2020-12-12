@@ -27,7 +27,7 @@ func InitMsgTemplateCode(db *xorm.Engine, codes ...string) {
 				Name:        tools.Ptr.String("系统消息"),
 				Code:        &code,
 				Type:        tools.Ptr.String("message"),
-				Level:       tools.Ptr.String("4"),
+				Level:       tools.Ptr.String("3"),
 				Target:      tools.Ptr.String("web"),
 				Expire:      nil,
 				MustConfirm: tools.Ptr.String("0"),
