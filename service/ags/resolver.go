@@ -98,6 +98,6 @@ func Gql(gqlpath string, gqlrouter gin.IRouter, gqlSchema graphql.ExecutableSche
 
 func Gin(auth, any gin.IRouter, db *xorm.Engine) {
 	Gql("/zpx/ags", any, source.NewExecutableSchema(source.Config{Resolvers: resolvers.NewResolver(db)}), db)
-	NewUploader(db).GinRouter(auth.Group("/zpx/agx"), any.Group("/zpx/ags"))
+	NewUploader(db).GinRouter(auth.Group("/zpx/ags"), any.Group("/zpx/ags"))
 
 }
