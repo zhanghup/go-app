@@ -14,8 +14,6 @@ input QMyMsgInfo{
     type: String
     "消息级别{dict: SYS006}"
     level: String
-    "消息接收平台{dict:SYS007}"
-    target: String
     "弹出消息是否必须确认{dict:STA005}"
     must_confirm: String
     "确认平台{dict:SYS007}"

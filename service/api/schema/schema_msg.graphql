@@ -3,6 +3,7 @@ extend type Query{
     msg_template(id: String!):MsgTemplate
     "你可以知道下一页有没有数据，但是你不会知道总共有多少页数据"
     msg_infos(query: QMsgInfo!): [MsgInfo!]
+    msg_historys(query: QMsgHistory!): [MsgHistory!]
 }
 
 extend type Mutation {
@@ -22,8 +23,6 @@ input QMsgInfo{
     level: String
     "消息接收平台{dict:SYS007}"
     target: String
-    "弹出消息是否必须确认{dict:STA005}"
-    must_confirm: String
     "确认平台{dict:SYS007}"
     confirm_target: String
     "已读平台{dict:SYS007}"
@@ -45,15 +44,10 @@ input QMsgTemplate{
 }
 
 type Message{
-    action: MsgAction!
     message:MsgInfo
+    template: MsgTemplate
 }
 
-enum MsgAction  @goModel(model:"github.com/zhanghup/go-app/service/event.MsgAction"){
-    add
-    read
-    confirm
-}
 
 type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
     id: String
@@ -72,8 +66,70 @@ type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
     target: String
     "消息超时时间"
     timeout: Int64
-    "弹出消息是否必须确认{dict:STA005}"
-    must_confirm: String
+    "确认平台{dict:SYS007}"
+    confirm_target: String
+    "已读平台{dict:SYS007}"
+    read_target: String
+    "消息状态{ dict:SYS008}"
+    state: String
+    "消息发送时间"
+    send_time: Int64
+    "消息阅读时间"
+    read_time: Int64
+    "消息确认时间"
+    confirm_time: Int64
+    "消息确认备注"
+    confirm_remark:String
+    "消息对象"
+    otype: String
+    "消息对象id"
+    oid:String
+    "消息标题"
+    title: String
+    "消息体"
+    content: String
+    "消息提示图片"
+    img_path: String
+    "备注"
+    remark: String
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+
+}
+
+
+input QMsgHistory{
+    "消息ID"
+    info: String
+
+    index: Int
+    size: Int
+}
+
+type MsgHistory @goModel(model:"github.com/zhanghup/go-app/beans.MsgHistory")  {
+    id: String
+    info: String
+    "接收者"
+    receiver: String
+    "接收者名称"
+    receiver_name: String
+    "模板id"
+    template: String
+    "消息类型{dict:SYS005}"
+    type: String
+    "消息级别{dict: SYS006}"
+    level: String
+    "消息接收平台{dict:SYS007}"
+    target: String
+    "消息超时时间"
+    timeout: Int64
     "确认平台{dict:SYS007}"
     confirm_target: String
     "已读平台{dict:SYS007}"
@@ -127,8 +183,6 @@ type MsgTemplate @goModel(model:"github.com/zhanghup/go-app/beans.MsgTemplate") 
     target: String
     "消息超时时间（秒）"
     expire: Int64
-    "消息是否必须确认{dict:STA005}"
-    must_confirm: String
     "消息提示图片"
     img_path: String
     "备注"

@@ -47,7 +47,6 @@ func (r *queryResolver) MsgInfos(ctx context.Context, query source.QMsgInfo) ([]
 		{{ if .type }} and info.type = :type {{ end }}
 		{{ if .level }} and info.level = :level {{ end }}
 		{{ if .target }} and info.target = :target {{ end }}
-		{{ if .must_confirm }} and info.must_confirm = :must_confirm {{ end }}
 		{{ if .confirm_target }} and info.confirm_target = :level {{ end }}
 		{{ if .read_target }} and info.read_target = :level {{ end }}
 		{{ if .status }} and info.status = :status {{ end }}
@@ -57,7 +56,6 @@ func (r *queryResolver) MsgInfos(ctx context.Context, query source.QMsgInfo) ([]
 		"type":           query.Type,
 		"level":          query.Level,
 		"target":         query.Target,
-		"must_confirm":   query.MustConfirm,
 		"confirm_target": query.ConfirmTarget,
 		"read_target":    query.ReadTarget,
 		"status":         query.Status,
@@ -65,12 +63,23 @@ func (r *queryResolver) MsgInfos(ctx context.Context, query source.QMsgInfo) ([]
 	return infos, err
 }
 
+func (r *queryResolver) MsgHistorys(ctx context.Context, query source.QMsgHistory) ([]beans.MsgHistory, error) {
+	infos := make([]beans.MsgHistory, 0)
+	_, err := r.DBS().SF(`
+		select his.* from msg_history his
+		where 1 = 1
+		{{ if .info }} and his.info = :info {{ end }}
+	`, map[string]interface{}{
+		"info": query.Info,
+	}).Order("-his.created").Page2(query.Index, query.Size, tools.Ptr.Bool(false), &infos)
+	return infos, err
+}
+
 func (r *subscriptionResolver) Message(ctx context.Context) (<-chan *source.Message, error) {
 	datas := make(chan *source.Message, 100)
 
-	fn := func(action event.MsgAction, msg beans.MsgInfo) {
+	fn := func(tpl beans.MsgTemplate, msg beans.MsgInfo) {
 		datas <- &source.Message{
-			Action:  action,
 			Message: &msg,
 		}
 	}

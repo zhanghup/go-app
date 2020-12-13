@@ -30,7 +30,6 @@ func InitMsgTemplateCode(db *xorm.Engine, codes ...string) {
 				Level:       tools.Ptr.String("3"),
 				Target:      tools.Ptr.String("web"),
 				Expire:      nil,
-				MustConfirm: tools.Ptr.String("0"),
 				Remark:      tools.Ptr.String("系统消息"),
 			})
 			if err != nil {

@@ -4,7 +4,6 @@ package source
 
 import (
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/service/event"
 )
 
 type Accounts struct {
@@ -35,8 +34,8 @@ type IPermObj struct {
 }
 
 type Message struct {
-	Action  event.MsgAction `json:"action" xorm:"action"`
-	Message *beans.MsgInfo  `json:"message" xorm:"message"`
+	Message  *beans.MsgInfo     `json:"message" xorm:"message"`
+	Template *beans.MsgTemplate `json:"template" xorm:"template"`
 }
 
 type NewAccount struct {
@@ -248,6 +247,13 @@ type QDict struct {
 	Status *string `json:"status" xorm:"status"`
 }
 
+type QMsgHistory struct {
+	// 消息ID
+	Info  *string `json:"info" xorm:"info"`
+	Index *int    `json:"index" xorm:"index"`
+	Size  *int    `json:"size" xorm:"size"`
+}
+
 type QMsgInfo struct {
 	// 接收者
 	Receiver *string `json:"receiver" xorm:"receiver"`
@@ -257,8 +263,6 @@ type QMsgInfo struct {
 	Level *string `json:"level" xorm:"level"`
 	// 消息接收平台{dict:SYS007}
 	Target *string `json:"target" xorm:"target"`
-	// 弹出消息是否必须确认{dict:STA005}
-	MustConfirm *string `json:"must_confirm" xorm:"must_confirm"`
 	// 确认平台{dict:SYS007}
 	ConfirmTarget *string `json:"confirm_target" xorm:"confirm_target"`
 	// 已读平台{dict:SYS007}
@@ -283,8 +287,6 @@ type QMyMsgInfo struct {
 	Type *string `json:"type" xorm:"type"`
 	// 消息级别{dict: SYS006}
 	Level *string `json:"level" xorm:"level"`
-	// 消息接收平台{dict:SYS007}
-	Target *string `json:"target" xorm:"target"`
 	// 弹出消息是否必须确认{dict:STA005}
 	MustConfirm *string `json:"must_confirm" xorm:"must_confirm"`
 	// 确认平台{dict:SYS007}

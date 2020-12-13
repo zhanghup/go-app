@@ -6,11 +6,9 @@ package api
 import (
 	"context"
 	"errors"
-	"time"
-
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
-	"github.com/zhanghup/go-app/service/event"
+	"github.com/zhanghup/go-tools"
 )
 
 func (r *mutationResolver) MyMsgInfoConfirm(ctx context.Context, id string, input source.NewMsgConfirm) (bool, error) {
@@ -22,14 +20,21 @@ func (r *mutationResolver) MyMsgInfoConfirm(ctx context.Context, id string, inpu
 		return false, errors.New("消息id不存在,id:" + id)
 	}
 
-	err = r.Sess(ctx).SF("update msg_info set confirm_remark = :confirm_remark,confirm_time = :confirm_time where id = :id", map[string]interface{}{
-		"confirm_remark": input.Remark,
-		"confirm_time":   time.Now().Unix(),
-		"id":             id,
-	}).Exec()
-	if err == nil {
-		go event.MsgNew(*r.Me(ctx).Info.User.Id, event.MsgTargetWeb, event.MsgActionConfirm, *msg)
-	}
+	err = r.Sess(ctx).SF(`
+		update 
+			msg_info 
+		set 
+			confirm_remark = :confirm_remark,
+			confirm_time =  unix_timestamp(now()), 
+			confirm_target = 'web',
+			state = '4'
+		where id = :id
+	`,
+		map[string]interface{}{
+			"confirm_remark": input.Remark,
+			"id":             id,
+		}).Exec()
+
 	return err == nil, err
 }
 
@@ -42,13 +47,17 @@ func (r *mutationResolver) MyMsgInfoRead(ctx context.Context, id string) (bool, 
 		return false, errors.New("消息id不存在,id:" + id)
 	}
 
-	err = r.Sess(ctx).SF("update msg_info set read_time = :read_time where id = :id", map[string]interface{}{
-		"read_time": time.Now().Unix(),
-		"id":        id,
+	err = r.Sess(ctx).SF(`
+		update 
+			msg_info 
+		set 
+			read_time = unix_timestamp(now()), 
+			read_target = 'web',
+			state = '0'
+		where id = :id
+	`, map[string]interface{}{
+		"id": id,
 	}).Exec()
-	if err == nil {
-		go event.MsgNew(*r.Me(ctx).Info.User.Id, event.MsgTargetWeb, event.MsgActionRead, *msg)
-	}
 
 	return err == nil, err
 }
@@ -70,8 +79,7 @@ func (r *queryResolver) MyMsgInfos(ctx context.Context, query source.QMyMsgInfo)
 		Receiver:      r.Me(ctx).Info.User.Id,
 		Type:          query.Type,
 		Level:         query.Level,
-		Target:        query.Target,
-		MustConfirm:   query.MustConfirm,
+		Target:        tools.Ptr.String("web"),
 		ConfirmTarget: query.ConfirmTarget,
 		ReadTarget:    query.ReadTarget,
 		State:         query.State,
