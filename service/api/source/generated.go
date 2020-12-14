@@ -215,8 +215,10 @@ type ComplexityRoot struct {
 	}
 
 	MsgTemplate struct {
+		Alert   func(childComplexity int) int
 		Code    func(childComplexity int) int
 		Created func(childComplexity int) int
+		Delay   func(childComplexity int) int
 		Expire  func(childComplexity int) int
 		Id      func(childComplexity int) int
 		ImgPath func(childComplexity int) int
@@ -1375,6 +1377,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgInfo.Weight(childComplexity), true
 
+	case "MsgTemplate.alert":
+		if e.complexity.MsgTemplate.Alert == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplate.Alert(childComplexity), true
+
 	case "MsgTemplate.code":
 		if e.complexity.MsgTemplate.Code == nil {
 			break
@@ -1388,6 +1397,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgTemplate.Created(childComplexity), true
+
+	case "MsgTemplate.delay":
+		if e.complexity.MsgTemplate.Delay == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplate.Delay(childComplexity), true
 
 	case "MsgTemplate.expire":
 		if e.complexity.MsgTemplate.Expire == nil {
@@ -3441,6 +3457,10 @@ type MsgTemplate @goModel(model:"github.com/zhanghup/go-app/beans.MsgTemplate") 
     target: String
     "消息超时时间（秒）"
     expire: Int64
+    "消息延时"
+    delay: Int64
+    "消息提前提醒时间"
+    alert: Int64
     "消息提示图片"
     img_path: String
     "备注"
@@ -9209,6 +9229,70 @@ func (ec *executionContext) _MsgTemplate_expire(ctx context.Context, field graph
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Expire, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgTemplate_delay(ctx context.Context, field graphql.CollectedField, obj *beans.MsgTemplate) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgTemplate",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Delay, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgTemplate_alert(ctx context.Context, field graphql.CollectedField, obj *beans.MsgTemplate) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgTemplate",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Alert, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -18735,6 +18819,10 @@ func (ec *executionContext) _MsgTemplate(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = ec._MsgTemplate_target(ctx, field, obj)
 		case "expire":
 			out.Values[i] = ec._MsgTemplate_expire(ctx, field, obj)
+		case "delay":
+			out.Values[i] = ec._MsgTemplate_delay(ctx, field, obj)
+		case "alert":
+			out.Values[i] = ec._MsgTemplate_alert(ctx, field, obj)
 		case "img_path":
 			out.Values[i] = ec._MsgTemplate_img_path(ctx, field, obj)
 		case "remark":

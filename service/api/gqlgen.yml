@@ -25,8 +25,4 @@ models:
   Int64:
     model:
       - github.com/99designs/gqlgen/graphql.Int64
-  NewAccount:
-    fields:
-      uid:
-        fieldName: Uid
 

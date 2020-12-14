@@ -2,16 +2,18 @@ package beans
 
 // 消息模板
 type MsgTemplate struct {
-	Bean        `xorm:"extends"`
-	Name        *string `json:"name"`
-	Code        *string `json:"code" xorm:"index"` // 模板编码
-	Type        *string `json:"type"`              // 消息分类 - dict
-	Level       *string `json:"level"`             // 消息等级 [0:严重、1:重要、2:次要、3:普通]
-	Target      *string `json:"target"`            // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
-	Expire      *int64  `json:"expire"`            // 消息超时时间（秒）
-	ImgPath     *string `json:"img_path"`          // 消息提示图片
-	Remark      *string `json:"remark"`            // 备注
-	Template    *string `json:"ext" xorm:"text"`   // 模板
+	Bean     `xorm:"extends"`
+	Name     *string `json:"name"`
+	Code     *string `json:"code" xorm:"index"`    // 模板编码
+	Type     *string `json:"type"`                 // 消息分类 - dict
+	Level    *string `json:"level"`                // 消息等级 [0:严重、1:重要、2:次要、3:普通]
+	Target   *string `json:"target"`               // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
+	Expire   *int64  `json:"expire"`               // 消息超时时间（秒）
+	Delay    *int64  `json:"delay"`                // 消息延时
+	Alert    *int64  `json:"alert"`                // 消息提前提醒时间
+	ImgPath  *string `json:"img_path"`             // 消息提示图片
+	Remark   *string `json:"remark"`               // 备注
+	Template *string `json:"template" xorm:"text"` // 模板
 }
 
 // 消息体

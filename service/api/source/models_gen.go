@@ -40,7 +40,7 @@ type Message struct {
 
 type NewAccount struct {
 	// 用户ID
-	UID *string `json:"uid" xorm:"Uid"`
+	UID *string `json:"uid" xorm:"uid"`
 	// 账号类型 dict: SYS002
 	Type string `json:"type" xorm:"type"`
 	// 用户名

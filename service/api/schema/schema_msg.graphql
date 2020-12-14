@@ -183,6 +183,10 @@ type MsgTemplate @goModel(model:"github.com/zhanghup/go-app/beans.MsgTemplate") 
     target: String
     "消息超时时间（秒）"
     expire: Int64
+    "消息延时"
+    delay: Int64
+    "消息提前提醒时间"
+    alert: Int64
     "消息提示图片"
     img_path: String
     "备注"

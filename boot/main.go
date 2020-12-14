@@ -50,7 +50,6 @@ func Boot(box *rice.Box, name string, initdb ...bool) *Struct {
 	return s
 }
 
-
 // 通知数据库完成初始化 - 需要在同步完成表结构的时候推送
 func (this *Struct) XormInited() *Struct {
 	// 数据库初始化完成事件
