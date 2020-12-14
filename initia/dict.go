@@ -140,7 +140,7 @@ func InitDictItem(db *xorm.Engine, code, id, name, value, ext string, weight, di
 			Weight: &weight,
 			Status: tools.Ptr.String("1"),
 		},
-		Code:     &id,
+		Code:     &code,
 		Name:     &name,
 		Value:    &value,
 		Disabled: &disabled,
