@@ -18,7 +18,7 @@ func main() {
 		panic(err)
 	}
 	_ = boot.Boot(box, "测试系统").
-		SyncTables().
+		//SyncTables().
 		//Init().
 		//InitTestData().
 		XormInited().

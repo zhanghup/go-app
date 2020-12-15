@@ -287,8 +287,6 @@ type QMyMsgInfo struct {
 	Type *string `json:"type" xorm:"type"`
 	// 消息级别{dict: SYS006}
 	Level *string `json:"level" xorm:"level"`
-	// 弹出消息是否必须确认{dict:STA005}
-	MustConfirm *string `json:"must_confirm" xorm:"must_confirm"`
 	// 确认平台{dict:SYS007}
 	ConfirmTarget *string `json:"confirm_target" xorm:"confirm_target"`
 	// 已读平台{dict:SYS007}
@@ -413,12 +411,14 @@ type UpdMsgTemplate struct {
 	Target *string `json:"target" xorm:"target"`
 	// 消息超时时间（秒）
 	Expire *int64 `json:"expire" xorm:"expire"`
-	// 消息是否必须确认{dict:STA005}
-	MustConfirm *string `json:"must_confirm" xorm:"must_confirm"`
 	// 消息提示图片
 	ImgPath *string `json:"img_path" xorm:"img_path"`
 	// 备注
 	Remark *string `json:"remark" xorm:"remark"`
+	// 消息延时
+	Delay *int64 `json:"delay" xorm:"delay"`
+	// 消息提前提醒时间
+	Alert *int64 `json:"alert" xorm:"alert"`
 }
 
 type UpdPlan struct {

@@ -69,21 +69,23 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, t
 		return err
 	}
 
-	/*
-		已读的消息分2中情况
-			a)	（消息、通知） 将不再推送
-			b)	（确认框） 将继续推送
-	*/
-	if *oldInfo.State == "0" && tools.Str.Contains([]string{"message", "notice"}, *oldInfo.Type) {
-		return nil
-	}
-	// 未确认的消息将一直推送，直到确认为止
-	if *oldInfo.State == "4" && tools.Str.Contains([]string{"confirm"}, *oldInfo.Type) {
-		return nil
-	}
+
 
 	// 更新消息或者插入消息
 	if ok {
+		/*
+			已读的消息分2中情况
+				a)	（消息、通知） 将不再推送
+				b)	（确认框） 将继续推送
+		*/
+		if *oldInfo.State == "0" && tools.Str.Contains([]string{"message", "notice"}, *oldInfo.Type) {
+			return nil
+		}
+		// 未确认的消息将一直推送，直到确认为止
+		if *oldInfo.State == "4" && tools.Str.Contains([]string{"confirm"}, *oldInfo.Type) {
+			return nil
+		}
+
 		info.Id = oldInfo.Id
 		if *oldInfo.State == "0" {
 			info.State = oldInfo.State

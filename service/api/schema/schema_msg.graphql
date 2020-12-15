@@ -213,10 +213,12 @@ input UpdMsgTemplate{
     target: String
     "消息超时时间（秒）"
     expire: Int64
-    "消息是否必须确认{dict:STA005}"
-    must_confirm: String
     "消息提示图片"
     img_path: String
     "备注"
     remark: String
+    "消息延时"
+    delay: Int64
+    "消息提前提醒时间"
+    alert: Int64
 }

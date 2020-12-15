@@ -3231,8 +3231,6 @@ input QMyMsgInfo{
     type: String
     "消息级别{dict: SYS006}"
     level: String
-    "弹出消息是否必须确认{dict:STA005}"
-    must_confirm: String
     "确认平台{dict:SYS007}"
     confirm_target: String
     "已读平台{dict:SYS007}"
@@ -3487,12 +3485,14 @@ input UpdMsgTemplate{
     target: String
     "消息超时时间（秒）"
     expire: Int64
-    "消息是否必须确认{dict:STA005}"
-    must_confirm: String
     "消息提示图片"
     img_path: String
     "备注"
     remark: String
+    "消息延时"
+    delay: Int64
+    "消息提前提醒时间"
+    alert: Int64
 }`, BuiltIn: false},
 	{Name: "schema/schema_plan.graphql", Input: `extend type Query{
     plans(query:QPlan!):Plans
@@ -17377,14 +17377,6 @@ func (ec *executionContext) unmarshalInputQMyMsgInfo(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "must_confirm":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("must_confirm"))
-			it.MustConfirm, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "confirm_target":
 			var err error
 
@@ -17925,14 +17917,6 @@ func (ec *executionContext) unmarshalInputUpdMsgTemplate(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
-		case "must_confirm":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("must_confirm"))
-			it.MustConfirm, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "img_path":
 			var err error
 
@@ -17946,6 +17930,22 @@ func (ec *executionContext) unmarshalInputUpdMsgTemplate(ctx context.Context, ob
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remark"))
 			it.Remark, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "delay":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delay"))
+			it.Delay, err = ec.unmarshalOInt642ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "alert":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alert"))
+			it.Alert, err = ec.unmarshalOInt642ᚖint64(ctx, v)
 			if err != nil {
 				return it, err
 			}

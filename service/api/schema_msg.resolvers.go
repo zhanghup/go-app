@@ -80,7 +80,8 @@ func (r *subscriptionResolver) Message(ctx context.Context) (<-chan *source.Mess
 
 	fn := func(tpl beans.MsgTemplate, msg beans.MsgInfo) {
 		datas <- &source.Message{
-			Message: &msg,
+			Message:  &msg,
+			Template: &tpl,
 		}
 	}
 
