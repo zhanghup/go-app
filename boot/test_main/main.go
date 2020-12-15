@@ -2,8 +2,8 @@ package main
 
 import (
 	"errors"
+	rice "github.com/GeertJohan/go.rice"
 	"github.com/gin-gonic/gin"
-	rice "github.com/giter/go.rice"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/boot"
 	"github.com/zhanghup/go-app/service/ags"

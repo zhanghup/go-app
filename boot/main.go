@@ -1,8 +1,8 @@
 package boot
 
 import (
+	rice "github.com/GeertJohan/go.rice"
 	"github.com/gin-gonic/gin"
-	"github.com/giter/go.rice"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-app/initia"

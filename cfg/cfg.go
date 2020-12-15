@@ -1,7 +1,7 @@
 package cfg
 
 import (
-	rice "github.com/giter/go.rice"
+	rice "github.com/GeertJohan/go.rice"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
