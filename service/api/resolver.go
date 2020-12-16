@@ -31,6 +31,8 @@ func Gin(g gin.IRouter, db *xorm.Engine) {
 	ags.Gql("/zpx/api", g.Group("/", directive.WebAuth(db)), source.NewExecutableSchema(config), db)
 }
 
+
+
 type Resolver struct {
 	*ResolverTools
 }

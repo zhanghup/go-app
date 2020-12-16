@@ -9,14 +9,17 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	rice "github.com/GeertJohan/go.rice"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"github.com/zhanghup/go-app/service/ags/resolvers"
 	"github.com/zhanghup/go-app/service/ags/source"
 	"github.com/zhanghup/go-app/service/directive"
+	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgql"
+	"io"
 	"net/http"
 	"time"
 	"xorm.io/xorm"
@@ -100,4 +103,39 @@ func Gin(auth, any gin.IRouter, db *xorm.Engine) {
 	Gql("/zpx/ags", any, source.NewExecutableSchema(source.Config{Resolvers: resolvers.NewResolver(db)}), db)
 	NewUploader(db).GinRouter(auth.Group("/zpx/ags"), any.Group("/zpx/ags"))
 
+}
+
+func Static(box *rice.Box, g gin.IRouter, prefix string) {
+	g.GET("/", func(ctx *gin.Context) {
+		ctx.Redirect(302, prefix)
+	})
+	g.GET("/"+prefix+"/*path", func(c *gin.Context) {
+
+		path, _ := c.Params.Get("path")
+		if tools.Str.Contains([]string{"/", "index.html"}, path) {
+			path = "index.html"
+		}
+
+		f, err := box.Open(prefix+"/" + path)
+
+		if err != nil {
+			f, err = box.Open(prefix + "/index.html")
+			if err != nil {
+				return
+			}
+		}
+		if path == "index.html" {
+			c.Header("Content-Type", "text/html; charset=utf-8")
+			io.Copy(c.Writer, f)
+			return
+		} else {
+			stat, err := f.Stat()
+			if err == nil {
+				http.ServeContent(c.Writer, c.Request, c.Request.URL.Path, stat.ModTime(), f)
+				return
+			}
+
+		}
+		c.String(404, "404")
+	})
 }
