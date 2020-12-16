@@ -215,21 +215,23 @@ type ComplexityRoot struct {
 	}
 
 	MsgTemplate struct {
-		Alert   func(childComplexity int) int
-		Code    func(childComplexity int) int
-		Created func(childComplexity int) int
-		Delay   func(childComplexity int) int
-		Expire  func(childComplexity int) int
-		Id      func(childComplexity int) int
-		ImgPath func(childComplexity int) int
-		Level   func(childComplexity int) int
-		Name    func(childComplexity int) int
-		Remark  func(childComplexity int) int
-		Status  func(childComplexity int) int
-		Target  func(childComplexity int) int
-		Type    func(childComplexity int) int
-		Updated func(childComplexity int) int
-		Weight  func(childComplexity int) int
+		Alert        func(childComplexity int) int
+		Code         func(childComplexity int) int
+		Created      func(childComplexity int) int
+		Delay        func(childComplexity int) int
+		Expire       func(childComplexity int) int
+		Id           func(childComplexity int) int
+		ImgPath      func(childComplexity int) int
+		Level        func(childComplexity int) int
+		Name         func(childComplexity int) int
+		Remark       func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Target       func(childComplexity int) int
+		Template     func(childComplexity int) int
+		TemplateCode func(childComplexity int) int
+		Type         func(childComplexity int) int
+		Updated      func(childComplexity int) int
+		Weight       func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -1460,6 +1462,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgTemplate.Target(childComplexity), true
+
+	case "MsgTemplate.template":
+		if e.complexity.MsgTemplate.Template == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplate.Template(childComplexity), true
+
+	case "MsgTemplate.template_code":
+		if e.complexity.MsgTemplate.TemplateCode == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplate.TemplateCode(childComplexity), true
 
 	case "MsgTemplate.type":
 		if e.complexity.MsgTemplate.Type == nil {
@@ -3463,6 +3479,10 @@ type MsgTemplate @goModel(model:"github.com/zhanghup/go-app/beans.MsgTemplate") 
     img_path: String
     "备注"
     remark: String
+    "消息模板"
+    template: String
+    "模板字段定义"
+    template_code: String
 
     "创建时间"
     created: Int
@@ -3493,6 +3513,10 @@ input UpdMsgTemplate{
     delay: Int64
     "消息提前提醒时间"
     alert: Int64
+    "消息模板"
+    template: String
+    "模板字段定义"
+    template_code: String
 }`, BuiltIn: false},
 	{Name: "schema/schema_plan.graphql", Input: `extend type Query{
     plans(query:QPlan!):Plans
@@ -9357,6 +9381,70 @@ func (ec *executionContext) _MsgTemplate_remark(ctx context.Context, field graph
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Remark, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgTemplate_template(ctx context.Context, field graphql.CollectedField, obj *beans.MsgTemplate) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgTemplate",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Template, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MsgTemplate_template_code(ctx context.Context, field graphql.CollectedField, obj *beans.MsgTemplate) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgTemplate",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TemplateCode, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17949,6 +18037,22 @@ func (ec *executionContext) unmarshalInputUpdMsgTemplate(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
+		case "template":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("template"))
+			it.Template, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "template_code":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("template_code"))
+			it.TemplateCode, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -18827,6 +18931,10 @@ func (ec *executionContext) _MsgTemplate(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = ec._MsgTemplate_img_path(ctx, field, obj)
 		case "remark":
 			out.Values[i] = ec._MsgTemplate_remark(ctx, field, obj)
+		case "template":
+			out.Values[i] = ec._MsgTemplate_template(ctx, field, obj)
+		case "template_code":
+			out.Values[i] = ec._MsgTemplate_template_code(ctx, field, obj)
 		case "created":
 			out.Values[i] = ec._MsgTemplate_created(ctx, field, obj)
 		case "updated":

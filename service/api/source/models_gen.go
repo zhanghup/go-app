@@ -419,6 +419,10 @@ type UpdMsgTemplate struct {
 	Delay *int64 `json:"delay" xorm:"delay"`
 	// 消息提前提醒时间
 	Alert *int64 `json:"alert" xorm:"alert"`
+	// 消息模板
+	Template *string `json:"template" xorm:"template"`
+	// 模板字段定义
+	TemplateCode *string `json:"template_code" xorm:"template_code"`
 }
 
 type UpdPlan struct {
