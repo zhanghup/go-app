@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	rice "github.com/GeertJohan/go.rice"
 	"github.com/gin-gonic/gin"
 	"github.com/zhanghup/go-app/beans"
@@ -9,6 +10,8 @@ import (
 	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/api"
 	"github.com/zhanghup/go-tools"
+	"io"
+	"net/http"
 	"xorm.io/xorm"
 )
 
@@ -50,6 +53,38 @@ func main() {
 		Router(func(g *gin.Engine, db *xorm.Engine) {
 			ags.Gin(g.Group(""), g.Group(""), db)
 			api.Gin(g.Group(""), db)
+
+			g.GET("/web/*path", func(c *gin.Context) {
+
+				path, _ := c.Params.Get("path")
+				if tools.Str.Contains([]string{"/", "index.html"}, path) {
+					path = "index.html"
+				}
+
+				f, err := box.Open("web/" + path)
+
+				if err != nil {
+					f, err = box.Open("web/index.html")
+					if err != nil {
+						return
+					}
+				}
+				if path == "index.html" {
+					c.Header("Content-Type", "text/html; charset=utf-8")
+					io.Copy(c.Writer, f)
+					return
+				} else {
+					stat, err := f.Stat()
+					if err == nil {
+						http.ServeContent(c.Writer, c.Request, c.Request.URL.Path, stat.ModTime(), f)
+						return
+					}
+
+				}
+
+				fmt.Println(path)
+				c.String(200, "ddddddddddddddd")
+			})
 		}).
 		StartRouter()
 }
