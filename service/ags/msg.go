@@ -78,11 +78,11 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, t
 				a)	（消息、通知） 将不再推送
 				b)	（确认框） 将继续推送
 		*/
-		if *oldInfo.State == "0" && tools.Str.Contains([]string{"message", "notice"}, *oldInfo.Type) {
+		if *oldInfo.State == "0" && tools.Str.Contains([]string{"message", "notice"}, *tpl.Type) {
 			return nil
 		}
 		// 未确认的消息将一直推送，直到确认为止
-		if *oldInfo.State == "4" && tools.Str.Contains([]string{"confirm"}, *oldInfo.Type) {
+		if *oldInfo.State == "4" && tools.Str.Contains([]string{"confirm"}, *tpl.Type) {
 			return nil
 		}
 
