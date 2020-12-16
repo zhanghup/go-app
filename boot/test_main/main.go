@@ -54,17 +54,20 @@ func main() {
 			ags.Gin(g.Group(""), g.Group(""), db)
 			api.Gin(g.Group(""), db)
 
-			g.GET("/web/*path", func(c *gin.Context) {
+			g.GET("/", func(ctx *gin.Context) {
+				ctx.Redirect(302, "/zpw/")
+			})
+			g.GET("/zpw/*path", func(c *gin.Context) {
 
 				path, _ := c.Params.Get("path")
 				if tools.Str.Contains([]string{"/", "index.html"}, path) {
 					path = "index.html"
 				}
 
-				f, err := box.Open("web/" + path)
+				f, err := box.Open("zpw/" + path)
 
 				if err != nil {
-					f, err = box.Open("web/index.html")
+					f, err = box.Open("zpw/index.html")
 					if err != nil {
 						return
 					}
