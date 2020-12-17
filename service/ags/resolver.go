@@ -90,22 +90,22 @@ func gqlschemaFmt(db *xorm.Engine, schema graphql.ExecutableSchema) func(c *gin.
 	}
 }
 
-func Gql(gqlpath string, gqlrouter gin.IRouter, gqlSchema graphql.ExecutableSchema, db *xorm.Engine) {
+func GinGql(gqlpath string, gqlrouter gin.IRouter, gqlSchema graphql.ExecutableSchema, db *xorm.Engine) {
 	gqlrouter.POST(gqlpath, gqlschemaFmt(db, gqlSchema))
 	gqlrouter.GET(gqlpath, gqlschemaFmt(db, gqlSchema))
-	Playground(gqlrouter, gqlpath+"/playground1", gqlpath)
+	GinPlayground(gqlrouter, gqlpath+"/playground1", gqlpath)
 	gqlrouter.GET(gqlpath+"/playground2", func(c *gin.Context) {
 		playground.Handler("标题", gqlpath)(c.Writer, c.Request)
 	})
 }
 
-func Gin(auth, any gin.IRouter, db *xorm.Engine) {
-	Gql("/zpx/ags", any, source.NewExecutableSchema(source.Config{Resolvers: resolvers.NewResolver(db)}), db)
-	NewUploader(db).GinRouter(auth.Group("/zpx/ags"), any.Group("/zpx/ags"))
+func GinAgs(auth, any gin.IRouter) {
+	GinGql("/zpx/ags", any, source.NewExecutableSchema(source.Config{Resolvers: resolvers.NewResolver(defaultDB)}), defaultDB)
+	defaultUploader.GinRouter(auth.Group("/zpx/ags"), any.Group("/zpx/ags"))
 
 }
 
-func Static(box *rice.Box, g gin.IRouter, prefix string) {
+func GinStatic(box *rice.Box, g gin.IRouter, prefix string) {
 	g.GET("/", func(ctx *gin.Context) {
 		ctx.Redirect(302, prefix)
 	})
@@ -116,7 +116,7 @@ func Static(box *rice.Box, g gin.IRouter, prefix string) {
 			path = "index.html"
 		}
 
-		f, err := box.Open(prefix+"/" + path)
+		f, err := box.Open(prefix + "/" + path)
 
 		if err != nil {
 			f, err = box.Open(prefix + "/index.html")

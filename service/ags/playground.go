@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Playground(g gin.IRouter, url, query string) {
+func GinPlayground(g gin.IRouter, url, query string) {
 	g.GET(url, func(c *gin.Context) {
 		var page = []byte(fmt.Sprintf(`
 		<!DOCTYPE html>

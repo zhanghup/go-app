@@ -69,8 +69,6 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, t
 		return err
 	}
 
-
-
 	// 更新消息或者插入消息
 	if ok {
 		/*
@@ -153,4 +151,36 @@ func (this *message) TimeoutMark() error {
 		end
 		where mi.timeout < unix_timestamp(now())
 	`).Exec()
+}
+
+var defaultMessage IMessage
+
+/*
+	初始化消息工具
+	@db: db为空，初始化默认消息工具
+		 db不为空，返回一个新的消息工具，但是默认的不会被替换
+*/
+func MessageInit(db ...*xorm.Engine) IMessage {
+	if defaultMessage != nil && len(db) == 0 {
+		return defaultMessage
+	}
+
+	var newdb *xorm.Engine
+	if len(db) == 0 {
+		newdb = defaultDB
+	} else {
+		newdb = db[0]
+	}
+
+	mmsg := &message{
+		db:  newdb,
+		dbs: txorm.NewEngine(newdb),
+	}
+
+	if len(db) == 0 {
+		defaultMessage = mmsg
+		return defaultMessage
+	} else {
+		return mmsg
+	}
 }

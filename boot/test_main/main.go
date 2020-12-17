@@ -17,41 +17,21 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	_ = boot.Boot(box, "测试系统").
-		//SyncTables().
-		//Init().
-		//InitTestData().
-		XormInited().
-		JobsInit().
-		JobsInitMessages().
-		Jobs("测试消息推送", "0/10 * * * * * ", func(db *xorm.Engine) error {
-			tpl := beans.MsgTemplate{}
-			ok, err := db.Where("code = ?", "system").Get(&tpl)
-			if err != nil {
-				return err
-			}
-			if !ok {
-				return errors.New("消息模板不存在")
-			}
+	boot.Boot(box, "测试系统", "这是一个测试系统").Jobs("测试消息推送", "0/10 * * * * * ", func(db *xorm.Engine) error {
+		tpl := beans.MsgTemplate{}
+		ok, err := db.Where("code = ?", "system").Get(&tpl)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return errors.New("消息模板不存在")
+		}
 
-			return ags.NewMessage(db).NewMessage(tpl, "root", "root", "user", "root", "天气不错 - "+tools.Ti.HMS(), "今天天气好晴朗，处处好风光")
-		}).
-		//Jobs("河东域名同步", "0 * * * * * ", func() error {
-		//	_, items, ok := ca.DictCache.Get("AUT001")
-		//	if !ok {
-		//		return errors.New("无同步内容[0]")
-		//	}
-		//	if len(items) == 0 {
-		//		return errors.New("无同步内容[1]")
-		//	}
-		//
-		//	return nil
-		//}).
-		Router(func(g *gin.Engine, db *xorm.Engine) {
-			ags.Gin(g.Group(""), g.Group(""), db)
-			ags.Static(box, g.Group(""), "zpw")
-			api.Gin(g.Group(""), db)
+		return ags.MessageSend(tpl, "root", "root", "user", "root", "天气不错 - "+tools.Ti.HMS(), "今天天气好晴朗，处处好风光")
+	}).JobsMessageDealTimeout().Router(func(g *gin.Engine, db *xorm.Engine) {
+		ags.GinAgs(g.Group(""), g.Group(""), db)
+		ags.GinStatic(box, g.Group(""), "zpw")
+		api.Gin(g.Group(""), db)
+	}).StartRouter()
 
-		}).
-		StartRouter()
 }

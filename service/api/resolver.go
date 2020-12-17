@@ -28,7 +28,7 @@ func Gin(g gin.IRouter, db *xorm.Engine) {
 			Perm: directive.Perm(db),
 		},
 	}
-	ags.Gql("/zpx/api", g.Group("/", directive.WebAuth(db)), source.NewExecutableSchema(config), db)
+	ags.GinGql("/zpx/api", g.Group("/", directive.WebAuth(db)), source.NewExecutableSchema(config), db)
 }
 
 
