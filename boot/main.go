@@ -9,6 +9,7 @@ import (
 	"github.com/zhanghup/go-app/initia"
 	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/event"
+	"github.com/zhanghup/go-app/service/job"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
 	"github.com/zhanghup/go-tools/tog"
@@ -157,6 +158,20 @@ func (this *stru) runWeb() error {
 func (this *stru) StartRouter() {
 	// 通知各个组件，数据库初始化已经完成
 	event.XormDefaultInit(this.db)
+
+	if len(this.jobs) > 0 {
+		err := job.InitJobs(this.db)
+		if err != nil {
+			panic(err)
+		}
+		for _, j := range this.jobs {
+			err := job.AddJob(j.name, j.spec, j.fn, j.flag...)
+			if err != nil {
+				panic(err)
+			}
+		}
+
+	}
 
 	this.app.Commands = append(this.app.Commands, &cli.Command{
 		Name:  "init",
