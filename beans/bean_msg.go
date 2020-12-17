@@ -38,6 +38,7 @@ type MsgInfo struct {
 	Oid           *string `json:"oid"`                   // 消息对象id
 	Title         *string `json:"title"`                 // 消息标题
 	Content       *string `json:"content"`               // 消息体
+	Model         *string `json:"content_map"`           // json字符串，用于格式化content
 	ImgPath       *string `json:"img_path"`              // 消息提示图片
 	Remark        *string `json:"remark"`                // 备注
 }
@@ -64,6 +65,7 @@ type MsgHistory struct {
 	Oid           *string `json:"oid"`                  // 消息对象id
 	Title         *string `json:"title"`                // 消息标题
 	Content       *string `json:"content"`              // 消息体
+	Model         *string `json:"content_map"`          // json字符串，用于格式化content
 	ImgPath       *string `json:"img_path"`             // 消息提示图片
 	Remark        *string `json:"remark"`               // 备注
 }

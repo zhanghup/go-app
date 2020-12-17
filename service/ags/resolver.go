@@ -101,7 +101,7 @@ func GinGql(gqlpath string, gqlrouter gin.IRouter, gqlSchema graphql.ExecutableS
 
 func GinAgs(auth, any gin.IRouter) {
 	GinGql("/zpx/ags", any, source.NewExecutableSchema(source.Config{Resolvers: resolvers.NewResolver(defaultDB)}), defaultDB)
-	defaultUploader.GinRouter(auth.Group("/zpx/ags"), any.Group("/zpx/ags"))
+	defaultUploader.GinRouter(auth.Group("/zpx/ags", directive.WebAuth(defaultDB)), any.Group("/zpx/ags"))
 
 }
 

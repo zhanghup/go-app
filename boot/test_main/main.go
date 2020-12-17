@@ -28,7 +28,10 @@ func main() {
 			return errors.New("消息模板不存在")
 		}
 
-		return ags.MessageSend(tpl, "root", "root", "user", "root", "天气不错 - "+tools.Ti.HMS(), "今天天气好晴朗，处处好风光")
+		return ags.MessageSend(tpl, "root", "root", "user", "root", "今天天气好晴朗，处处好风光", map[string]string{
+			"name": tools.Str.RandString(8),
+			"time": tools.Ti.HMS(),
+		})
 	}).JobsMessageDealTimeout().Router(func(g *gin.Engine, db *xorm.Engine) {
 		ags.GinAgs(g.Group(""), g.Group(""))
 		ags.GinStatic(box, g.Group(""), "zpw")

@@ -13,7 +13,7 @@ import (
 )
 
 type IMessage interface {
-	NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, title, content string) error
+	NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, defaultContent string, model map[string]string) error
 	TimeoutMark() error
 }
 
@@ -25,7 +25,7 @@ type message struct {
 /*
 	实时消息推送
 */
-func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, title, content string) error {
+func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, defaultContent string, model map[string]string) error {
 
 	if tpl.Target == nil || len(*tpl.Target) == 0 {
 		return errors.New("消息未指定需要推送的平台")
@@ -38,6 +38,13 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, t
 	if tpl.Expire != nil {
 		timeout = nowtime + *tpl.Expire
 	}
+
+	content := defaultContent
+	if tpl.Template != nil {
+		content = tools.Str.Tmp(*tpl.Template, model).String()
+	}
+
+	title := tools.Str.Tmp(*tpl.Name, model).String()
 
 	info := beans.MsgInfo{
 		Bean: beans.Bean{
@@ -57,6 +64,7 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, t
 		Oid:          &oid,
 		Title:        &title,
 		Content:      &content,
+		Model:        tools.Ptr.String(tools.Str.JSONString(model)),
 		ImgPath:      tpl.ImgPath,
 		Remark:       tpl.Remark,
 	}
@@ -108,21 +116,22 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, t
 			Status: tools.Ptr.String("1"),
 		},
 		Info:         info.Id,
-		Receiver:     &uid,
-		ReceiverName: &uname,
-		Type:         tpl.Type,
-		Template:     tpl.Id,
-		Level:        tpl.Level,
-		Target:       tpl.Target,
-		Timeout:      &timeout,
-		State:        tools.Ptr.String("1"), // 未读
-		SendTime:     tools.Ptr.Int64(nowtime),
-		Otype:        &otype,
-		Oid:          &oid,
-		Title:        &title,
-		Content:      &content,
-		ImgPath:      tpl.ImgPath,
-		Remark:       tpl.Remark,
+		Receiver:     info.Receiver,
+		ReceiverName: info.ReceiverName,
+		Type:         info.Type,
+		Template:     info.Template,
+		Level:        info.Level,
+		Target:       info.Target,
+		Timeout:      info.Timeout,
+		State:        info.State, // 未读
+		SendTime:     info.SendTime,
+		Otype:        info.Otype,
+		Oid:          info.Oid,
+		Title:        info.Title,
+		Content:      info.Content,
+		Model:        info.Model,
+		ImgPath:      info.ImgPath,
+		Remark:       info.Remark,
 	}
 	_, err = this.db.Insert(history)
 	if err != nil {

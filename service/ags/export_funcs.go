@@ -10,8 +10,8 @@ import (
 // ----- 消息
 
 // 消息发送
-func MessageSend(tpl beans.MsgTemplate, uid, uname, otype, oid, title, content string) error {
-	return defaultMessage.NewMessage(tpl, uid, uname, otype, oid, title, content)
+func MessageSend(tpl beans.MsgTemplate, uid, uname, otype, oid, defaultContent string, model map[string]string) error {
+	return defaultMessage.NewMessage(tpl, uid, uname, otype, oid, defaultContent, model)
 }
 
 // 消息过期处理
