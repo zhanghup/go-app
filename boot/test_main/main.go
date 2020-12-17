@@ -13,6 +13,7 @@ import (
 )
 
 func main() {
+
 	box, err := rice.FindBox("conf")
 	if err != nil {
 		panic(err)
@@ -29,7 +30,7 @@ func main() {
 
 		return ags.MessageSend(tpl, "root", "root", "user", "root", "天气不错 - "+tools.Ti.HMS(), "今天天气好晴朗，处处好风光")
 	}).JobsMessageDealTimeout().Router(func(g *gin.Engine, db *xorm.Engine) {
-		ags.GinAgs(g.Group(""), g.Group(""), db)
+		ags.GinAgs(g.Group(""), g.Group(""))
 		ags.GinStatic(box, g.Group(""), "zpw")
 		api.Gin(g.Group(""), db)
 	}).StartRouter()
