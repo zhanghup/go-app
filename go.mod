@@ -7,7 +7,6 @@ require (
 	github.com/GeertJohan/go.rice v1.0.1
 	github.com/asaskevich/EventBus v0.0.0-20200428142821-4fc0642a29f3
 	github.com/gin-gonic/gin v1.6.2
-	github.com/giter/go.rice v0.0.0-20171227004756-39a3aa768429
 	github.com/gorilla/websocket v1.4.2
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/pkg/errors v0.8.1
