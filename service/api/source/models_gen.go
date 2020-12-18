@@ -42,7 +42,7 @@ type NewAccount struct {
 	// 用户ID
 	UID *string `json:"uid" xorm:"uid"`
 	// 账号类型 dict: SYS002
-	Type string `json:"type" xorm:"type"`
+	Type *string `json:"type" xorm:"type"`
 	// 用户名
 	Username *string `json:"username" xorm:"username"`
 	// 密码
@@ -157,6 +157,8 @@ type NewUserInfo struct {
 	Name *string `json:"name" xorm:"name"`
 	// 头像
 	Avatar *string `json:"avatar" xorm:"avatar"`
+	// 工号
+	Sn *string `json:"sn" xorm:"sn"`
 	// 身份证
 	IDCard *string `json:"id_card" xorm:"id_card"`
 	// 出生年月
@@ -342,7 +344,7 @@ type Roles struct {
 
 type UpdAccount struct {
 	// 账号类型 dict: SYS002
-	Type string `json:"type" xorm:"type"`
+	Type *string `json:"type" xorm:"type"`
 	// 用户名
 	Username *string `json:"username" xorm:"username"`
 	// 密码
@@ -473,6 +475,8 @@ type UpdUserInfo struct {
 	Name *string `json:"name" xorm:"name"`
 	// 头像
 	Avatar *string `json:"avatar" xorm:"avatar"`
+	// 工号
+	Sn *string `json:"sn" xorm:"sn"`
 	// 身份证
 	IDCard *string `json:"id_card" xorm:"id_card"`
 	// 出生年月

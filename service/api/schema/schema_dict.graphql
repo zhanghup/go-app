@@ -43,6 +43,8 @@ type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     name: String
     "备注"
     remark: String
+    "1: 禁止删除和修改子项"
+    disabled: Int
 
     "创建时间"
     created: Int
@@ -71,7 +73,7 @@ input NewDict {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 input UpdDict {
@@ -85,7 +87,7 @@ input UpdDict {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
@@ -126,7 +128,7 @@ input NewDictItem{
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 input UpdDictItem{
@@ -140,5 +142,5 @@ input UpdDictItem{
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }

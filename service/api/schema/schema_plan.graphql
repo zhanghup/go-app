@@ -61,7 +61,7 @@ input NewPlan {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 input UpdPlan {
@@ -75,6 +75,6 @@ input UpdPlan {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 

@@ -84,7 +84,7 @@ input NewRole {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 input UpdRole {
@@ -96,5 +96,5 @@ input UpdRole {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }

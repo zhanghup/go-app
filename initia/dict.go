@@ -11,24 +11,24 @@ func InitDict(db *xorm.Engine) {
 	// SYS
 	{
 		// 字典类型 SYS001
-		InitDictCode(db, "SYS", "001", "字典类型", []DictInfoItem{
+		InitDictCode(db, "SYS", "001", "字典类型", 1, []DictInfoItem{
 			{"1", "系统类型", "SYS", "", 1},
 			{"2", "系统状态", "STA", "", 1},
 			{"3", "业务类型", "BUS", "", 1},
 		})
 
 		// 账号类型 SYS002
-		InitDictCode(db, "SYS", "002", "账号类型", []DictInfoItem{
+		InitDictCode(db, "SYS", "002", "账号类型", 1, []DictInfoItem{
 			{"1", "用户密码", "password", "", 1},
 		})
 
 		// 权限类型 SYS003
-		InitDictCode(db, "SYS", "003", "权限类型", []DictInfoItem{
+		InitDictCode(db, "SYS", "003", "权限类型", 1, []DictInfoItem{
 			{"1", "菜单权限", "menu", "", 1},
 		})
 
 		// 权限状态 SYS004
-		InitDictCode(db, "SYS", "004", "权限状态", []DictInfoItem{
+		InitDictCode(db, "SYS", "004", "权限状态", 1, []DictInfoItem{
 			{"1", "新增", "C", "", 1},
 			{"2", "查询", "R", "", 1},
 			{"3", "编辑", "U", "", 1},
@@ -37,14 +37,14 @@ func InitDict(db *xorm.Engine) {
 		})
 
 		// 权限类型 SYS005
-		InitDictCode(db, "SYS", "005", "消息模板类型", []DictInfoItem{
+		InitDictCode(db, "SYS", "005", "消息模板类型", 1, []DictInfoItem{
 			{"1", "确认框", "confirm", "", 1},
 			{"2", "消息提示", "message", "", 1},
 			{"3", "通知", "notice", "", 1},
 		})
 
 		// 消息等级 SYS006
-		InitDictCode(db, "SYS", "006", "消息等级", []DictInfoItem{
+		InitDictCode(db, "SYS", "006", "消息等级", 1, []DictInfoItem{
 			{"1", "严重", "0", "", 1},
 			{"2", "重要", "1", "", 1},
 			{"3", "次要", "2", "", 1},
@@ -52,12 +52,12 @@ func InitDict(db *xorm.Engine) {
 		})
 
 		// 消息推送目标 SYS007
-		InitDictCode(db, "SYS", "007", "消息推送目标", []DictInfoItem{
+		InitDictCode(db, "SYS", "007", "消息推送目标", 1, []DictInfoItem{
 			{"1", "网页", "web", "", 1},
 		})
 
 		// 消息状态 SYS008
-		InitDictCode(db, "SYS", "008", "消息状态", []DictInfoItem{
+		InitDictCode(db, "SYS", "008", "消息状态", 1, []DictInfoItem{
 			{"1", "已读", "0", "", 1},
 			{"2", "未读", "1", "", 1},
 			{"3", "已读过期", "2", "", 1},
@@ -66,7 +66,7 @@ func InitDict(db *xorm.Engine) {
 		})
 
 		// 业务对象 SYS009
-		InitDictCode(db, "SYS", "009", "业务对象", []DictInfoItem{
+		InitDictCode(db, "SYS", "009", "业务对象", 1, []DictInfoItem{
 			{"1", "组织管理", "dept", "", 1},
 			{"2", "用户管理", "user", "", 1},
 			{"3", "数据字典", "dict", "", 1},
@@ -78,33 +78,33 @@ func InitDict(db *xorm.Engine) {
 	// STA
 	{
 		// 数据状态 STA001
-		InitDictCode(db, "STA", "001", "数据状态", []DictInfoItem{
+		InitDictCode(db, "STA", "001", "数据状态", 1, []DictInfoItem{
 			{"1", "启用", "1", "", 1},
 			{"2", "禁用", "0", "", 1},
 		})
 
 		// 人物性别 STA002
-		InitDictCode(db, "STA", "002", "人物性别", []DictInfoItem{
+		InitDictCode(db, "STA", "002", "人物性别", 1, []DictInfoItem{
 			{"1", "男", "1", "", 1},
 			{"2", "女", "2", "", 1},
 			{"3", "未知", "3", "", 1},
 		})
 
 		// 运行状态 STA003
-		InitDictCode(db, "STA", "003", "运行状态", []DictInfoItem{
+		InitDictCode(db, "STA", "003", "运行状态", 1, []DictInfoItem{
 			{"1", "开始", "start", "", 1},
 			{"2", "停止", "stop", "", 1},
 		})
 
 		// 执行结果 STA004
-		InitDictCode(db, "STA", "004", "执行结果", []DictInfoItem{
+		InitDictCode(db, "STA", "004", "执行结果", 1, []DictInfoItem{
 			{"1", "成功", "success", "", 1},
 			{"2", "失败", "error", "", 1},
 			{"3", "拒绝", "refuse", "", 1},
 		})
 
 		// 是否 STA005
-		InitDictCode(db, "STA", "005", "是否", []DictInfoItem{
+		InitDictCode(db, "STA", "005", "是否", 1, []DictInfoItem{
 			{"1", "是", "1", "", 1},
 			{"2", "否", "0", "", 1},
 		})
@@ -113,12 +113,12 @@ func InitDict(db *xorm.Engine) {
 	// BUS
 	{
 		// 组织类型 BUS001
-		InitDictCode(db, "BUS", "001", "组织类型", []DictInfoItem{
+		InitDictCode(db, "BUS", "001", "组织类型", 0, []DictInfoItem{
 			{"1", "普通组织", "1", "", 0},
 		})
 
 		// 用户类型 BUS001
-		InitDictCode(db, "BUS", "002", "用户类型", []DictInfoItem{
+		InitDictCode(db, "BUS", "002", "用户类型", 0, []DictInfoItem{
 			{"1", "普通用户", "1", "", 0},
 		})
 	}
@@ -162,7 +162,7 @@ func InitDictItem(db *xorm.Engine, code, id, name, value, ext string, weight, di
 	}
 }
 
-func InitDictCode(db *xorm.Engine, typeArg, code, name string, items []DictInfoItem) {
+func InitDictCode(db *xorm.Engine, typeArg, code, name string, disabled int, items []DictInfoItem) {
 	hisDict := beans.Dict{}
 	id := typeArg + code
 	ok, err := db.Table(hisDict).Where("id = ?", id).Get(&hisDict)
@@ -176,6 +176,7 @@ func InitDictCode(db *xorm.Engine, typeArg, code, name string, items []DictInfoI
 		hisDict.Code = &id
 		hisDict.Name = &name
 		hisDict.Type = &typeArg
+		hisDict.Disabled = &disabled
 		_, err = db.Insert(hisDict)
 		if err != nil {
 			tog.Error(err.Error())
@@ -187,6 +188,7 @@ func InitDictCode(db *xorm.Engine, typeArg, code, name string, items []DictInfoI
 		hisDict.Code = &id
 		hisDict.Name = &name
 		hisDict.Type = &typeArg
+		hisDict.Disabled = &disabled
 		_, err = db.Where("id = ?", id).Update(hisDict)
 		if err != nil {
 			tog.Error(err.Error())

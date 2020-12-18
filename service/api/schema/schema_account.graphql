@@ -58,7 +58,7 @@ input NewAccount {
     "用户ID"
     uid: String
     "账号类型 dict: SYS002"
-    type: String!
+    type: String = "password"
     "用户名"
     username: String
     "密码"
@@ -69,13 +69,13 @@ input NewAccount {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 input UpdAccount {
 
     "账号类型 dict: SYS002"
-    type: String!
+    type: String = "password"
     "用户名"
     username: String
     "密码"
@@ -86,6 +86,6 @@ input UpdAccount {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 

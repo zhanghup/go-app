@@ -127,16 +127,17 @@ type ComplexityRoot struct {
 	}
 
 	Dict struct {
-		Code    func(childComplexity int) int
-		Created func(childComplexity int) int
-		Id      func(childComplexity int) int
-		Name    func(childComplexity int) int
-		Remark  func(childComplexity int) int
-		Status  func(childComplexity int) int
-		Type    func(childComplexity int) int
-		Updated func(childComplexity int) int
-		Values  func(childComplexity int) int
-		Weight  func(childComplexity int) int
+		Code     func(childComplexity int) int
+		Created  func(childComplexity int) int
+		Disabled func(childComplexity int) int
+		Id       func(childComplexity int) int
+		Name     func(childComplexity int) int
+		Remark   func(childComplexity int) int
+		Status   func(childComplexity int) int
+		Type     func(childComplexity int) int
+		Updated  func(childComplexity int) int
+		Values   func(childComplexity int) int
+		Weight   func(childComplexity int) int
 	}
 
 	DictItem struct {
@@ -388,6 +389,7 @@ type ComplexityRoot struct {
 		ORoles   func(childComplexity int) int
 		Remark   func(childComplexity int) int
 		Sex      func(childComplexity int) int
+		Sn       func(childComplexity int) int
 		Status   func(childComplexity int) int
 		Type     func(childComplexity int) int
 		Updated  func(childComplexity int) int
@@ -881,6 +883,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Dict.Created(childComplexity), true
+
+	case "Dict.disabled":
+		if e.complexity.Dict.Disabled == nil {
+			break
+		}
+
+		return e.complexity.Dict.Disabled(childComplexity), true
 
 	case "Dict.id":
 		if e.complexity.Dict.Id == nil {
@@ -2638,6 +2647,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Sex(childComplexity), true
 
+	case "User.sn":
+		if e.complexity.User.Sn == nil {
+			break
+		}
+
+		return e.complexity.User.Sn(childComplexity), true
+
 	case "User.status":
 		if e.complexity.User.Status == nil {
 			break
@@ -2851,7 +2867,7 @@ input NewAccount {
     "用户ID"
     uid: String
     "账号类型 dict: SYS002"
-    type: String!
+    type: String = "password"
     "用户名"
     username: String
     "密码"
@@ -2862,13 +2878,13 @@ input NewAccount {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 input UpdAccount {
 
     "账号类型 dict: SYS002"
-    type: String!
+    type: String = "password"
     "用户名"
     username: String
     "密码"
@@ -2879,7 +2895,7 @@ input UpdAccount {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 `, BuiltIn: false},
@@ -3062,7 +3078,7 @@ input NewDept {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 input UpdDept {
@@ -3085,7 +3101,7 @@ input UpdDept {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 `, BuiltIn: false},
@@ -3134,6 +3150,8 @@ type Dict @goModel(model:"github.com/zhanghup/go-app/beans.Dict")  {
     name: String
     "备注"
     remark: String
+    "1: 禁止删除和修改子项"
+    disabled: Int
 
     "创建时间"
     created: Int
@@ -3162,7 +3180,7 @@ input NewDict {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 input UpdDict {
@@ -3176,7 +3194,7 @@ input UpdDict {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 type DictItem @goModel(model:"github.com/zhanghup/go-app/beans.DictItem")  {
@@ -3217,7 +3235,7 @@ input NewDictItem{
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 input UpdDictItem{
@@ -3231,7 +3249,7 @@ input UpdDictItem{
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }`, BuiltIn: false},
 	{Name: "schema/schema_me.graphql", Input: `extend type Query{
     my_info:MyInfo
@@ -3583,7 +3601,7 @@ input NewPlan {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 input UpdPlan {
@@ -3597,7 +3615,7 @@ input UpdPlan {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 `, BuiltIn: false},
@@ -3648,7 +3666,7 @@ input NewPlanStep {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 input UpdPlanStep {
@@ -3656,7 +3674,7 @@ input UpdPlanStep {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 `, BuiltIn: false},
@@ -3746,7 +3764,7 @@ input NewRole {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 input UpdRole {
@@ -3758,7 +3776,7 @@ input UpdRole {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 `, BuiltIn: false},
 	{Name: "schema/schema_subscribe.graphql", Input: ``, BuiltIn: false},
@@ -3804,6 +3822,8 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     name: String
     "头像"
     avatar: String
+    "工号"
+    sn: String
     "身份证"
     id_card: String
     "出生年月"
@@ -3833,7 +3853,7 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
 
 input NewUser{
     user: NewUserInfo!
-    account: NewAccount!
+    account: NewAccount
     roles:[String!]
 }
 
@@ -3846,6 +3866,8 @@ input NewUserInfo{
     name: String
     "头像"
     avatar: String
+    "工号"
+    sn: String
     "身份证"
     id_card: String
     "出生年月"
@@ -3857,7 +3879,7 @@ input NewUserInfo{
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
     "备注"
     remark: String
     "是否为管理员{dict:STA005}"
@@ -3879,6 +3901,8 @@ input UpdUserInfo{
     name: String
     "头像"
     avatar: String
+    "工号"
+    sn: String
     "身份证"
     id_card: String
     "出生年月"
@@ -3890,7 +3914,7 @@ input UpdUserInfo{
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
     "备注"
     remark: String
     "是否为管理员{dict:STA005}"
@@ -6866,6 +6890,38 @@ func (ec *executionContext) _Dict_remark(ctx context.Context, field graphql.Coll
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Dict_disabled(ctx context.Context, field graphql.CollectedField, obj *beans.Dict) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Dict",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Disabled, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Dict_created(ctx context.Context, field graphql.CollectedField, obj *beans.Dict) (ret graphql.Marshaler) {
@@ -14850,6 +14906,38 @@ func (ec *executionContext) _User_avatar(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _User_sn(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Sn, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _User_id_card(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -16449,6 +16537,13 @@ func (ec *executionContext) unmarshalInputNewAccount(ctx context.Context, obj in
 	var it NewAccount
 	var asMap = obj.(map[string]interface{})
 
+	if _, present := asMap["type"]; !present {
+		asMap["type"] = "password"
+	}
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
+
 	for k, v := range asMap {
 		switch k {
 		case "uid":
@@ -16463,7 +16558,7 @@ func (ec *executionContext) unmarshalInputNewAccount(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			it.Type, err = ec.unmarshalNString2string(ctx, v)
+			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16516,6 +16611,10 @@ func (ec *executionContext) unmarshalInputNewAccount(ctx context.Context, obj in
 func (ec *executionContext) unmarshalInputNewDept(ctx context.Context, obj interface{}) (NewDept, error) {
 	var it NewDept
 	var asMap = obj.(map[string]interface{})
+
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -16601,6 +16700,10 @@ func (ec *executionContext) unmarshalInputNewDict(ctx context.Context, obj inter
 	var it NewDict
 	var asMap = obj.(map[string]interface{})
 
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
+
 	for k, v := range asMap {
 		switch k {
 		case "type":
@@ -16660,6 +16763,10 @@ func (ec *executionContext) unmarshalInputNewDict(ctx context.Context, obj inter
 func (ec *executionContext) unmarshalInputNewDictItem(ctx context.Context, obj interface{}) (NewDictItem, error) {
 	var it NewDictItem
 	var asMap = obj.(map[string]interface{})
+
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -16741,6 +16848,10 @@ func (ec *executionContext) unmarshalInputNewPlan(ctx context.Context, obj inter
 	var it NewPlan
 	var asMap = obj.(map[string]interface{})
 
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
+
 	for k, v := range asMap {
 		switch k {
 		case "name":
@@ -16793,6 +16904,10 @@ func (ec *executionContext) unmarshalInputNewPlanStep(ctx context.Context, obj i
 	var it NewPlanStep
 	var asMap = obj.(map[string]interface{})
 
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
+
 	for k, v := range asMap {
 		switch k {
 		case "weight":
@@ -16820,6 +16935,10 @@ func (ec *executionContext) unmarshalInputNewPlanStep(ctx context.Context, obj i
 func (ec *executionContext) unmarshalInputNewRole(ctx context.Context, obj interface{}) (NewRole, error) {
 	var it NewRole
 	var asMap = obj.(map[string]interface{})
+
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -16879,7 +16998,7 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("account"))
-			it.Account, err = ec.unmarshalNNewAccount2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewAccount(ctx, v)
+			it.Account, err = ec.unmarshalONewAccount2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewAccount(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16900,6 +17019,10 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 func (ec *executionContext) unmarshalInputNewUserInfo(ctx context.Context, obj interface{}) (NewUserInfo, error) {
 	var it NewUserInfo
 	var asMap = obj.(map[string]interface{})
+
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -16932,6 +17055,14 @@ func (ec *executionContext) unmarshalInputNewUserInfo(ctx context.Context, obj i
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
 			it.Avatar, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sn"))
+			it.Sn, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17733,13 +17864,20 @@ func (ec *executionContext) unmarshalInputUpdAccount(ctx context.Context, obj in
 	var it UpdAccount
 	var asMap = obj.(map[string]interface{})
 
+	if _, present := asMap["type"]; !present {
+		asMap["type"] = "password"
+	}
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
+
 	for k, v := range asMap {
 		switch k {
 		case "type":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			it.Type, err = ec.unmarshalNString2string(ctx, v)
+			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17792,6 +17930,10 @@ func (ec *executionContext) unmarshalInputUpdAccount(ctx context.Context, obj in
 func (ec *executionContext) unmarshalInputUpdDept(ctx context.Context, obj interface{}) (UpdDept, error) {
 	var it UpdDept
 	var asMap = obj.(map[string]interface{})
+
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -17877,6 +18019,10 @@ func (ec *executionContext) unmarshalInputUpdDict(ctx context.Context, obj inter
 	var it UpdDict
 	var asMap = obj.(map[string]interface{})
 
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
+
 	for k, v := range asMap {
 		switch k {
 		case "type":
@@ -17928,6 +18074,10 @@ func (ec *executionContext) unmarshalInputUpdDict(ctx context.Context, obj inter
 func (ec *executionContext) unmarshalInputUpdDictItem(ctx context.Context, obj interface{}) (UpdDictItem, error) {
 	var it UpdDictItem
 	var asMap = obj.(map[string]interface{})
+
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -18081,6 +18231,10 @@ func (ec *executionContext) unmarshalInputUpdPlan(ctx context.Context, obj inter
 	var it UpdPlan
 	var asMap = obj.(map[string]interface{})
 
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
+
 	for k, v := range asMap {
 		switch k {
 		case "name":
@@ -18133,6 +18287,10 @@ func (ec *executionContext) unmarshalInputUpdPlanStep(ctx context.Context, obj i
 	var it UpdPlanStep
 	var asMap = obj.(map[string]interface{})
 
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
+
 	for k, v := range asMap {
 		switch k {
 		case "weight":
@@ -18160,6 +18318,10 @@ func (ec *executionContext) unmarshalInputUpdPlanStep(ctx context.Context, obj i
 func (ec *executionContext) unmarshalInputUpdRole(ctx context.Context, obj interface{}) (UpdRole, error) {
 	var it UpdRole
 	var asMap = obj.(map[string]interface{})
+
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -18241,6 +18403,10 @@ func (ec *executionContext) unmarshalInputUpdUserInfo(ctx context.Context, obj i
 	var it UpdUserInfo
 	var asMap = obj.(map[string]interface{})
 
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "1"
+	}
+
 	for k, v := range asMap {
 		switch k {
 		case "dept":
@@ -18272,6 +18438,14 @@ func (ec *executionContext) unmarshalInputUpdUserInfo(ctx context.Context, obj i
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
 			it.Avatar, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sn"))
+			it.Sn, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18672,6 +18846,8 @@ func (ec *executionContext) _Dict(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Dict_name(ctx, field, obj)
 		case "remark":
 			out.Values[i] = ec._Dict_remark(ctx, field, obj)
+		case "disabled":
+			out.Values[i] = ec._Dict_disabled(ctx, field, obj)
 		case "created":
 			out.Values[i] = ec._Dict_created(ctx, field, obj)
 		case "updated":
@@ -19836,6 +20012,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_name(ctx, field, obj)
 		case "avatar":
 			out.Values[i] = ec._User_avatar(ctx, field, obj)
+		case "sn":
+			out.Values[i] = ec._User_sn(ctx, field, obj)
 		case "id_card":
 			out.Values[i] = ec._User_id_card(ctx, field, obj)
 		case "birth":
@@ -20251,11 +20429,6 @@ func (ec *executionContext) marshalNMsgTemplate2githubᚗcomᚋzhanghupᚋgoᚑa
 func (ec *executionContext) unmarshalNNewAccount2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewAccount(ctx context.Context, v interface{}) (NewAccount, error) {
 	res, err := ec.unmarshalInputNewAccount(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNNewAccount2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewAccount(ctx context.Context, v interface{}) (*NewAccount, error) {
-	res, err := ec.unmarshalInputNewAccount(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNNewDept2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewDept(ctx context.Context, v interface{}) (NewDept, error) {
@@ -21238,6 +21411,14 @@ func (ec *executionContext) marshalOMyInfo2ᚖgithubᚗcomᚋzhanghupᚋgoᚑapp
 		return graphql.Null
 	}
 	return ec._MyInfo(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalONewAccount2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewAccount(ctx context.Context, v interface{}) (*NewAccount, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNewAccount(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOPermObj2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐPermObjᚄ(ctx context.Context, sel ast.SelectionSet, v []PermObj) graphql.Marshaler {

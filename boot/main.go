@@ -148,6 +148,25 @@ func (this *stru) Router(fn ...func(g *gin.Engine, db *xorm.Engine)) IBoot {
 
 func (this *stru) runWeb() error {
 	return tgin.NewGin(cfg.Web, func(g *gin.Engine) error {
+		// 通知各个组件，数据库初始化已经完成
+		event.XormDefaultInit(this.db)
+
+		// 开启定时任务
+		if len(this.jobs) > 0 {
+			err := job.InitJobs(this.db)
+			if err != nil {
+				panic(err)
+			}
+			for _, j := range this.jobs {
+				err := job.AddJob(j.name, j.spec, j.fn, j.flag...)
+				if err != nil {
+					panic(err)
+				}
+			}
+
+		}
+
+		// 初始化路由
 		for _, fn := range this.routerfns {
 			fn(g, this.db)
 		}
@@ -156,22 +175,7 @@ func (this *stru) runWeb() error {
 }
 
 func (this *stru) StartRouter() {
-	// 通知各个组件，数据库初始化已经完成
-	event.XormDefaultInit(this.db)
 
-	if len(this.jobs) > 0 {
-		err := job.InitJobs(this.db)
-		if err != nil {
-			panic(err)
-		}
-		for _, j := range this.jobs {
-			err := job.AddJob(j.name, j.spec, j.fn, j.flag...)
-			if err != nil {
-				panic(err)
-			}
-		}
-
-	}
 
 	this.app.Commands = append(this.app.Commands, &cli.Command{
 		Name:  "init",

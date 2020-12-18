@@ -40,6 +40,8 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
     name: String
     "头像"
     avatar: String
+    "工号"
+    sn: String
     "身份证"
     id_card: String
     "出生年月"
@@ -69,7 +71,7 @@ type User @goModel(model:"github.com/zhanghup/go-app/beans.User")  {
 
 input NewUser{
     user: NewUserInfo!
-    account: NewAccount!
+    account: NewAccount
     roles:[String!]
 }
 
@@ -82,6 +84,8 @@ input NewUserInfo{
     name: String
     "头像"
     avatar: String
+    "工号"
+    sn: String
     "身份证"
     id_card: String
     "出生年月"
@@ -93,7 +97,7 @@ input NewUserInfo{
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
     "备注"
     remark: String
     "是否为管理员{dict:STA005}"
@@ -115,6 +119,8 @@ input UpdUserInfo{
     name: String
     "头像"
     avatar: String
+    "工号"
+    sn: String
     "身份证"
     id_card: String
     "出生年月"
@@ -126,7 +132,7 @@ input UpdUserInfo{
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
     "备注"
     remark: String
     "是否为管理员{dict:STA005}"

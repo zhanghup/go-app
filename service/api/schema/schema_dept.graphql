@@ -78,7 +78,7 @@ input NewDept {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 
 input UpdDept {
@@ -101,6 +101,6 @@ input UpdDept {
     "排序"
     weight: Int
     "状态{dict:STA001}"
-    status: String
+    status: String = "1"
 }
 

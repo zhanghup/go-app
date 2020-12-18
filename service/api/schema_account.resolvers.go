@@ -16,7 +16,7 @@ import (
 func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAccount) (string, error) {
 	acc := new(beans.Account)
 	acc.Salt = tools.Ptr.Uid()
-	if input.Type == "password" {
+	if *input.Type == "password" {
 		if input.Username == nil || input.Password == nil {
 			return "", errors.New("用户名密码不能为空")
 		}
@@ -25,7 +25,7 @@ func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAc
 	}
 
 	acc.Uid = input.UID
-	acc.Type = &input.Type
+	acc.Type = input.Type
 	acc.Username = input.Username
 	acc.Password = input.Password
 	acc.Default = input.Default
@@ -56,7 +56,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 		}
 	}
 
-	if input.Type == "password" {
+	if *input.Type == "password" {
 		if input.Username == nil || input.Password == nil {
 			return false, errors.New("用户名密码不能为空")
 		}

@@ -24,6 +24,7 @@ type User struct {
 	IdCard *string `json:"id_card"` // 身份证ID
 	Birth  *int64  `json:"birth"`   // 出生日期
 	Sex    *string `json:"sex"`     // 人物性别
+	Sn     *string `json:"sn"`      // 工号
 	Mobile *string `json:"mobile"`  // 联系电话
 	Remark *string `json:"remark"`  // 备注
 	Admin  *string `json:"admin"`   // 是否为管理员账户
@@ -57,6 +58,7 @@ type Dict struct {
 	Name   *string `json:"name"`               // 字典名称
 	Type   *string `json:"type"`               // 字典类型
 	Remark *string `json:"remark"`             // 备注
+	Disabled *int    `json:"disabled"`
 }
 type DictItem struct {
 	Bean     `xorm:"extends"`
