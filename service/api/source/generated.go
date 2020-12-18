@@ -3117,6 +3117,7 @@ extend type Mutation {
 input QDict{
     "字典类型"
     type: String
+    dicts: [String!]
     "状态{dict:STA001}"
     status: String
 }
@@ -17270,6 +17271,14 @@ func (ec *executionContext) unmarshalInputQDict(ctx context.Context, obj interfa
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
 			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "dicts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dicts"))
+			it.Dicts, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}

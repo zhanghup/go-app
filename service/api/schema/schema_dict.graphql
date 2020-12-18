@@ -26,6 +26,7 @@ extend type Mutation {
 input QDict{
     "字典类型"
     type: String
+    dicts: [String!]
     "状态{dict:STA001}"
     status: String
 }

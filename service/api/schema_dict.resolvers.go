@@ -105,11 +105,13 @@ func (r *queryResolver) Dicts(ctx context.Context, query *source.QDict) ([]beans
 		where 1 = 1 
 		{{ if .type }} and u.type = :type {{ end }} 
 		{{ if .status }} and u.status = :status {{ end }} 
-		order by u.code`,
+		{{ if .dicts }} and u.code in :dicts {{ end }} 
+		`,
 		map[string]interface{}{
 			"type":   query.Type,
 			"status": query.Status,
-		}).Find(&dicts)
+			"dicts":  query.Dicts,
+		}).Order("u.code").Find(&dicts)
 	return dicts, err
 }
 
