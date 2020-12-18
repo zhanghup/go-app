@@ -99,16 +99,18 @@ func (r *queryResolver) Dicts(ctx context.Context, query *source.QDict) ([]beans
 	dicts := make([]beans.Dict, 0)
 	err := r.DBS().SF(`
 		select 
-			* 
+			u.* 
 		from 
 			dict u 
 		where 1 = 1 
 		{{ if .type }} and u.type = :type {{ end }} 
+		{{ if .types }} and u.type in :types {{ end }} 
 		{{ if .status }} and u.status = :status {{ end }} 
 		{{ if .dicts }} and u.code in :dicts {{ end }} 
 		`,
 		map[string]interface{}{
 			"type":   query.Type,
+			"types":  query.Types,
 			"status": query.Status,
 			"dicts":  query.Dicts,
 		}).Order("u.code").Find(&dicts)

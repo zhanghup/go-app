@@ -243,6 +243,7 @@ type QDept struct {
 type QDict struct {
 	// 字典类型
 	Type  *string  `json:"type" xorm:"type"`
+	Types []string `json:"types" xorm:"types"`
 	Dicts []string `json:"dicts" xorm:"dicts"`
 	// 状态{dict:STA001}
 	Status *string `json:"status" xorm:"status"`
