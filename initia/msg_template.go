@@ -12,7 +12,8 @@ func InitMsgTemplate(db *xorm.Engine) {
 }
 
 func InitMsgTemplateCode(db *xorm.Engine, name, code, typ, level, target, remark, templateCode string) {
-	ok, err := db.Table(beans.MsgTemplate{}).Where("code = ?", code).Exist()
+	oldTpl := beans.MsgTemplate{}
+	ok, err := db.Table(&oldTpl).Where("code = ?", code).Get(&oldTpl)
 	if err != nil {
 		tog.Error(err.Error())
 		return
@@ -33,6 +34,14 @@ func InitMsgTemplateCode(db *xorm.Engine, name, code, typ, level, target, remark
 			Alert:        tools.Ptr.Int64(86400), // 提前一天开始提醒
 			Expire:       tools.Ptr.Int64(86400), // 消息推送后一天未确认过期
 			TemplateCode: &templateCode,
+		})
+		if err != nil {
+			tog.Error(err.Error())
+			return
+		}
+	} else {
+		_, err = db.Table(oldTpl).Where("id = ?", oldTpl.Id).Update(map[string]interface{}{
+			"template_code": templateCode,
 		})
 		if err != nil {
 			tog.Error(err.Error())
