@@ -16,6 +16,8 @@ input QDept{
     status: String
     "名称模糊查询"
     name: String
+    "部门编码"
+    code: String
 
     index: Int
     size: Int

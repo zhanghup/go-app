@@ -236,7 +236,9 @@ type QDept struct {
 	// 状态{dict:STA001}
 	Status *string `json:"status" xorm:"status"`
 	// 名称模糊查询
-	Name  *string `json:"name" xorm:"name"`
+	Name *string `json:"name" xorm:"name"`
+	// 部门编码
+	Code  *string `json:"code" xorm:"code"`
 	Index *int    `json:"index" xorm:"index"`
 	Size  *int    `json:"size" xorm:"size"`
 	Count *bool   `json:"count" xorm:"count"`

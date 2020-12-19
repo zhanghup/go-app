@@ -78,5 +78,5 @@ func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 
 func (r *queryResolver) LoginStatus(ctx context.Context) (bool, error) {
 	_,err := directive.WebAuthFunc(r.DB,r.Gin(ctx))
-	return err == nil,err
+	return err == nil,nil
 }

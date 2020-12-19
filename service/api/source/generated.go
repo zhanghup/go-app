@@ -3016,6 +3016,8 @@ input QDept{
     status: String
     "名称模糊查询"
     name: String
+    "部门编码"
+    code: String
 
     index: Int
     size: Int
@@ -17357,6 +17359,14 @@ func (ec *executionContext) unmarshalInputQDept(ctx context.Context, obj interfa
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "code":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
+			it.Code, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}

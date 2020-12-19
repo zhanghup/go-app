@@ -37,6 +37,15 @@ func (this *userCache) Get(token string) (User, bool) {
 	}
 }
 
+func (this *userCache) GetByUser(uid string) (User, bool) {
+	o := this.tokenmap.Get(uid)
+	if o != nil {
+		token := o.(string)
+		return this.Get(token)
+	}
+	return User{}, false
+}
+
 func (this *userCache) RemoveByToken(token string) {
 	o := this.data.Get(token)
 	if o != nil {
