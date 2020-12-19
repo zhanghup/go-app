@@ -3535,8 +3535,6 @@ input UpdMsgTemplate{
     alert: Int64
     "消息模板"
     template: String
-    "模板字段定义"
-    template_code: String
 }`, BuiltIn: false},
 	{Name: "schema/schema_plan.graphql", Input: `extend type Query{
     plans(query:QPlan!):Plans
@@ -18210,14 +18208,6 @@ func (ec *executionContext) unmarshalInputUpdMsgTemplate(ctx context.Context, ob
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("template"))
 			it.Template, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "template_code":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("template_code"))
-			it.TemplateCode, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}

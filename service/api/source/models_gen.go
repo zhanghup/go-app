@@ -425,8 +425,6 @@ type UpdMsgTemplate struct {
 	Alert *int64 `json:"alert" xorm:"alert"`
 	// 消息模板
 	Template *string `json:"template" xorm:"template"`
-	// 模板字段定义
-	TemplateCode *string `json:"template_code" xorm:"template_code"`
 }
 
 type UpdPlan struct {

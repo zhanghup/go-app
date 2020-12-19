@@ -227,6 +227,4 @@ input UpdMsgTemplate{
     alert: Int64
     "消息模板"
     template: String
-    "模板字段定义"
-    template_code: String
 }
