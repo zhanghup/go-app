@@ -14,7 +14,6 @@ import (
 )
 
 func WebAuth(db *xorm.Engine) gin.HandlerFunc {
-
 	return func(c *gin.Context) {
 		tgin.DoCustom(c, func(c *gin.Context) (interface{}, string) {
 			res, err := WebAuthFunc(db, c)
