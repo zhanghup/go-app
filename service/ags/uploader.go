@@ -70,8 +70,8 @@ func (this *uploader) UploadIO(read io.Reader, name, contentType string) (string
 		if err != nil {
 			return "[UploadIO] 写入文件失败【1】", err
 		}
-		_ = os.MkdirAll(fmt.Sprintf("upload/%s", contentType), 0777)
-		f, err := os.Create(fmt.Sprintf("upload/%s/%s.%s", contentType, *res.Id, endStr))
+		_ = os.MkdirAll(fmt.Sprintf("upload/%s/%s", tools.Time.YM(), contentType), 0777)
+		f, err := os.Create(fmt.Sprintf("upload/%s/%s/%s.%s", tools.Time.YM(), contentType, *res.Id, endStr))
 		if err != nil {
 			return "[UploadIO] 写入文件失败【2】", err
 		}
@@ -95,7 +95,7 @@ func (this *uploader) GetFile(id string) (*beans.Resource, *os.File, error) {
 	if !ok {
 		return nil, nil, errors.New("文件不存在")
 	}
-	f, err := os.Open(fmt.Sprintf("upload/%s/%s.%s", res.ContentType, *res.Id, res.FileEnd))
+	f, err := os.Open(fmt.Sprintf("upload/%s/%s/%s.%s", tools.Time.UnixYM(*res.Created), res.ContentType, *res.Id, res.FileEnd))
 	return res, f, err
 }
 
@@ -235,7 +235,7 @@ var defaultUploader IUploader
 	初始化上传工具
 	@db: db为空，初始化默认上传器
 		 db不为空，返回一个新的上传器，但是默认的不会被替换
- */
+*/
 func UploaderNew(db ...*xorm.Engine) IUploader {
 	if defaultUploader != nil && len(db) == 0 {
 		return defaultUploader
