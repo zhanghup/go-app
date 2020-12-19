@@ -21,6 +21,7 @@ import (
 	"github.com/zhanghup/go-tools/tgql"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 	"xorm.io/xorm"
 )
@@ -114,6 +115,9 @@ func GinStatic(box *rice.Box, g gin.IRouter, prefix string) {
 		path, _ := c.Params.Get("path")
 		if tools.Str.Contains([]string{"/", "index.html"}, path) {
 			path = "index.html"
+		}
+		if strings.Index(path,"/") == 0{
+			path = path[1:]
 		}
 
 		f, err := box.Open(prefix + "/" + path)
