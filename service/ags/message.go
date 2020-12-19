@@ -102,6 +102,7 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 			return err
 		}
 	} else {
+		info.State = tools.Ptr.String("1") // 未读
 		_, err := this.db.Insert(info)
 		if err != nil {
 			tog.Error("【消息推送】 Error: " + err.Error())
