@@ -69,6 +69,23 @@ func (this *dictCache) Get(dict string) (*beans.Dict, []beans.DictItem, bool) {
 	return &v.Dict, v.DictItem, true
 }
 
+func (this *dictCache) GetName(dictCode, value string) string {
+	_, items, ok := this.Get(dictCode)
+	if !ok {
+		return ""
+	}
+	if items == nil {
+		return ""
+	}
+	for _, s := range items {
+		if s.Value != nil && *s.Value == value {
+			return *s.Name
+		}
+	}
+	return ""
+
+}
+
 func init() {
 	event.XormDefaultInitSubscribeOnce(func(db *xorm.Engine) {
 		if DictCache != nil {
