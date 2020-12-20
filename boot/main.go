@@ -34,11 +34,13 @@ type stru struct {
 	initFns   []func(db *xorm.Engine)
 	syncFns   []func(db *xorm.Engine)
 	routerfns []func(g *gin.Engine, db *xorm.Engine)
+	commonds  []*cli.Command
 
 	app *cli.App
 }
 
 type IBoot interface {
+	Cmd(fns ...func(db *xorm.Engine) []cli.Command) IBoot
 	Init(fns ...func(db *xorm.Engine)) IBoot
 	SyncTables(fn ...func(db *xorm.Engine)) IBoot
 	Jobs(name, spec string, fn func(db *xorm.Engine) error, flag ...bool) IBoot
@@ -114,19 +116,6 @@ func (this *stru) Jobs(name, spec string, fn func(db *xorm.Engine) error, flag .
 		fn:   fn,
 		flag: flag,
 	})
-	//if !this.jobinit {
-	//	err := job.InitJobs(this.db)
-	//	if err != nil {
-	//		tog.Error(err.Error())
-	//		panic(err)
-	//	}
-	//}
-	//
-	//err := job.AddJob(name, spec, fn, flag...)
-	//if err != nil {
-	//	tog.Error(err.Error())
-	//	panic(err)
-	//}
 	return this
 }
 
@@ -143,6 +132,17 @@ func (this *stru) JobsMessageDealTimeout() IBoot {
 // 自定义接口
 func (this *stru) Router(fn ...func(g *gin.Engine, db *xorm.Engine)) IBoot {
 	this.routerfns = append(this.routerfns, fn...)
+	return this
+}
+
+// 自定义命令
+func (this *stru) Cmd(fns ...func(db *xorm.Engine) []cli.Command) IBoot {
+	for i := range fns {
+		cmds := fns[i](this.db)
+		for j := range cmds {
+			this.commonds = append(this.commonds, &cmds[j])
+		}
+	}
 	return this
 }
 
@@ -175,7 +175,6 @@ func (this *stru) runWeb() error {
 }
 
 func (this *stru) StartRouter() {
-
 
 	this.app.Commands = append(this.app.Commands, &cli.Command{
 		Name:  "init",
@@ -214,6 +213,7 @@ func (this *stru) StartRouter() {
 			return this.runWeb()
 		},
 	})
+	this.app.Commands = append(this.app.Commands, this.commonds...)
 
 	// 开启任务
 	this.app.Action = func(ctx *cli.Context) error {

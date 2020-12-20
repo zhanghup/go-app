@@ -4,8 +4,10 @@ import (
 	"errors"
 	rice "github.com/GeertJohan/go.rice"
 	"github.com/gin-gonic/gin"
+	"github.com/urfave/cli/v2"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/boot"
+	"github.com/zhanghup/go-app/initia"
 	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/api"
 	"github.com/zhanghup/go-tools"
@@ -36,6 +38,19 @@ func main() {
 		ags.GinAgs(g.Group(""), g.Group(""))
 		ags.GinStatic(box, g.Group(""), "zpw")
 		api.Gin(g.Group(""), db)
-	}).StartRouter()
+	}).
+		Cmd(func(db *xorm.Engine) []cli.Command {
+			return []cli.Command{
+				{
+					Name:        "test",
+					Description: "初始化测试数据",
+					Action: func(c *cli.Context) error {
+						initia.InitTest(db)
+						return nil
+					},
+				},
+			}
+		}).
+		StartRouter()
 
 }

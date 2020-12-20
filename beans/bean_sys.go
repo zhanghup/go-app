@@ -33,7 +33,7 @@ type User struct {
 // 账户
 type Account struct {
 	Bean     `xorm:"extends"`
-	Uid      *string `json:"uid"`           // 用户ID
+	Uid      *string `json:"uid" xorm:"index"`           // 用户ID
 	Type     *string `json:"type"`          // 字典
 	Username *string `json:"username"`      // 用户名
 	Password *string `json:"password"`      // 密码
