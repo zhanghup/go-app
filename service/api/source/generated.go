@@ -168,11 +168,6 @@ type ComplexityRoot struct {
 		Weight  func(childComplexity int) int
 	}
 
-	Menus struct {
-		Data  func(childComplexity int) int
-		Total func(childComplexity int) int
-	}
-
 	Message struct {
 		Message  func(childComplexity int) int
 		Template func(childComplexity int) int
@@ -491,7 +486,7 @@ type QueryResolver interface {
 	Dict(ctx context.Context, id string) (*beans.Dict, error)
 	MyInfo(ctx context.Context) (*beans.User, error)
 	MyMsgInfos(ctx context.Context, query QMyMsgInfo) ([]beans.MsgInfo, error)
-	Menus(ctx context.Context, query QMenu) (*Menus, error)
+	Menus(ctx context.Context, query QMenu) ([]beans.Menu, error)
 	Menu(ctx context.Context, id string) (*beans.Menu, error)
 	MsgTemplates(ctx context.Context, query QMsgTemplate) ([]beans.MsgTemplate, error)
 	MsgTemplate(ctx context.Context, id string) (*beans.MsgTemplate, error)
@@ -1121,20 +1116,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Menu.Weight(childComplexity), true
-
-	case "Menus.data":
-		if e.complexity.Menus.Data == nil {
-			break
-		}
-
-		return e.complexity.Menus.Data(childComplexity), true
-
-	case "Menus.total":
-		if e.complexity.Menus.Total == nil {
-			break
-		}
-
-		return e.complexity.Menus.Total(childComplexity), true
 
 	case "Message.message":
 		if e.complexity.Message.Message == nil {
@@ -3477,7 +3458,7 @@ type MyInfo @goModel(model:"github.com/zhanghup/go-app/beans.User"){
     o_dept:Dept
 }`, BuiltIn: false},
 	{Name: "schema/schema_menu.graphql", Input: `extend type Query{
-    menus(query:QMenu!):Menus @perm(entity: "menu",perm: "R",remark:"菜单查询")
+    menus(query:QMenu!):[Menu!] @perm(entity: "menu",perm: "R",remark:"菜单查询")
     menu(id: String!):Menu @perm(entity: "menu",perm: "R",remark:"菜单查询")
 }
 
@@ -3489,15 +3470,6 @@ extend type Mutation {
 input QMenu{
     "状态{dict:STA001}"
     status: String
-
-    index: Int
-    size: Int
-    count: Boolean
-}
-
-type Menus{
-    total: Int
-    data:[Menu!]
 }
 
 type Menu @goModel(model:"github.com/zhanghup/go-app/beans.Menu") {
@@ -3524,25 +3496,15 @@ type Menu @goModel(model:"github.com/zhanghup/go-app/beans.Menu") {
     weight: Int
     "状态{dict:STA001}"
     status: String
-
 }
 
-
 input UpdMenu {
-    id: String
-    "菜单名称"
-    name: String
     "菜单标题"
     title: String
-    "菜单路径"
-    path: String
-    "菜单昵称"
-    alias: String
     "菜单图标"
     icon: String
     "上级菜单"
     parent: String
-
     "排序"
     weight: Int
     "状态{dict:STA001}"
@@ -8081,70 +8043,6 @@ func (ec *executionContext) _Menu_status(ctx context.Context, field graphql.Coll
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Menus_total(ctx context.Context, field graphql.CollectedField, obj *Menus) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Menus",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Total, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Menus_data(ctx context.Context, field graphql.CollectedField, obj *Menus) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Menus",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Data, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]beans.Menu)
-	fc.Result = res
-	return ec.marshalOMenu2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMenuᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Message_message(ctx context.Context, field graphql.CollectedField, obj *Message) (ret graphql.Marshaler) {
@@ -14715,10 +14613,10 @@ func (ec *executionContext) _Query_menus(ctx context.Context, field graphql.Coll
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*Menus); ok {
+		if data, ok := tmp.([]beans.Menu); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/source.Menus`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []github.com/zhanghup/go-app/beans.Menu`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14727,9 +14625,9 @@ func (ec *executionContext) _Query_menus(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*Menus)
+	res := resTmp.([]beans.Menu)
 	fc.Result = res
-	return ec.marshalOMenus2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMenus(ctx, field.Selections, res)
+	return ec.marshalOMenu2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMenuᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_menu(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -18835,30 +18733,6 @@ func (ec *executionContext) unmarshalInputQMenu(ctx context.Context, obj interfa
 			if err != nil {
 				return it, err
 			}
-		case "index":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("index"))
-			it.Index, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "size":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("size"))
-			it.Size, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "count":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("count"))
-			it.Count, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		}
 	}
 
@@ -19562,43 +19436,11 @@ func (ec *executionContext) unmarshalInputUpdMenu(ctx context.Context, obj inter
 
 	for k, v := range asMap {
 		switch k {
-		case "id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "title":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
 			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "path":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
-			it.Path, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "alias":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alias"))
-			it.Alias, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20458,32 +20300,6 @@ func (ec *executionContext) _Menu(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Menu_weight(ctx, field, obj)
 		case "status":
 			out.Values[i] = ec._Menu_status(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var menusImplementors = []string{"Menus"}
-
-func (ec *executionContext) _Menus(ctx context.Context, sel ast.SelectionSet, obj *Menus) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, menusImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Menus")
-		case "total":
-			out.Values[i] = ec._Menus_total(ctx, field, obj)
-		case "data":
-			out.Values[i] = ec._Menus_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -22981,13 +22797,6 @@ func (ec *executionContext) unmarshalOMenuLocal2ᚕgithubᚗcomᚋzhanghupᚋgo�
 		}
 	}
 	return res, nil
-}
-
-func (ec *executionContext) marshalOMenus2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMenus(ctx context.Context, sel ast.SelectionSet, v *Menus) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Menus(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOMessage2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMessage(ctx context.Context, sel ast.SelectionSet, v *Message) graphql.Marshaler {

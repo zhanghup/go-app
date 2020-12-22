@@ -90,3 +90,12 @@ func (this *Resolver) PlanStepLoader(ctx context.Context, id string) (*beans.Pla
 	}
 	return result, err
 }
+
+func (this *Resolver) MenuLoader(ctx context.Context, id string) (*beans.Menu, error) {
+	result := new(beans.Menu)
+	err := this.Loader(ctx).Object(result, "select * from menu where id in :keys", nil, "Id", "").Load(id, result)
+	if result.Id == nil {
+		return nil, err
+	}
+	return result, err
+}

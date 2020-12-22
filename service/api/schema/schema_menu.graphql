@@ -1,5 +1,5 @@
 extend type Query{
-    menus(query:QMenu!):Menus @perm(entity: "menu",perm: "R",remark:"菜单查询")
+    menus(query:QMenu!):[Menu!] @perm(entity: "menu",perm: "R",remark:"菜单查询")
     menu(id: String!):Menu @perm(entity: "menu",perm: "R",remark:"菜单查询")
 }
 
@@ -11,15 +11,6 @@ extend type Mutation {
 input QMenu{
     "状态{dict:STA001}"
     status: String
-
-    index: Int
-    size: Int
-    count: Boolean
-}
-
-type Menus{
-    total: Int
-    data:[Menu!]
 }
 
 type Menu @goModel(model:"github.com/zhanghup/go-app/beans.Menu") {
@@ -46,25 +37,15 @@ type Menu @goModel(model:"github.com/zhanghup/go-app/beans.Menu") {
     weight: Int
     "状态{dict:STA001}"
     status: String
-
 }
 
-
 input UpdMenu {
-    id: String
-    "菜单名称"
-    name: String
     "菜单标题"
     title: String
-    "菜单路径"
-    path: String
-    "菜单昵称"
-    alias: String
     "菜单图标"
     icon: String
     "上级菜单"
     parent: String
-
     "排序"
     weight: Int
     "状态{dict:STA001}"

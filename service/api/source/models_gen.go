@@ -49,11 +49,6 @@ type MenuLocal struct {
 	Children []MenuLocal `json:"children" xorm:"children"`
 }
 
-type Menus struct {
-	Total *int         `json:"total" xorm:"total"`
-	Data  []beans.Menu `json:"data" xorm:"data"`
-}
-
 type Message struct {
 	Message  *beans.MsgInfo     `json:"message" xorm:"message"`
 	Template *beans.MsgTemplate `json:"template" xorm:"template"`
@@ -277,9 +272,6 @@ type QDict struct {
 type QMenu struct {
 	// 状态{dict:STA001}
 	Status *string `json:"status" xorm:"status"`
-	Index  *int    `json:"index" xorm:"index"`
-	Size   *int    `json:"size" xorm:"size"`
-	Count  *bool   `json:"count" xorm:"count"`
 }
 
 type QMsgHistory struct {
@@ -436,15 +428,8 @@ type UpdDictItem struct {
 }
 
 type UpdMenu struct {
-	ID *string `json:"id" xorm:"id"`
-	// 菜单名称
-	Name *string `json:"name" xorm:"name"`
 	// 菜单标题
 	Title *string `json:"title" xorm:"title"`
-	// 菜单路径
-	Path *string `json:"path" xorm:"path"`
-	// 菜单昵称
-	Alias *string `json:"alias" xorm:"alias"`
 	// 菜单图标
 	Icon *string `json:"icon" xorm:"icon"`
 	// 上级菜单

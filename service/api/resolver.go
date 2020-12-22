@@ -26,12 +26,11 @@ func Gin(g gin.IRouter, db *xorm.Engine) {
 		Resolvers: NewResolver(db),
 		Directives: source.DirectiveRoot{
 			Perm: directive.Perm(db),
+			Root: directive.Root(db),
 		},
 	}
 	ags.GinGql("/zpx/api", g.Group("/", directive.WebAuth(db)), source.NewExecutableSchema(config), db)
 }
-
-
 
 type Resolver struct {
 	*ResolverTools
