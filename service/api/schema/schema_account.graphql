@@ -1,12 +1,12 @@
 extend type Query{
-    accounts(query:QAccount!):Accounts
-    account(id: String!):Account
+    accounts(query:QAccount!):Accounts @perm(entity: "account",perm: "R",remark: "账户查询")
+    account(id: String!):Account @perm(entity: "account",perm: "R",remark: "账户查询")
 }
 
 extend type Mutation {
-    account_create(input:NewAccount!):String!
-    account_update(id: String!,input:UpdAccount!):Boolean!
-    account_removes(ids: [String!]):Boolean!
+    account_create(input:NewAccount!):String! @perm(entity: "account",perm: "R",remark: "添加查询")
+    account_update(id: String!,input:UpdAccount!):Boolean! @perm(entity: "account",perm: "R",remark: "账户修改")
+    account_removes(ids: [String!]):Boolean! @perm(entity: "account",perm: "R",remark: "账户删除")
 }
 
 input QAccount{

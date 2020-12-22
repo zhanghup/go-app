@@ -1,26 +1,26 @@
 extend type Query{
     "字典列表（分页）"
-    dicts(query:QDict):[Dict!] @perm(entity: "dict",perm: "R")
+    dicts(query:QDict):[Dict!] @perm(entity: "dict",perm: "R",remark:"字典查询")
     "字典单个对象"
-    dict(id: String!):Dict @perm(entity: "dict",perm: "R")
+    dict(id: String!):Dict @perm(entity: "dict",perm: "R",remark:"字典查询")
 }
 
 extend type Mutation {
     "字典新建"
-    dict_create(input:NewDict!):Boolean!  @perm(entity: "dict",perm: "C")
+    dict_create(input:NewDict!):Boolean!  @perm(entity: "dict",perm: "C",remark:"字典新增")
     "字典更新"
-    dict_update(id: String!,input:UpdDict!):Boolean!  @perm(entity: "dict",perm: "U")
+    dict_update(id: String!,input:UpdDict!):Boolean!  @perm(entity: "dict",perm: "U",remark:"字典修改")
     "字典批量删除"
-    dict_removes(ids: [String!]):Boolean! @perm(entity: "dict",perm: "D")
+    dict_removes(ids: [String!]):Boolean! @perm(entity: "dict",perm: "D",remark:"字典删除")
 
     "字典项新建"
-    dict_item_create(input:NewDictItem!):Boolean!  @perm(entity: "dict",perm: "C")
+    dict_item_create(input:NewDictItem!):Boolean!  @perm(entity: "dict_item",perm: "C",remark:"字典项删除")
     "字典项更新"
-    dict_item_update(id: String!,input:UpdDictItem!):Boolean!  @perm(entity: "dict",perm: "U")
+    dict_item_update(id: String!,input:UpdDictItem!):Boolean!  @perm(entity: "dict_item",perm: "U",remark:"字典项删除")
     "字典项批量删除"
-    dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict",perm: "D")
+    dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict_item",perm: "D",remark:"字典项删除")
     "字典项重新排序"
-    dict_item_sort(code: String!,items:[String!]): Boolean! @perm(entity: "dict",perm: "M")
+    dict_item_sort(code: String!,items:[String!]): Boolean! @perm(entity: "dict_item",perm: "MSort",remark:"字典项排序")
 }
 
 input QDict{

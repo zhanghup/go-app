@@ -1,16 +1,16 @@
 extend type Query{
     "任务列表（分页）"
-    crons(query:QCron!):Crons  @perm(entity: "cron",perm: "R")
+    crons(query:QCron!):Crons  @perm(entity: "cron",perm: "R",remark: "定时任务查询")
     "任务单个"
-    cron(id: String!):Cron  @perm(entity: "cron",perm: "R")
+    cron(id: String!):Cron  @perm(entity: "cron",perm: "R",remark: "定时任务查询")
     "历史执行记录"
-    cron_logs(query:QCronLog!):CronLogs  @perm(entity: "cron",perm: "R")
+    cron_logs(query:QCronLog!):CronLogs  @perm(entity: "cron",perm: "RLog",remark: "定时任务历史查询")
 }
 
 extend type Mutation {
-    cron_stop(id: String!):Boolean! @perm(entity: "cron",perm: "M")
-    cron_start(id: String!):Boolean! @perm(entity: "cron",perm: "M")
-    cron_run(id: String!):Boolean! @perm(entity: "cron",perm: "M")
+    cron_stop(id: String!):Boolean! @perm(entity: "cron",perm: "MStop",remark: "定时任务开启")
+    cron_start(id: String!):Boolean! @perm(entity: "cron",perm: "MStart",remark: "定时任务暂停")
+    cron_run(id: String!):Boolean! @perm(entity: "cron",perm: "MRun",remark: "定时任务立即执行一次")
 }
 
 input QCron{

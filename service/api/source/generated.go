@@ -47,6 +47,7 @@ type ResolverRoot interface {
 
 type DirectiveRoot struct {
 	Perm func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string, remark *string) (res interface{}, err error)
+	Root func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -153,6 +154,25 @@ type ComplexityRoot struct {
 		Weight   func(childComplexity int) int
 	}
 
+	Menu struct {
+		Alias   func(childComplexity int) int
+		Created func(childComplexity int) int
+		Icon    func(childComplexity int) int
+		Id      func(childComplexity int) int
+		Name    func(childComplexity int) int
+		Parent  func(childComplexity int) int
+		Path    func(childComplexity int) int
+		Status  func(childComplexity int) int
+		Title   func(childComplexity int) int
+		Updated func(childComplexity int) int
+		Weight  func(childComplexity int) int
+	}
+
+	Menus struct {
+		Data  func(childComplexity int) int
+		Total func(childComplexity int) int
+	}
+
 	Message struct {
 		Message  func(childComplexity int) int
 		Template func(childComplexity int) int
@@ -252,6 +272,8 @@ type ComplexityRoot struct {
 		DictItemUpdate    func(childComplexity int, id string, input UpdDictItem) int
 		DictRemoves       func(childComplexity int, ids []string) int
 		DictUpdate        func(childComplexity int, id string, input UpdDict) int
+		MenuReload        func(childComplexity int, menus []MenuLocal) int
+		MenuUpdate        func(childComplexity int, id string, input UpdMenu) int
 		MsgTemplateUpdate func(childComplexity int, id string, input UpdMsgTemplate) int
 		MyMsgInfoConfirm  func(childComplexity int, id string, input NewMsgConfirm) int
 		MyMsgInfoRead     func(childComplexity int, id string) int
@@ -334,6 +356,8 @@ type ComplexityRoot struct {
 		Dict            func(childComplexity int, id string) int
 		Dicts           func(childComplexity int, query *QDict) int
 		Hello           func(childComplexity int) int
+		Menu            func(childComplexity int, id string) int
+		Menus           func(childComplexity int, query QMenu) int
 		MsgHistorys     func(childComplexity int, query QMsgHistory) int
 		MsgInfos        func(childComplexity int, query QMsgInfo) int
 		MsgTemplate     func(childComplexity int, id string) int
@@ -429,6 +453,8 @@ type MutationResolver interface {
 	DictItemSort(ctx context.Context, code string, items []string) (bool, error)
 	MyMsgInfoConfirm(ctx context.Context, id string, input NewMsgConfirm) (bool, error)
 	MyMsgInfoRead(ctx context.Context, id string) (bool, error)
+	MenuUpdate(ctx context.Context, id string, input UpdMenu) (bool, error)
+	MenuReload(ctx context.Context, menus []MenuLocal) (bool, error)
 	MsgTemplateUpdate(ctx context.Context, id string, input UpdMsgTemplate) (bool, error)
 	PlanCreate(ctx context.Context, input NewPlan) (string, error)
 	PlanUpdate(ctx context.Context, id string, input UpdPlan) (bool, error)
@@ -465,6 +491,8 @@ type QueryResolver interface {
 	Dict(ctx context.Context, id string) (*beans.Dict, error)
 	MyInfo(ctx context.Context) (*beans.User, error)
 	MyMsgInfos(ctx context.Context, query QMyMsgInfo) ([]beans.MsgInfo, error)
+	Menus(ctx context.Context, query QMenu) (*Menus, error)
+	Menu(ctx context.Context, id string) (*beans.Menu, error)
 	MsgTemplates(ctx context.Context, query QMsgTemplate) ([]beans.MsgTemplate, error)
 	MsgTemplate(ctx context.Context, id string) (*beans.MsgTemplate, error)
 	MsgInfos(ctx context.Context, query QMsgInfo) ([]beans.MsgInfo, error)
@@ -1016,6 +1044,97 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DictItem.Weight(childComplexity), true
+
+	case "Menu.alias":
+		if e.complexity.Menu.Alias == nil {
+			break
+		}
+
+		return e.complexity.Menu.Alias(childComplexity), true
+
+	case "Menu.created":
+		if e.complexity.Menu.Created == nil {
+			break
+		}
+
+		return e.complexity.Menu.Created(childComplexity), true
+
+	case "Menu.icon":
+		if e.complexity.Menu.Icon == nil {
+			break
+		}
+
+		return e.complexity.Menu.Icon(childComplexity), true
+
+	case "Menu.id":
+		if e.complexity.Menu.Id == nil {
+			break
+		}
+
+		return e.complexity.Menu.Id(childComplexity), true
+
+	case "Menu.name":
+		if e.complexity.Menu.Name == nil {
+			break
+		}
+
+		return e.complexity.Menu.Name(childComplexity), true
+
+	case "Menu.parent":
+		if e.complexity.Menu.Parent == nil {
+			break
+		}
+
+		return e.complexity.Menu.Parent(childComplexity), true
+
+	case "Menu.path":
+		if e.complexity.Menu.Path == nil {
+			break
+		}
+
+		return e.complexity.Menu.Path(childComplexity), true
+
+	case "Menu.status":
+		if e.complexity.Menu.Status == nil {
+			break
+		}
+
+		return e.complexity.Menu.Status(childComplexity), true
+
+	case "Menu.title":
+		if e.complexity.Menu.Title == nil {
+			break
+		}
+
+		return e.complexity.Menu.Title(childComplexity), true
+
+	case "Menu.updated":
+		if e.complexity.Menu.Updated == nil {
+			break
+		}
+
+		return e.complexity.Menu.Updated(childComplexity), true
+
+	case "Menu.weight":
+		if e.complexity.Menu.Weight == nil {
+			break
+		}
+
+		return e.complexity.Menu.Weight(childComplexity), true
+
+	case "Menus.data":
+		if e.complexity.Menus.Data == nil {
+			break
+		}
+
+		return e.complexity.Menus.Data(childComplexity), true
+
+	case "Menus.total":
+		if e.complexity.Menus.Total == nil {
+			break
+		}
+
+		return e.complexity.Menus.Total(childComplexity), true
 
 	case "Message.message":
 		if e.complexity.Message.Message == nil {
@@ -1699,6 +1818,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DictUpdate(childComplexity, args["id"].(string), args["input"].(UpdDict)), true
 
+	case "Mutation.menu_reload":
+		if e.complexity.Mutation.MenuReload == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_menu_reload_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MenuReload(childComplexity, args["menus"].([]MenuLocal)), true
+
+	case "Mutation.menu_update":
+		if e.complexity.Mutation.MenuUpdate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_menu_update_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MenuUpdate(childComplexity, args["id"].(string), args["input"].(UpdMenu)), true
+
 	case "Mutation.msg_template_update":
 		if e.complexity.Mutation.MsgTemplateUpdate == nil {
 			break
@@ -2266,6 +2409,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Hello(childComplexity), true
 
+	case "Query.menu":
+		if e.complexity.Query.Menu == nil {
+			break
+		}
+
+		args, err := ec.field_Query_menu_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Menu(childComplexity, args["id"].(string)), true
+
+	case "Query.menus":
+		if e.complexity.Query.Menus == nil {
+			break
+		}
+
+		args, err := ec.field_Query_menus_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Menus(childComplexity, args["query"].(QMenu)), true
+
 	case "Query.msg_historys":
 		if e.complexity.Query.MsgHistorys == nil {
 			break
@@ -2782,6 +2949,7 @@ scalar Int64
 
 "数据操作权限"
 directive @perm(entity:String!, perm: String!,remark:String) on FIELD_DEFINITION
+directive @root on FIELD_DEFINITION
 
 directive @goModel(model: String, models: [String!]) on OBJECT
     | INPUT_OBJECT
@@ -2808,14 +2976,14 @@ type Subscription {
 }
 `, BuiltIn: false},
 	{Name: "schema/schema_account.graphql", Input: `extend type Query{
-    accounts(query:QAccount!):Accounts
-    account(id: String!):Account
+    accounts(query:QAccount!):Accounts @perm(entity: "account",perm: "R",remark: "账户查询")
+    account(id: String!):Account @perm(entity: "account",perm: "R",remark: "账户查询")
 }
 
 extend type Mutation {
-    account_create(input:NewAccount!):String!
-    account_update(id: String!,input:UpdAccount!):Boolean!
-    account_removes(ids: [String!]):Boolean!
+    account_create(input:NewAccount!):String! @perm(entity: "account",perm: "R",remark: "添加查询")
+    account_update(id: String!,input:UpdAccount!):Boolean! @perm(entity: "account",perm: "R",remark: "账户修改")
+    account_removes(ids: [String!]):Boolean! @perm(entity: "account",perm: "R",remark: "账户删除")
 }
 
 input QAccount{
@@ -2901,17 +3069,17 @@ input UpdAccount {
 `, BuiltIn: false},
 	{Name: "schema/schema_cron.graphql", Input: `extend type Query{
     "任务列表（分页）"
-    crons(query:QCron!):Crons  @perm(entity: "cron",perm: "R")
+    crons(query:QCron!):Crons  @perm(entity: "cron",perm: "R",remark: "定时任务查询")
     "任务单个"
-    cron(id: String!):Cron  @perm(entity: "cron",perm: "R")
+    cron(id: String!):Cron  @perm(entity: "cron",perm: "R",remark: "定时任务查询")
     "历史执行记录"
-    cron_logs(query:QCronLog!):CronLogs  @perm(entity: "cron",perm: "R")
+    cron_logs(query:QCronLog!):CronLogs  @perm(entity: "cron",perm: "RLog",remark: "定时任务历史查询")
 }
 
 extend type Mutation {
-    cron_stop(id: String!):Boolean! @perm(entity: "cron",perm: "M")
-    cron_start(id: String!):Boolean! @perm(entity: "cron",perm: "M")
-    cron_run(id: String!):Boolean! @perm(entity: "cron",perm: "M")
+    cron_stop(id: String!):Boolean! @perm(entity: "cron",perm: "MStop",remark: "定时任务开启")
+    cron_start(id: String!):Boolean! @perm(entity: "cron",perm: "MStart",remark: "定时任务暂停")
+    cron_run(id: String!):Boolean! @perm(entity: "cron",perm: "MRun",remark: "定时任务立即执行一次")
 }
 
 input QCron{
@@ -2999,15 +3167,15 @@ type CronLog @goModel(model:"github.com/zhanghup/go-app/beans.CronLog")  {
 
 }`, BuiltIn: false},
 	{Name: "schema/schema_dept.graphql", Input: `extend type Query{
-    depts(query:QDept!):Depts  @perm(entity: "dept",perm: "R")
-    dept(id: String!):Dept @perm(entity: "dept",perm: "R")
-    dept_tree: Any @perm(entity: "dept",perm: "R")
+    depts(query:QDept!):Depts  @perm(entity: "dept",perm: "R",remark:"组织部门查询")
+    dept(id: String!):Dept @perm(entity: "dept",perm: "R",remark:"组织部门查询")
+    dept_tree: Any @perm(entity: "dept",perm: "R",remark:"组织部门查询")
 }
 
 extend type Mutation {
-    dept_create(input:NewDept!):String! @perm(entity: "dept",perm: "C")
-    dept_update(id: String!,input:UpdDept!):Boolean! @perm(entity: "dept",perm: "U")
-    dept_removes(ids: [String!]):Boolean! @perm(entity: "dept",perm: "D")
+    dept_create(input:NewDept!):String! @perm(entity: "dept",perm: "C",remark:"组织部门新增")
+    dept_update(id: String!,input:UpdDept!):Boolean! @perm(entity: "dept",perm: "U",remark:"组织部门修改")
+    dept_removes(ids: [String!]):Boolean! @perm(entity: "dept",perm: "D",remark:"组织部门删除")
 }
 
 input QDept{
@@ -3109,27 +3277,27 @@ input UpdDept {
 `, BuiltIn: false},
 	{Name: "schema/schema_dict.graphql", Input: `extend type Query{
     "字典列表（分页）"
-    dicts(query:QDict):[Dict!] @perm(entity: "dict",perm: "R")
+    dicts(query:QDict):[Dict!] @perm(entity: "dict",perm: "R",remark:"字典查询")
     "字典单个对象"
-    dict(id: String!):Dict @perm(entity: "dict",perm: "R")
+    dict(id: String!):Dict @perm(entity: "dict",perm: "R",remark:"字典查询")
 }
 
 extend type Mutation {
     "字典新建"
-    dict_create(input:NewDict!):Boolean!  @perm(entity: "dict",perm: "C")
+    dict_create(input:NewDict!):Boolean!  @perm(entity: "dict",perm: "C",remark:"字典新增")
     "字典更新"
-    dict_update(id: String!,input:UpdDict!):Boolean!  @perm(entity: "dict",perm: "U")
+    dict_update(id: String!,input:UpdDict!):Boolean!  @perm(entity: "dict",perm: "U",remark:"字典修改")
     "字典批量删除"
-    dict_removes(ids: [String!]):Boolean! @perm(entity: "dict",perm: "D")
+    dict_removes(ids: [String!]):Boolean! @perm(entity: "dict",perm: "D",remark:"字典删除")
 
     "字典项新建"
-    dict_item_create(input:NewDictItem!):Boolean!  @perm(entity: "dict",perm: "C")
+    dict_item_create(input:NewDictItem!):Boolean!  @perm(entity: "dict_item",perm: "C",remark:"字典项删除")
     "字典项更新"
-    dict_item_update(id: String!,input:UpdDictItem!):Boolean!  @perm(entity: "dict",perm: "U")
+    dict_item_update(id: String!,input:UpdDictItem!):Boolean!  @perm(entity: "dict_item",perm: "U",remark:"字典项删除")
     "字典项批量删除"
-    dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict",perm: "D")
+    dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict_item",perm: "D",remark:"字典项删除")
     "字典项重新排序"
-    dict_item_sort(code: String!,items:[String!]): Boolean! @perm(entity: "dict",perm: "M")
+    dict_item_sort(code: String!,items:[String!]): Boolean! @perm(entity: "dict_item",perm: "MSort",remark:"字典项排序")
 }
 
 input QDict{
@@ -3308,6 +3476,96 @@ type MyInfo @goModel(model:"github.com/zhanghup/go-app/beans.User"){
 
     o_dept:Dept
 }`, BuiltIn: false},
+	{Name: "schema/schema_menu.graphql", Input: `extend type Query{
+    menus(query:QMenu!):Menus @perm(entity: "menu",perm: "R",remark:"菜单查询")
+    menu(id: String!):Menu @perm(entity: "menu",perm: "R",remark:"菜单查询")
+}
+
+extend type Mutation {
+    menu_update(id: String!,input:UpdMenu!):Boolean! @perm(entity: "menu",perm: "U",remark:"菜单修改")
+    menu_reload(menus:[MenuLocal!]!):Boolean! @root
+}
+
+input QMenu{
+    "状态{dict:STA001}"
+    status: String
+
+    index: Int
+    size: Int
+    count: Boolean
+}
+
+type Menus{
+    total: Int
+    data:[Menu!]
+}
+
+type Menu @goModel(model:"github.com/zhanghup/go-app/beans.Menu") {
+    id: String
+
+    "菜单名称"
+    name: String
+    "菜单标题"
+    title: String
+    "菜单路径"
+    path: String
+    "菜单昵称"
+    alias: String
+    "菜单图标"
+    icon: String
+    "上级菜单"
+    parent: String
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+
+}
+
+
+input UpdMenu {
+    id: String
+    "菜单名称"
+    name: String
+    "菜单标题"
+    title: String
+    "菜单路径"
+    path: String
+    "菜单昵称"
+    alias: String
+    "菜单图标"
+    icon: String
+    "上级菜单"
+    parent: String
+
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+
+input MenuLocal {
+    id: String
+    "菜单名称"
+    name: String
+    "菜单标题"
+    title: String
+    "菜单路径"
+    path: String
+    "菜单昵称"
+    alias: String
+    "菜单图标"
+    icon: String
+    "子菜单"
+    children: [MenuLocal!]
+}
+
+`, BuiltIn: false},
 	{Name: "schema/schema_msg.graphql", Input: `extend type Query{
     msg_templates(query:QMsgTemplate!):[MsgTemplate!]
     msg_template(id: String!):MsgTemplate
@@ -3680,32 +3938,32 @@ input UpdPlanStep {
 `, BuiltIn: false},
 	{Name: "schema/schema_role.graphql", Input: `extend type Query {
     "角色列表（分页）"
-    roles(query: QRole!): Roles @perm(entity: "role",perm: "R")
+    roles(query: QRole!): Roles  @perm(entity: "role",perm: "R",remark:"角色查询")
     "角色获取单个"
-    role(id: String!): Role @perm(entity: "role",perm: "R")
+    role(id: String!): Role  @perm(entity: "role",perm: "R",remark:"角色查询")
     "角色用户列表"
-    role_users(id: String!): [String!] @perm(entity: "role",perm: "R")
+    role_users(id: String!): [String!]  @perm(entity: "role",perm: "R",remark:"角色用户查询")
     "权限列表"
     role_perms(id: String!,type: String): [String!] @perm(entity: "role",perm: "R",remark:"角色权限查询")
     "对象权限列表"
-    role_perm_objects(id: String!): [PermObj!] @perm(entity: "role",perm: "R",remark:"角色对象权限查询")
+    role_perm_objects(id: String!): [PermObj!] @perm(entity: "role",perm: "R",remark:"角色对象查询")
 }
 
 extend type Mutation {
     "角色新建"
-    role_create(input: NewRole!):Boolean! @perm(entity: "role",perm: "C")
+    role_create(input: NewRole!):Boolean! @perm(entity: "role",perm: "C",remark:"角色新增")
     "角色更新"
-    role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "role",perm: "U")
+    role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "role",perm: "U",remark:"角色更新")
     "角色批量删除"
-    role_removes(ids: [String!]): Boolean! @perm(entity: "role",perm: "D")
+    role_removes(ids: [String!]): Boolean! @perm(entity: "role",perm: "D",remark:"角色删除")
     "新增权限"
-    role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean! @perm(entity: "role",perm: "M",remark:"角色权限新增")
+    role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean! @perm(entity: "role",perm: "MP",remark:"角色权限新增")
     "新增对象权限"
-    role_perm_obj_create(id: String!, perms:[IPermObj!]!): Boolean! @perm(entity: "role",perm: "M",remark:"角色对象权限新增")
+    role_perm_obj_create(id: String!, perms:[IPermObj!]!): Boolean! @perm(entity: "role",perm: "MO",remark:"角色对象权限新增")
     "角色分配"
-    role_to_user(uid: String!,roles:[String!]!): Boolean! @perm(entity: "role",perm: "M",remark:"角色分配")
+    role_to_user(uid: String!,roles:[String!]!): Boolean! @perm(entity: "role",perm: "MTU",remark:"角色分配")
     "角色分配"
-    role_with_user(role: String!,uids:[String!]!): Boolean! @perm(entity: "role",perm: "M",remark:"角色分配")
+    role_with_user(role: String!,uids:[String!]!): Boolean! @perm(entity: "role",perm: "MWU",remark:"角色分配")
 }
 
 input IPermObj{
@@ -3782,18 +4040,18 @@ input UpdRole {
 	{Name: "schema/schema_subscribe.graphql", Input: ``, BuiltIn: false},
 	{Name: "schema/schema_user.graphql", Input: `extend type Query{
     "用户列表（分页）"
-    users(query:QUser!):Users  @perm(entity: "user",perm: "R")
+    users(query:QUser!):Users  @perm(entity: "user",perm: "R",remark:"用户查询")
     "用户获取单个"
-    user(id: String!):User  @perm(entity: "user",perm: "R")
+    user(id: String!):User  @perm(entity: "user",perm: "R",remark:"用户查询")
 }
 
 extend type Mutation {
     "用户新建"
-    user_create(input:NewUser!):String!  @perm(entity: "user",perm: "C")
+    user_create(input:NewUser!):String!  @perm(entity: "user",perm: "C",remark:"用户新增")
     "用户更新"
-    user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U")
+    user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U",remark:"用户修改")
     "用户批量删除"
-    user_removes(ids: [String!]):Boolean! @perm(entity: "user",perm: "D")
+    user_removes(ids: [String!]):Boolean! @perm(entity: "user",perm: "D",remark:"用户删除")
 }
 
 input QUser{
@@ -4239,6 +4497,45 @@ func (ec *executionContext) field_Mutation_dict_update_args(ctx context.Context,
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg1, err = ec.unmarshalNUpdDict2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐUpdDict(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_menu_reload_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []MenuLocal
+	if tmp, ok := rawArgs["menus"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("menus"))
+		arg0, err = ec.unmarshalNMenuLocal2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMenuLocalᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["menus"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_menu_update_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 UpdMenu
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdMenu2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐUpdMenu(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4773,6 +5070,36 @@ func (ec *executionContext) field_Query_dicts_args(ctx context.Context, rawArgs 
 	if tmp, ok := rawArgs["query"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("query"))
 		arg0, err = ec.unmarshalOQDict2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐQDict(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["query"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_menu_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_menus_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 QMenu
+	if tmp, ok := rawArgs["query"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("query"))
+		arg0, err = ec.unmarshalNQMenu2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐQMenu(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -7404,6 +7731,422 @@ func (ec *executionContext) _DictItem_status(ctx context.Context, field graphql.
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Menu_id(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menu",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Id, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menu_name(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menu",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menu_title(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menu",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menu_path(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menu",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Path, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menu_alias(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menu",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Alias, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menu_icon(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menu",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Icon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menu_parent(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menu",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Parent, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menu_created(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menu",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Created, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menu_updated(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menu",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Updated, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menu_weight(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menu",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Weight, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menu_status(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menu",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menus_total(ctx context.Context, field graphql.CollectedField, obj *Menus) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menus",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Menus_data(ctx context.Context, field graphql.CollectedField, obj *Menus) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menus",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Data, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]beans.Menu)
+	fc.Result = res
+	return ec.marshalOMenu2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMenuᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Message_message(ctx context.Context, field graphql.CollectedField, obj *Message) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9700,8 +10443,40 @@ func (ec *executionContext) _Mutation_account_create(ctx context.Context, field 
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AccountCreate(rctx, args["input"].(NewAccount))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AccountCreate(rctx, args["input"].(NewAccount))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "account")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "添加查询")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9742,8 +10517,40 @@ func (ec *executionContext) _Mutation_account_update(ctx context.Context, field 
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AccountUpdate(rctx, args["id"].(string), args["input"].(UpdAccount))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AccountUpdate(rctx, args["id"].(string), args["input"].(UpdAccount))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "account")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "账户修改")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9784,8 +10591,40 @@ func (ec *executionContext) _Mutation_account_removes(ctx context.Context, field
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AccountRemoves(rctx, args["ids"].([]string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AccountRemoves(rctx, args["ids"].([]string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "account")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "账户删除")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9835,14 +10674,18 @@ func (ec *executionContext) _Mutation_cron_stop(ctx context.Context, field graph
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "M")
+			perm, err := ec.unmarshalNString2string(ctx, "MStop")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "定时任务开启")
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -9905,14 +10748,18 @@ func (ec *executionContext) _Mutation_cron_start(ctx context.Context, field grap
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "M")
+			perm, err := ec.unmarshalNString2string(ctx, "MStart")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "定时任务暂停")
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -9975,14 +10822,18 @@ func (ec *executionContext) _Mutation_cron_run(ctx context.Context, field graphq
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "M")
+			perm, err := ec.unmarshalNString2string(ctx, "MRun")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "定时任务立即执行一次")
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -10049,10 +10900,14 @@ func (ec *executionContext) _Mutation_dept_create(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "组织部门新增")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -10119,10 +10974,14 @@ func (ec *executionContext) _Mutation_dept_update(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "组织部门修改")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -10189,10 +11048,14 @@ func (ec *executionContext) _Mutation_dept_removes(ctx context.Context, field gr
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "组织部门删除")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -10259,10 +11122,14 @@ func (ec *executionContext) _Mutation_dict_create(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "字典新增")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -10329,10 +11196,14 @@ func (ec *executionContext) _Mutation_dict_update(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "字典修改")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -10399,10 +11270,14 @@ func (ec *executionContext) _Mutation_dict_removes(ctx context.Context, field gr
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "字典删除")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -10461,7 +11336,7 @@ func (ec *executionContext) _Mutation_dict_item_create(ctx context.Context, fiel
 			return ec.resolvers.Mutation().DictItemCreate(rctx, args["input"].(NewDictItem))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "dict_item")
 			if err != nil {
 				return nil, err
 			}
@@ -10469,10 +11344,14 @@ func (ec *executionContext) _Mutation_dict_item_create(ctx context.Context, fiel
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "字典项删除")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -10531,7 +11410,7 @@ func (ec *executionContext) _Mutation_dict_item_update(ctx context.Context, fiel
 			return ec.resolvers.Mutation().DictItemUpdate(rctx, args["id"].(string), args["input"].(UpdDictItem))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "dict_item")
 			if err != nil {
 				return nil, err
 			}
@@ -10539,10 +11418,14 @@ func (ec *executionContext) _Mutation_dict_item_update(ctx context.Context, fiel
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "字典项删除")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -10601,7 +11484,7 @@ func (ec *executionContext) _Mutation_dict_item_removes(ctx context.Context, fie
 			return ec.resolvers.Mutation().DictItemRemoves(rctx, args["ids"].([]string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "dict_item")
 			if err != nil {
 				return nil, err
 			}
@@ -10609,10 +11492,14 @@ func (ec *executionContext) _Mutation_dict_item_removes(ctx context.Context, fie
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "字典项删除")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -10671,18 +11558,22 @@ func (ec *executionContext) _Mutation_dict_item_sort(ctx context.Context, field 
 			return ec.resolvers.Mutation().DictItemSort(rctx, args["code"].(string), args["items"].([]string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
+			entity, err := ec.unmarshalNString2string(ctx, "dict_item")
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "M")
+			perm, err := ec.unmarshalNString2string(ctx, "MSort")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "字典项排序")
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -10780,6 +11671,142 @@ func (ec *executionContext) _Mutation_my_msg_info_read(ctx context.Context, fiel
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().MyMsgInfoRead(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_menu_update(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_menu_update_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().MenuUpdate(rctx, args["id"].(string), args["input"].(UpdMenu))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "menu")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "U")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "菜单修改")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_menu_reload(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_menu_reload_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().MenuReload(rctx, args["menus"].([]MenuLocal))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Root == nil {
+				return nil, errors.New("directive root is not implemented")
+			}
+			return ec.directives.Root(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11127,10 +12154,14 @@ func (ec *executionContext) _Mutation_role_create(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色新增")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -11197,10 +12228,14 @@ func (ec *executionContext) _Mutation_role_update(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色更新")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -11267,10 +12302,14 @@ func (ec *executionContext) _Mutation_role_removes(ctx context.Context, field gr
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色删除")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -11333,7 +12372,7 @@ func (ec *executionContext) _Mutation_role_perm_create(ctx context.Context, fiel
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "M")
+			perm, err := ec.unmarshalNString2string(ctx, "MP")
 			if err != nil {
 				return nil, err
 			}
@@ -11407,7 +12446,7 @@ func (ec *executionContext) _Mutation_role_perm_obj_create(ctx context.Context, 
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "M")
+			perm, err := ec.unmarshalNString2string(ctx, "MO")
 			if err != nil {
 				return nil, err
 			}
@@ -11481,7 +12520,7 @@ func (ec *executionContext) _Mutation_role_to_user(ctx context.Context, field gr
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "M")
+			perm, err := ec.unmarshalNString2string(ctx, "MTU")
 			if err != nil {
 				return nil, err
 			}
@@ -11555,7 +12594,7 @@ func (ec *executionContext) _Mutation_role_with_user(ctx context.Context, field 
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "M")
+			perm, err := ec.unmarshalNString2string(ctx, "MWU")
 			if err != nil {
 				return nil, err
 			}
@@ -11633,10 +12672,14 @@ func (ec *executionContext) _Mutation_user_create(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "用户新增")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -11703,10 +12746,14 @@ func (ec *executionContext) _Mutation_user_update(ctx context.Context, field gra
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "用户修改")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -11773,10 +12820,14 @@ func (ec *executionContext) _Mutation_user_removes(ctx context.Context, field gr
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "用户删除")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -12860,8 +13911,40 @@ func (ec *executionContext) _Query_accounts(ctx context.Context, field graphql.C
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Accounts(rctx, args["query"].(QAccount))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Accounts(rctx, args["query"].(QAccount))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "account")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "账户查询")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*Accounts); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/source.Accounts`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12899,8 +13982,40 @@ func (ec *executionContext) _Query_account(ctx context.Context, field graphql.Co
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Account(rctx, args["id"].(string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Account(rctx, args["id"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "account")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "账户查询")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*beans.Account); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Account`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12951,10 +14066,14 @@ func (ec *executionContext) _Query_crons(ctx context.Context, field graphql.Coll
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "定时任务查询")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -13018,10 +14137,14 @@ func (ec *executionContext) _Query_cron(ctx context.Context, field graphql.Colle
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "定时任务查询")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -13081,14 +14204,18 @@ func (ec *executionContext) _Query_cron_logs(ctx context.Context, field graphql.
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
+			perm, err := ec.unmarshalNString2string(ctx, "RLog")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "定时任务历史查询")
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -13152,10 +14279,14 @@ func (ec *executionContext) _Query_depts(ctx context.Context, field graphql.Coll
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "组织部门查询")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -13219,10 +14350,14 @@ func (ec *executionContext) _Query_dept(ctx context.Context, field graphql.Colle
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "组织部门查询")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -13279,10 +14414,14 @@ func (ec *executionContext) _Query_dept_tree(ctx context.Context, field graphql.
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "组织部门查询")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -13346,10 +14485,14 @@ func (ec *executionContext) _Query_dicts(ctx context.Context, field graphql.Coll
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "字典查询")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -13413,10 +14556,14 @@ func (ec *executionContext) _Query_dict(ctx context.Context, field graphql.Colle
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "字典查询")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -13512,6 +14659,148 @@ func (ec *executionContext) _Query_my_msg_infos(ctx context.Context, field graph
 	res := resTmp.([]beans.MsgInfo)
 	fc.Result = res
 	return ec.marshalOMsgInfo2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgInfoᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_menus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_menus_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Menus(rctx, args["query"].(QMenu))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "menu")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "菜单查询")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*Menus); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/source.Menus`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Menus)
+	fc.Result = res
+	return ec.marshalOMenus2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMenus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_menu(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_menu_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Menu(rctx, args["id"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "menu")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "R")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "菜单查询")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*beans.Menu); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Menu`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*beans.Menu)
+	fc.Result = res
+	return ec.marshalOMenu2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMenu(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_msg_templates(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -13863,10 +15152,14 @@ func (ec *executionContext) _Query_roles(ctx context.Context, field graphql.Coll
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色查询")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -13930,10 +15223,14 @@ func (ec *executionContext) _Query_role(ctx context.Context, field graphql.Colle
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色查询")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -13997,10 +15294,14 @@ func (ec *executionContext) _Query_role_users(ctx context.Context, field graphql
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色用户查询")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -14135,7 +15436,7 @@ func (ec *executionContext) _Query_role_perm_objects(ctx context.Context, field 
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色对象权限查询")
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色对象查询")
 			if err != nil {
 				return nil, err
 			}
@@ -14206,10 +15507,14 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "用户查询")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -14273,10 +15578,14 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 			if err != nil {
 				return nil, err
 			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "用户查询")
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Perm == nil {
 				return nil, errors.New("directive perm is not implemented")
 			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, nil)
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
 		}
 
 		tmp, err := directive1(rctx)
@@ -16533,6 +17842,74 @@ func (ec *executionContext) unmarshalInputIPermObj(ctx context.Context, obj inte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputMenuLocal(ctx context.Context, obj interface{}) (MenuLocal, error) {
+	var it MenuLocal
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "path":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+			it.Path, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "alias":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alias"))
+			it.Alias, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "icon":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("icon"))
+			it.Icon, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "children":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("children"))
+			it.Children, err = ec.unmarshalOMenuLocal2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMenuLocalᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewAccount(ctx context.Context, obj interface{}) (NewAccount, error) {
 	var it NewAccount
 	var asMap = obj.(map[string]interface{})
@@ -17444,6 +18821,50 @@ func (ec *executionContext) unmarshalInputQDict(ctx context.Context, obj interfa
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputQMenu(ctx context.Context, obj interface{}) (QMenu, error) {
+	var it QMenu
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "index":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("index"))
+			it.Index, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "size":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("size"))
+			it.Size, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "count":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("count"))
+			it.Count, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputQMsgHistory(ctx context.Context, obj interface{}) (QMsgHistory, error) {
 	var it QMsgHistory
 	var asMap = obj.(map[string]interface{})
@@ -18110,6 +19531,90 @@ func (ec *executionContext) unmarshalInputUpdDictItem(ctx context.Context, obj i
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ext"))
 			it.Ext, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "weight":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weight"))
+			it.Weight, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdMenu(ctx context.Context, obj interface{}) (UpdMenu, error) {
+	var it UpdMenu
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "path":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+			it.Path, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "alias":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alias"))
+			it.Alias, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "icon":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("icon"))
+			it.Icon, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "parent":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parent"))
+			it.Parent, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18920,6 +20425,76 @@ func (ec *executionContext) _DictItem(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
+var menuImplementors = []string{"Menu"}
+
+func (ec *executionContext) _Menu(ctx context.Context, sel ast.SelectionSet, obj *beans.Menu) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, menuImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Menu")
+		case "id":
+			out.Values[i] = ec._Menu_id(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._Menu_name(ctx, field, obj)
+		case "title":
+			out.Values[i] = ec._Menu_title(ctx, field, obj)
+		case "path":
+			out.Values[i] = ec._Menu_path(ctx, field, obj)
+		case "alias":
+			out.Values[i] = ec._Menu_alias(ctx, field, obj)
+		case "icon":
+			out.Values[i] = ec._Menu_icon(ctx, field, obj)
+		case "parent":
+			out.Values[i] = ec._Menu_parent(ctx, field, obj)
+		case "created":
+			out.Values[i] = ec._Menu_created(ctx, field, obj)
+		case "updated":
+			out.Values[i] = ec._Menu_updated(ctx, field, obj)
+		case "weight":
+			out.Values[i] = ec._Menu_weight(ctx, field, obj)
+		case "status":
+			out.Values[i] = ec._Menu_status(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var menusImplementors = []string{"Menus"}
+
+func (ec *executionContext) _Menus(ctx context.Context, sel ast.SelectionSet, obj *Menus) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, menusImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Menus")
+		case "total":
+			out.Values[i] = ec._Menus_total(ctx, field, obj)
+		case "data":
+			out.Values[i] = ec._Menus_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var messageImplementors = []string{"Message"}
 
 func (ec *executionContext) _Message(ctx context.Context, sel ast.SelectionSet, obj *Message) graphql.Marshaler {
@@ -19252,6 +20827,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "my_msg_info_read":
 			out.Values[i] = ec._Mutation_my_msg_info_read(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "menu_update":
+			out.Values[i] = ec._Mutation_menu_update(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "menu_reload":
+			out.Values[i] = ec._Mutation_menu_reload(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -19725,6 +21310,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_my_msg_infos(ctx, field)
+				return res
+			})
+		case "menus":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_menus(ctx, field)
+				return res
+			})
+		case "menu":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_menu(ctx, field)
 				return res
 			})
 		case "msg_templates":
@@ -20414,6 +22021,36 @@ func (ec *executionContext) unmarshalNIPermObj2ᚕgithubᚗcomᚋzhanghupᚋgo�
 	return res, nil
 }
 
+func (ec *executionContext) marshalNMenu2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMenu(ctx context.Context, sel ast.SelectionSet, v beans.Menu) graphql.Marshaler {
+	return ec._Menu(ctx, sel, &v)
+}
+
+func (ec *executionContext) unmarshalNMenuLocal2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMenuLocal(ctx context.Context, v interface{}) (MenuLocal, error) {
+	res, err := ec.unmarshalInputMenuLocal(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNMenuLocal2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMenuLocalᚄ(ctx context.Context, v interface{}) ([]MenuLocal, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]MenuLocal, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNMenuLocal2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMenuLocal(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) marshalNMsgHistory2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMsgHistory(ctx context.Context, sel ast.SelectionSet, v beans.MsgHistory) graphql.Marshaler {
 	return ec._MsgHistory(ctx, sel, &v)
 }
@@ -20505,6 +22142,11 @@ func (ec *executionContext) unmarshalNQCronLog2githubᚗcomᚋzhanghupᚋgoᚑap
 
 func (ec *executionContext) unmarshalNQDept2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐQDept(ctx context.Context, v interface{}) (QDept, error) {
 	res, err := ec.unmarshalInputQDept(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNQMenu2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐQMenu(ctx context.Context, v interface{}) (QMenu, error) {
+	res, err := ec.unmarshalInputQMenu(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -20619,6 +22261,11 @@ func (ec *executionContext) unmarshalNUpdDict2githubᚗcomᚋzhanghupᚋgoᚑapp
 
 func (ec *executionContext) unmarshalNUpdDictItem2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐUpdDictItem(ctx context.Context, v interface{}) (UpdDictItem, error) {
 	res, err := ec.unmarshalInputUpdDictItem(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdMenu2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐUpdMenu(ctx context.Context, v interface{}) (UpdMenu, error) {
+	res, err := ec.unmarshalInputUpdMenu(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -21263,6 +22910,84 @@ func (ec *executionContext) marshalOInt642ᚖint64(ctx context.Context, sel ast.
 		return graphql.Null
 	}
 	return graphql.MarshalInt64(*v)
+}
+
+func (ec *executionContext) marshalOMenu2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMenuᚄ(ctx context.Context, sel ast.SelectionSet, v []beans.Menu) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMenu2githubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMenu(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOMenu2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐMenu(ctx context.Context, sel ast.SelectionSet, v *beans.Menu) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Menu(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOMenuLocal2ᚕgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMenuLocalᚄ(ctx context.Context, v interface{}) ([]MenuLocal, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]MenuLocal, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNMenuLocal2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMenuLocal(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOMenus2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMenus(ctx context.Context, sel ast.SelectionSet, v *Menus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Menus(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOMessage2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐMessage(ctx context.Context, sel ast.SelectionSet, v *Message) graphql.Marshaler {

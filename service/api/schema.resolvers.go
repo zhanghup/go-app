@@ -41,5 +41,7 @@ func (r *Resolver) Query() source.QueryResolver { return &queryResolver{r} }
 func (r *Resolver) Subscription() source.SubscriptionResolver { return &subscriptionResolver{r} }
 
 type mutationResolver struct{ *Resolver }
+
 type queryResolver struct{ *Resolver }
+
 type subscriptionResolver struct{ *Resolver }

@@ -1,17 +1,17 @@
 extend type Query{
     "用户列表（分页）"
-    users(query:QUser!):Users  @perm(entity: "user",perm: "R")
+    users(query:QUser!):Users  @perm(entity: "user",perm: "R",remark:"用户查询")
     "用户获取单个"
-    user(id: String!):User  @perm(entity: "user",perm: "R")
+    user(id: String!):User  @perm(entity: "user",perm: "R",remark:"用户查询")
 }
 
 extend type Mutation {
     "用户新建"
-    user_create(input:NewUser!):String!  @perm(entity: "user",perm: "C")
+    user_create(input:NewUser!):String!  @perm(entity: "user",perm: "C",remark:"用户新增")
     "用户更新"
-    user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U")
+    user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U",remark:"用户修改")
     "用户批量删除"
-    user_removes(ids: [String!]):Boolean! @perm(entity: "user",perm: "D")
+    user_removes(ids: [String!]):Boolean! @perm(entity: "user",perm: "D",remark:"用户删除")
 }
 
 input QUser{

@@ -1,0 +1,89 @@
+extend type Query{
+    menus(query:QMenu!):Menus @perm(entity: "menu",perm: "R",remark:"菜单查询")
+    menu(id: String!):Menu @perm(entity: "menu",perm: "R",remark:"菜单查询")
+}
+
+extend type Mutation {
+    menu_update(id: String!,input:UpdMenu!):Boolean! @perm(entity: "menu",perm: "U",remark:"菜单修改")
+    menu_reload(menus:[MenuLocal!]!):Boolean! @root
+}
+
+input QMenu{
+    "状态{dict:STA001}"
+    status: String
+
+    index: Int
+    size: Int
+    count: Boolean
+}
+
+type Menus{
+    total: Int
+    data:[Menu!]
+}
+
+type Menu @goModel(model:"github.com/zhanghup/go-app/beans.Menu") {
+    id: String
+
+    "菜单名称"
+    name: String
+    "菜单标题"
+    title: String
+    "菜单路径"
+    path: String
+    "菜单昵称"
+    alias: String
+    "菜单图标"
+    icon: String
+    "上级菜单"
+    parent: String
+
+    "创建时间"
+    created: Int
+    "更新时间"
+    updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+
+}
+
+
+input UpdMenu {
+    id: String
+    "菜单名称"
+    name: String
+    "菜单标题"
+    title: String
+    "菜单路径"
+    path: String
+    "菜单昵称"
+    alias: String
+    "菜单图标"
+    icon: String
+    "上级菜单"
+    parent: String
+
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+
+input MenuLocal {
+    id: String
+    "菜单名称"
+    name: String
+    "菜单标题"
+    title: String
+    "菜单路径"
+    path: String
+    "菜单昵称"
+    alias: String
+    "菜单图标"
+    icon: String
+    "子菜单"
+    children: [MenuLocal!]
+}
+

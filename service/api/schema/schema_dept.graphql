@@ -1,13 +1,13 @@
 extend type Query{
-    depts(query:QDept!):Depts  @perm(entity: "dept",perm: "R")
-    dept(id: String!):Dept @perm(entity: "dept",perm: "R")
-    dept_tree: Any @perm(entity: "dept",perm: "R")
+    depts(query:QDept!):Depts  @perm(entity: "dept",perm: "R",remark:"组织部门查询")
+    dept(id: String!):Dept @perm(entity: "dept",perm: "R",remark:"组织部门查询")
+    dept_tree: Any @perm(entity: "dept",perm: "R",remark:"组织部门查询")
 }
 
 extend type Mutation {
-    dept_create(input:NewDept!):String! @perm(entity: "dept",perm: "C")
-    dept_update(id: String!,input:UpdDept!):Boolean! @perm(entity: "dept",perm: "U")
-    dept_removes(ids: [String!]):Boolean! @perm(entity: "dept",perm: "D")
+    dept_create(input:NewDept!):String! @perm(entity: "dept",perm: "C",remark:"组织部门新增")
+    dept_update(id: String!,input:UpdDept!):Boolean! @perm(entity: "dept",perm: "U",remark:"组织部门修改")
+    dept_removes(ids: [String!]):Boolean! @perm(entity: "dept",perm: "D",remark:"组织部门删除")
 }
 
 input QDept{
