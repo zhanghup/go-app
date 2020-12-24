@@ -134,13 +134,9 @@ input NewDictItem{
 input UpdDictItem{
     "名称"
     name: String
-    "值"
-    value: String
     "扩展"
     ext: String
 
-    "排序"
-    weight: Int
     "状态{dict:STA001}"
     status: String = "1"
 }

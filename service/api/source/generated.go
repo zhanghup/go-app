@@ -3392,13 +3392,9 @@ input NewDictItem{
 input UpdDictItem{
     "名称"
     name: String
-    "值"
-    value: String
     "扩展"
     ext: String
 
-    "排序"
-    weight: Int
     "状态{dict:STA001}"
     status: String = "1"
 }`, BuiltIn: false},
@@ -4018,6 +4014,18 @@ extend type Mutation {
 
 input QUser{
     keyword: String
+    "部门ID"
+    dept: String
+    "用户类型{dict:BUS002}"
+    type: String
+    "用户名称模糊查询"
+    name: String
+    "工号模糊查询"
+    sn: String
+    "性别{dict:STA002}"
+    sex: String
+    "是否为管理员{dict:STA005}"
+    admin: String
     "状态{dict:STA001}"
     status: String
 
@@ -18517,6 +18525,54 @@ func (ec *executionContext) unmarshalInputQUser(ctx context.Context, obj interfa
 			if err != nil {
 				return it, err
 			}
+		case "dept":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dept"))
+			it.Dept, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sn"))
+			it.Sn, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sex":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sex"))
+			it.Sex, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "admin":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("admin"))
+			it.Admin, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "status":
 			var err error
 
@@ -18784,27 +18840,11 @@ func (ec *executionContext) unmarshalInputUpdDictItem(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
-		case "value":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
-			it.Value, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "ext":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ext"))
 			it.Ext, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "weight":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weight"))
-			it.Weight, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}

@@ -48,11 +48,13 @@ func (r *queryResolver) Depts(ctx context.Context, query source.QDept) (*source.
 			{{ if .pid }} and d.pid = :pid {{ end }} 
 			{{ if .status }} and d.status = :status {{ end }}
 			{{ if .code }} and d.code like concat('%',:code,'%') {{ end }}
+			{{ if .name }} and d.name like concat('%',:name,'%') {{ end }}
 		`,
 		map[string]interface{}{
 			"pid":    query.Pid,
 			"status": query.Status,
 			"code": query.Code,
+			"name": query.Name,
 		}).Order("d.weight").Page2(query.Index, query.Size, query.Count, &depts)
 	return &source.Depts{Total: &i, Data: depts}, err
 }

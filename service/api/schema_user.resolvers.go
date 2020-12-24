@@ -206,11 +206,22 @@ func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.
 			) 
 		{{ end }}
 		{{ if .status }} and u.status = :status {{ end }}
+		{{ if .dept }} and u.dept = :dept {{ end }}
+		{{ if .type }} and u.type = :type {{ end }}
+		{{ if .sn }} and u.sn = :sn {{ end }}
+		{{ if .sex }} and u.sex = :sex {{ end }}
+		{{ if .admin }} and u.admin = :admin {{ end }}
+		{{ if .name }} and u.name like concat('%',:name,'%') {{ end }}
 		
 	`, map[string]interface{}{
 		"keyword": query.Keyword,
-		"ctx":     ctx,
 		"status":  query.Status,
+		"dept":    query.Dept,
+		"type":    query.Type,
+		"sn":      query.Sn,
+		"sex":     query.Sex,
+		"admin":   query.Admin,
+		"name":    query.Name,
 	}).Page2(query.Index, query.Size, query.Count, &users)
 	return &source.Users{Data: users, Total: &total}, err
 }

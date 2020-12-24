@@ -16,6 +16,18 @@ extend type Mutation {
 
 input QUser{
     keyword: String
+    "部门ID"
+    dept: String
+    "用户类型{dict:BUS002}"
+    type: String
+    "用户名称模糊查询"
+    name: String
+    "工号模糊查询"
+    sn: String
+    "性别{dict:STA002}"
+    sex: String
+    "是否为管理员{dict:STA005}"
+    admin: String
     "状态{dict:STA001}"
     status: String
 

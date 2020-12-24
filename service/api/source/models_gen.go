@@ -353,6 +353,18 @@ type QRole struct {
 
 type QUser struct {
 	Keyword *string `json:"keyword" xorm:"keyword"`
+	// 部门ID
+	Dept *string `json:"dept" xorm:"dept"`
+	// 用户类型{dict:BUS002}
+	Type *string `json:"type" xorm:"type"`
+	// 用户名称模糊查询
+	Name *string `json:"name" xorm:"name"`
+	// 工号模糊查询
+	Sn *string `json:"sn" xorm:"sn"`
+	// 性别{dict:STA002}
+	Sex *string `json:"sex" xorm:"sex"`
+	// 是否为管理员{dict:STA005}
+	Admin *string `json:"admin" xorm:"admin"`
 	// 状态{dict:STA001}
 	Status *string `json:"status" xorm:"status"`
 	Index  *int    `json:"index" xorm:"index"`
@@ -417,12 +429,8 @@ type UpdDict struct {
 type UpdDictItem struct {
 	// 名称
 	Name *string `json:"name" xorm:"name"`
-	// 值
-	Value *string `json:"value" xorm:"value"`
 	// 扩展
 	Ext *string `json:"ext" xorm:"ext"`
-	// 排序
-	Weight *int `json:"weight" xorm:"weight"`
 	// 状态{dict:STA001}
 	Status *string `json:"status" xorm:"status"`
 }
