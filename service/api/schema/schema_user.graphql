@@ -1,8 +1,8 @@
 extend type Query{
     "用户列表（分页）"
-    users(query:QUser!):Users  @perm(entity: "user",perm: "R",remark:"用户查询")
+    users(query:QUser!):Users
     "用户获取单个"
-    user(id: String!):User  @perm(entity: "user",perm: "R",remark:"用户查询")
+    user(id: String!):User
 }
 
 extend type Mutation {

@@ -1,8 +1,8 @@
 extend type Query{
     "字典列表（分页）"
-    dicts(query:QDict):[Dict!] @perm(entity: "dict",perm: "R",remark:"字典查询")
+    dicts(query:QDict):[Dict!]
     "字典单个对象"
-    dict(id: String!):Dict @perm(entity: "dict",perm: "R",remark:"字典查询")
+    dict(id: String!):Dict
 }
 
 extend type Mutation {

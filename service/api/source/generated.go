@@ -2957,8 +2957,8 @@ type Subscription {
 }
 `, BuiltIn: false},
 	{Name: "schema/schema_account.graphql", Input: `extend type Query{
-    accounts(query:QAccount!):Accounts @perm(entity: "account",perm: "R",remark: "账户查询")
-    account(id: String!):Account @perm(entity: "account",perm: "R",remark: "账户查询")
+    accounts(query:QAccount!):Accounts
+    account(id: String!):Account
 }
 
 extend type Mutation {
@@ -3050,11 +3050,11 @@ input UpdAccount {
 `, BuiltIn: false},
 	{Name: "schema/schema_cron.graphql", Input: `extend type Query{
     "任务列表（分页）"
-    crons(query:QCron!):Crons  @perm(entity: "cron",perm: "R",remark: "定时任务查询")
+    crons(query:QCron!):Crons
     "任务单个"
-    cron(id: String!):Cron  @perm(entity: "cron",perm: "R",remark: "定时任务查询")
+    cron(id: String!):Cron
     "历史执行记录"
-    cron_logs(query:QCronLog!):CronLogs  @perm(entity: "cron",perm: "RLog",remark: "定时任务历史查询")
+    cron_logs(query:QCronLog!):CronLogs
 }
 
 extend type Mutation {
@@ -3148,9 +3148,9 @@ type CronLog @goModel(model:"github.com/zhanghup/go-app/beans.CronLog")  {
 
 }`, BuiltIn: false},
 	{Name: "schema/schema_dept.graphql", Input: `extend type Query{
-    depts(query:QDept!):Depts  @perm(entity: "dept",perm: "R",remark:"组织部门查询")
-    dept(id: String!):Dept @perm(entity: "dept",perm: "R",remark:"组织部门查询")
-    dept_tree: Any @perm(entity: "dept",perm: "R",remark:"组织部门查询")
+    depts(query:QDept!):Depts
+    dept(id: String!):Dept
+    dept_tree: Any
 }
 
 extend type Mutation {
@@ -3258,9 +3258,9 @@ input UpdDept {
 `, BuiltIn: false},
 	{Name: "schema/schema_dict.graphql", Input: `extend type Query{
     "字典列表（分页）"
-    dicts(query:QDict):[Dict!] @perm(entity: "dict",perm: "R",remark:"字典查询")
+    dicts(query:QDict):[Dict!]
     "字典单个对象"
-    dict(id: String!):Dict @perm(entity: "dict",perm: "R",remark:"字典查询")
+    dict(id: String!):Dict
 }
 
 extend type Mutation {
@@ -3458,8 +3458,8 @@ type MyInfo @goModel(model:"github.com/zhanghup/go-app/beans.User"){
     o_dept:Dept
 }`, BuiltIn: false},
 	{Name: "schema/schema_menu.graphql", Input: `extend type Query{
-    menus(query:QMenu!):[Menu!] @perm(entity: "menu",perm: "R",remark:"菜单查询")
-    menu(id: String!):Menu @perm(entity: "menu",perm: "R",remark:"菜单查询")
+    menus(query:QMenu!):[Menu!]
+    menu(id: String!):Menu
 }
 
 extend type Mutation {
@@ -3900,15 +3900,15 @@ input UpdPlanStep {
 `, BuiltIn: false},
 	{Name: "schema/schema_role.graphql", Input: `extend type Query {
     "角色列表（分页）"
-    roles(query: QRole!): Roles  @perm(entity: "role",perm: "R",remark:"角色查询")
+    roles(query: QRole!): Roles
     "角色获取单个"
-    role(id: String!): Role  @perm(entity: "role",perm: "R",remark:"角色查询")
+    role(id: String!): Role
     "角色用户列表"
-    role_users(id: String!): [String!]  @perm(entity: "role",perm: "R",remark:"角色用户查询")
+    role_users(id: String!): [String!]
     "权限列表"
-    role_perms(id: String!,type: String): [String!] @perm(entity: "role",perm: "R",remark:"角色权限查询")
+    role_perms(id: String!,type: String): [String!]
     "对象权限列表"
-    role_perm_objects(id: String!): [PermObj!] @perm(entity: "role",perm: "R",remark:"角色对象查询")
+    role_perm_objects(id: String!): [PermObj!]
 }
 
 extend type Mutation {
@@ -4002,9 +4002,9 @@ input UpdRole {
 	{Name: "schema/schema_subscribe.graphql", Input: ``, BuiltIn: false},
 	{Name: "schema/schema_user.graphql", Input: `extend type Query{
     "用户列表（分页）"
-    users(query:QUser!):Users  @perm(entity: "user",perm: "R",remark:"用户查询")
+    users(query:QUser!):Users
     "用户获取单个"
-    user(id: String!):User  @perm(entity: "user",perm: "R",remark:"用户查询")
+    user(id: String!):User
 }
 
 extend type Mutation {
@@ -13809,40 +13809,8 @@ func (ec *executionContext) _Query_accounts(ctx context.Context, field graphql.C
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Accounts(rctx, args["query"].(QAccount))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "account")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "账户查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*Accounts); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/source.Accounts`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Accounts(rctx, args["query"].(QAccount))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13880,40 +13848,8 @@ func (ec *executionContext) _Query_account(ctx context.Context, field graphql.Co
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Account(rctx, args["id"].(string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "account")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "账户查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*beans.Account); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Account`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Account(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13951,40 +13887,8 @@ func (ec *executionContext) _Query_crons(ctx context.Context, field graphql.Coll
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Crons(rctx, args["query"].(QCron))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "cron")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "定时任务查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*Crons); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/source.Crons`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Crons(rctx, args["query"].(QCron))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14022,40 +13926,8 @@ func (ec *executionContext) _Query_cron(ctx context.Context, field graphql.Colle
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Cron(rctx, args["id"].(string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "cron")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "定时任务查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*beans.Cron); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Cron`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Cron(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14093,40 +13965,8 @@ func (ec *executionContext) _Query_cron_logs(ctx context.Context, field graphql.
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().CronLogs(rctx, args["query"].(QCronLog))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "cron")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "RLog")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "定时任务历史查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*CronLogs); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/source.CronLogs`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CronLogs(rctx, args["query"].(QCronLog))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14164,40 +14004,8 @@ func (ec *executionContext) _Query_depts(ctx context.Context, field graphql.Coll
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Depts(rctx, args["query"].(QDept))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dept")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "组织部门查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*Depts); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/source.Depts`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Depts(rctx, args["query"].(QDept))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14235,40 +14043,8 @@ func (ec *executionContext) _Query_dept(ctx context.Context, field graphql.Colle
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Dept(rctx, args["id"].(string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dept")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "组织部门查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*beans.Dept); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Dept`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Dept(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14299,40 +14075,8 @@ func (ec *executionContext) _Query_dept_tree(ctx context.Context, field graphql.
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().DeptTree(rctx)
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dept")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "组织部门查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(interface{}); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be interface{}`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().DeptTree(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14370,40 +14114,8 @@ func (ec *executionContext) _Query_dicts(ctx context.Context, field graphql.Coll
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Dicts(rctx, args["query"].(*QDict))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "字典查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]beans.Dict); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []github.com/zhanghup/go-app/beans.Dict`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Dicts(rctx, args["query"].(*QDict))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14441,40 +14153,8 @@ func (ec *executionContext) _Query_dict(ctx context.Context, field graphql.Colle
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Dict(rctx, args["id"].(string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "dict")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "字典查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*beans.Dict); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Dict`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Dict(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14583,40 +14263,8 @@ func (ec *executionContext) _Query_menus(ctx context.Context, field graphql.Coll
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Menus(rctx, args["query"].(QMenu))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "menu")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "菜单查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]beans.Menu); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []github.com/zhanghup/go-app/beans.Menu`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Menus(rctx, args["query"].(QMenu))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14654,40 +14302,8 @@ func (ec *executionContext) _Query_menu(ctx context.Context, field graphql.Colle
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Menu(rctx, args["id"].(string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "menu")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "菜单查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*beans.Menu); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Menu`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Menu(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15037,40 +14653,8 @@ func (ec *executionContext) _Query_roles(ctx context.Context, field graphql.Coll
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Roles(rctx, args["query"].(QRole))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "role")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*Roles); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/source.Roles`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Roles(rctx, args["query"].(QRole))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15108,40 +14692,8 @@ func (ec *executionContext) _Query_role(ctx context.Context, field graphql.Colle
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Role(rctx, args["id"].(string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "role")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*beans.Role); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.Role`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Role(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15179,40 +14731,8 @@ func (ec *executionContext) _Query_role_users(ctx context.Context, field graphql
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().RoleUsers(rctx, args["id"].(string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "role")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色用户查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]string); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().RoleUsers(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15250,40 +14770,8 @@ func (ec *executionContext) _Query_role_perms(ctx context.Context, field graphql
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().RolePerms(rctx, args["id"].(string), args["type"].(*string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "role")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色权限查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]string); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().RolePerms(rctx, args["id"].(string), args["type"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15321,40 +14809,8 @@ func (ec *executionContext) _Query_role_perm_objects(ctx context.Context, field 
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().RolePermObjects(rctx, args["id"].(string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "role")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色对象查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]PermObj); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []github.com/zhanghup/go-app/service/api/source.PermObj`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().RolePermObjects(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15392,40 +14848,8 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Users(rctx, args["query"].(QUser))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "user")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "用户查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*Users); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/service/api/source.Users`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Users(rctx, args["query"].(QUser))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15463,40 +14887,8 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().User(rctx, args["id"].(string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "user")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "R")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "用户查询")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*beans.User); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/zhanghup/go-app/beans.User`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().User(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

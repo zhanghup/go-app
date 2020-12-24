@@ -5,7 +5,6 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-tools"
-	"strings"
 	"xorm.io/xorm"
 )
 
@@ -47,8 +46,8 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 				}
 			} else {
 				// 非管理员
-				data, ok := user.Info.PermObjects[entity]
-				if ok && strings.Contains(data, perm) {
+				//data, ok := user.Info.PermObjects[entity]
+				//if ok && strings.Contains(data, perm) {
 					res, err = next(ctx)
 					if err != nil {
 						lg.State = tools.Ptr.String("error") // 失败
@@ -56,9 +55,9 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 					} else {
 						lg.State = tools.Ptr.String("success") // 成功
 					}
-				} else {
-					lg.State = tools.Ptr.String("refuse") // 拒绝
-				}
+				//} else {
+				//	lg.State = tools.Ptr.String("refuse") // 拒绝
+				//}
 			}
 		}
 

@@ -1,6 +1,6 @@
 extend type Query{
-    menus(query:QMenu!):[Menu!] @perm(entity: "menu",perm: "R",remark:"菜单查询")
-    menu(id: String!):Menu @perm(entity: "menu",perm: "R",remark:"菜单查询")
+    menus(query:QMenu!):[Menu!]
+    menu(id: String!):Menu
 }
 
 extend type Mutation {

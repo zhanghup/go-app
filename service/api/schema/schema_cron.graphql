@@ -1,10 +1,10 @@
 extend type Query{
     "任务列表（分页）"
-    crons(query:QCron!):Crons  @perm(entity: "cron",perm: "R",remark: "定时任务查询")
+    crons(query:QCron!):Crons
     "任务单个"
-    cron(id: String!):Cron  @perm(entity: "cron",perm: "R",remark: "定时任务查询")
+    cron(id: String!):Cron
     "历史执行记录"
-    cron_logs(query:QCronLog!):CronLogs  @perm(entity: "cron",perm: "RLog",remark: "定时任务历史查询")
+    cron_logs(query:QCronLog!):CronLogs
 }
 
 extend type Mutation {

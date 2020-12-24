@@ -1,6 +1,6 @@
 extend type Query{
-    accounts(query:QAccount!):Accounts @perm(entity: "account",perm: "R",remark: "账户查询")
-    account(id: String!):Account @perm(entity: "account",perm: "R",remark: "账户查询")
+    accounts(query:QAccount!):Accounts
+    account(id: String!):Account
 }
 
 extend type Mutation {

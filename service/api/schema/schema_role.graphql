@@ -1,14 +1,14 @@
 extend type Query {
     "角色列表（分页）"
-    roles(query: QRole!): Roles  @perm(entity: "role",perm: "R",remark:"角色查询")
+    roles(query: QRole!): Roles
     "角色获取单个"
-    role(id: String!): Role  @perm(entity: "role",perm: "R",remark:"角色查询")
+    role(id: String!): Role
     "角色用户列表"
-    role_users(id: String!): [String!]  @perm(entity: "role",perm: "R",remark:"角色用户查询")
+    role_users(id: String!): [String!]
     "权限列表"
-    role_perms(id: String!,type: String): [String!] @perm(entity: "role",perm: "R",remark:"角色权限查询")
+    role_perms(id: String!,type: String): [String!]
     "对象权限列表"
-    role_perm_objects(id: String!): [PermObj!] @perm(entity: "role",perm: "R",remark:"角色对象查询")
+    role_perm_objects(id: String!): [PermObj!]
 }
 
 extend type Mutation {
