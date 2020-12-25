@@ -48,13 +48,13 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 				// 非管理员
 				//data, ok := user.Info.PermObjects[entity]
 				//if ok && strings.Contains(data, perm) {
-					res, err = next(ctx)
-					if err != nil {
-						lg.State = tools.Ptr.String("error") // 失败
-						lg.Msg = tools.Ptr.String(err.Error())
-					} else {
-						lg.State = tools.Ptr.String("success") // 成功
-					}
+				res, err = next(ctx)
+				if err != nil {
+					lg.State = tools.Ptr.String("error") // 失败
+					lg.Msg = tools.Ptr.String(err.Error())
+				} else {
+					lg.State = tools.Ptr.String("success") // 成功
+				}
 				//} else {
 				//	lg.State = tools.Ptr.String("refuse") // 拒绝
 				//}
@@ -62,12 +62,10 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 		}
 
 		// 不记录查询操作
-		if perm != "R"{
-			input := graphql.GetOperationContext(ctx)
-			lg.Gql = &input.RawQuery
-			lg.GqlVariables = tools.Ptr.String(tools.Str.JSONString(input.Variables))
-			go db.Insert(lg)
-		}
+		input := graphql.GetOperationContext(ctx)
+		lg.Gql = &input.RawQuery
+		lg.GqlVariables = tools.Ptr.String(tools.Str.JSONString(input.Variables))
+		go db.Insert(lg)
 
 		return
 	}
