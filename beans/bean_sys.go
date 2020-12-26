@@ -102,8 +102,6 @@ type Menu struct {
 	Bean   `xorm:"extends"`
 	Name   *string `json:"name"`
 	Title  *string `json:"title"`
-	Path   *string `json:"path"`
-	Alias  *string `json:"alias"`
 	Icon   *string `json:"icon"`
 	Parent *string `json:"parent"`
 }

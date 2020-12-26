@@ -20,10 +20,6 @@ type Menu @goModel(model:"github.com/zhanghup/go-app/beans.Menu") {
     name: String
     "菜单标题"
     title: String
-    "菜单路径"
-    path: String
-    "菜单昵称"
-    alias: String
     "菜单图标"
     icon: String
     "上级菜单"
@@ -58,10 +54,6 @@ input MenuLocal {
     name: String
     "菜单标题"
     title: String
-    "菜单路径"
-    path: String
-    "菜单昵称"
-    alias: String
     "菜单图标"
     icon: String
     "子菜单"
