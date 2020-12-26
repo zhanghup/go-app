@@ -19,7 +19,7 @@ type IMessage interface {
 
 type message struct {
 	db  *xorm.Engine
-	dbs *txorm.Engine
+	dbs txorm.IEngine
 }
 
 /*

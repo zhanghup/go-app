@@ -97,7 +97,7 @@ func (r *queryResolver) Dicts(ctx context.Context, query *source.QDict) ([]beans
 		query = &source.QDict{}
 	}
 	dicts := make([]beans.Dict, 0)
-	err := r.DBS().SF(`
+	err := r.DBS(ctx).SF(`
 		select 
 			u.* 
 		from 

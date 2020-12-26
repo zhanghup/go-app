@@ -29,7 +29,7 @@ func (r *mutationResolver) PlanRemoves(ctx context.Context, ids []string) (bool,
 
 func (r *queryResolver) Plans(ctx context.Context, query source.QPlan) (*source.Plans, error) {
 	plans := make([]beans.Plan, 0)
-	i, err := r.DBS().SF(`
+	i, err := r.DBS(ctx).SF(`
 		select 
 			* 
 		from 

@@ -14,7 +14,7 @@ import (
 
 type Resolver struct {
 	DB     *xorm.Engine
-	DBS    *txorm.Engine
+	DBS    txorm.IEngine
 	Gin    func(g context.Context) *gin.Context
 	Me     func(ctx context.Context) directive.Me
 	Loader func(ctx context.Context) tgql.Loader

@@ -27,7 +27,7 @@ var job *Jobs
 type Jobs struct {
 	job  *cron.Cron
 	db   *xorm.Engine
-	dbs  *txorm.Engine
+	dbs  txorm.IEngine
 	data tools.ICache // 存定时任务
 }
 

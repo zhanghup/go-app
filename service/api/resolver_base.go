@@ -33,12 +33,12 @@ func (this *ResolverTools) Create(ctx context.Context, tab interface{}, obj inte
 			return true
 		})
 
-		_, err := sess.Session().Insert(tab)
+		_, err := sess.S().Insert(tab)
 		if err != nil {
 			return err
 		}
 		if obj != nil {
-			_, err = sess.Session().Table(tab).Where("id = ?", id).Update(obj)
+			_, err = sess.S().Table(tab).Where("id = ?", id).Update(obj)
 		}
 		return err
 	})
@@ -48,11 +48,11 @@ func (this *ResolverTools) Create(ctx context.Context, tab interface{}, obj inte
 
 func (this *ResolverTools) Update(ctx context.Context, tab interface{}, id string, obj interface{}) (bool, error) {
 	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
-		_, err := sess.Session().Table(tab).Where("id = ?", id).Update(tab)
+		_, err := sess.S().Table(tab).Where("id = ?", id).Update(tab)
 		if err != nil {
 			return err
 		}
-		_, err = sess.Session().Table(tab).Where("id = ?", id).AllCols().Update(obj)
+		_, err = sess.S().Table(tab).Where("id = ?", id).AllCols().Update(obj)
 		return err
 	})
 
@@ -61,7 +61,7 @@ func (this *ResolverTools) Update(ctx context.Context, tab interface{}, id strin
 
 func (this *ResolverTools) Removes(ctx context.Context, table interface{}, ids []string) (bool, error) {
 	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
-		_, err := sess.Session().Table(table).In("id", ids).Delete(table)
+		_, err := sess.S().Table(table).In("id", ids).Delete(table)
 		return err
 	})
 	return err == nil, err

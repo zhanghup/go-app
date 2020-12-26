@@ -83,7 +83,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 
 func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bool, error) {
 	uids := make([]string, 0)
-	err := r.DBS().DB.In("id", ids).Cols("uid").Find(&uids)
+	err := r.DBS(ctx).E().In("id", ids).Cols("uid").Find(&uids)
 	if err != nil {
 		return false, err
 	}
@@ -96,7 +96,7 @@ func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bo
 
 func (r *queryResolver) Accounts(ctx context.Context, query source.QAccount) (*source.Accounts, error) {
 	account := make([]beans.Account, 0)
-	total, err := r.DBS().SF(`
+	total, err := r.DBS(ctx).SF(`
 		select * from account 
 		where 1 = 1
 		{{ if .uid }} and account.uid = :uid {{ end }}

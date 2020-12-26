@@ -39,7 +39,7 @@ func (r *mutationResolver) DeptRemoves(ctx context.Context, ids []string) (bool,
 func (r *queryResolver) Depts(ctx context.Context, query source.QDept) (*source.Depts, error) {
 	depts := make([]beans.Dept, 0)
 
-	i, err := r.DBS().SF(`
+	i, err := r.DBS(ctx).SF(`
 		select 
 			* 
 		from 
@@ -65,7 +65,7 @@ func (r *queryResolver) Dept(ctx context.Context, id string) (*beans.Dept, error
 
 func (r *queryResolver) DeptTree(ctx context.Context) (interface{}, error) {
 	depts := make([]beans.Dept, 0)
-	err := r.DBS().DB.Find(&depts)
+	err := r.DBS(ctx).E().Find(&depts)
 	if err != nil {
 		return nil, err
 	}

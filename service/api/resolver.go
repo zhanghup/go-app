@@ -37,7 +37,7 @@ type Resolver struct {
 }
 
 type ResolverTools struct {
-	DBS       func() *txorm.Engine
+	DBS       func(ctx context.Context) txorm.ISession
 	Sess      func(ctx context.Context) txorm.ISession
 	Loader    func(ctx context.Context) tgql.Loader
 	Me        func(ctx context.Context) directive.Me
@@ -47,11 +47,11 @@ type ResolverTools struct {
 func NewResolverTools(db *xorm.Engine) *ResolverTools {
 	dbs := txorm.NewEngine(db)
 	return &ResolverTools{
-		DBS: func() *txorm.Engine {
-			return dbs
+		DBS: func(ctx context.Context) txorm.ISession {
+			return dbs.NewSession(true, ctx)
 		},
 		Sess: func(ctx context.Context) txorm.ISession {
-			sess := dbs.NewSession(ctx)
+			sess := dbs.Session(ctx)
 			err := sess.Begin()
 			if err != nil {
 				tog.Error("【开启事务异常！！！】")

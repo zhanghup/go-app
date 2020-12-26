@@ -24,7 +24,7 @@ func (r *mutationResolver) PlanStepRemoves(ctx context.Context, ids []string) (b
 
 func (r *queryResolver) PlanSteps(ctx context.Context, query source.QPlanStep) (*source.PlanSteps, error) {
 	plans := make([]beans.PlanStep, 0)
-	i, err := r.DBS().SF(`
+	i, err := r.DBS(ctx).SF(`
 		select 
 			* 
 		from 

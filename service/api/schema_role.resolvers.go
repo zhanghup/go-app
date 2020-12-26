@@ -168,7 +168,7 @@ func (r *mutationResolver) RoleWithUser(ctx context.Context, role string, uids [
 
 func (r *queryResolver) Roles(ctx context.Context, query source.QRole) (*source.Roles, error) {
 	roles := make([]beans.Role, 0)
-	total, err := r.DBS().SF(`
+	total, err := r.DBS(ctx).SF(`
 		select * from role u
 		where 1 = 1
 		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
@@ -186,13 +186,13 @@ func (r *queryResolver) Role(ctx context.Context, id string) (*beans.Role, error
 
 func (r *queryResolver) RoleUsers(ctx context.Context, id string) ([]string, error) {
 	res := make([]string, 0)
-	err := r.DBS().SF(`select uid from role_user where role = :id`, map[string]interface{}{"id": id}).Find(&res)
+	err := r.DBS(ctx).SF(`select uid from role_user where role = :id`, map[string]interface{}{"id": id}).Find(&res)
 	return res, err
 }
 
 func (r *queryResolver) RolePerms(ctx context.Context, id string, typeArg *string) ([]string, error) {
 	result := make([]string, 0)
-	err := r.DBS().SF(`
+	err := r.DBS(ctx).SF(`
 		select oid from perm where role = :role 
 		{{ if .type }} and type = :type {{ end }}
 	`, map[string]interface{}{
@@ -204,7 +204,7 @@ func (r *queryResolver) RolePerms(ctx context.Context, id string, typeArg *strin
 
 func (r *queryResolver) RolePermObjects(ctx context.Context, id string) ([]source.PermObj, error) {
 	result := make([]source.PermObj, 0)
-	err := r.DBS().SF(`
+	err := r.DBS(ctx).SF(`
 		select object,mask from perm_object where role = :role 
 	`, map[string]interface{}{
 		"role": id,

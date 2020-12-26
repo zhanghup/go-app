@@ -74,7 +74,7 @@ func gqlschemaFmt(db *xorm.Engine, schema graphql.ExecutableSchema) func(c *gin.
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
 		// 统一建立session
-		ctx = context.WithValue(ctx, txorm.CONTEXT_SESSION, txorm.NewEngine(db).NewSession(ctx))
+		ctx = context.WithValue(ctx, txorm.CONTEXT_SESSION, txorm.NewEngine(db).Session(ctx))
 		// 统一关联gin对象
 		ctx = context.WithValue(ctx, directive.GIN_CONTEXT, c)
 

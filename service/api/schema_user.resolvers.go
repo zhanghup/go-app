@@ -153,7 +153,7 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 
 	users := make([]beans.User, 0)
 	{ // 查找当前需要删除的用户
-		err := r.DBS().DB.In("id", ids).Find(&users)
+		err := r.DBS(ctx).E().In("id", ids).Find(&users)
 		if err != nil {
 			return false, err
 		}
@@ -191,7 +191,7 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 
 func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.Users, error) {
 	users := make([]beans.User, 0)
-	total, err := r.DBS().SF(`
+	total, err := r.DBS(ctx).SF(`
 		select 
 			u.* 
 		from 
