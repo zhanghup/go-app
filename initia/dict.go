@@ -73,6 +73,12 @@ func InitDict(db *xorm.Engine) {
 			{"4", "角色管理", "role", "", 1},
 			{"5", "定时任务", "cron", "", 1},
 		})
+
+		// 菜单类型 SYS010
+		InitDictCode(db, "SYS", "010", "菜单类型", 1, []DictInfoItem{
+			{"1", "目录菜单", "0", "", 1},
+			{"2", "路由菜单", "1", "", 1},
+		})
 	}
 
 	// STA

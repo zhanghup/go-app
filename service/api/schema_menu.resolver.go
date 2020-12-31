@@ -23,12 +23,11 @@ func (r *mutationResolver) MenuReload(ctx context.Context, menus []source.MenuLo
 				Id:     m.ID,
 				Status: tools.Ptr.String("1"),
 			},
-			Name:  m.Name,
-			Title: m.Title,
-			Path:  m.Path,
-			Alias: m.Alias,
-			Icon:  m.Icon,
+			Name:   m.Name,
+			Title:  m.Title,
+			Icon:   m.Icon,
 			Parent: pid,
+			Type:   m.Type,
 		})
 		return err
 	}

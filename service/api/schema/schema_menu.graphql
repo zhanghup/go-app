@@ -4,6 +4,7 @@ extend type Query{
 }
 
 extend type Mutation {
+    menu_create(input:NewMenu!):String!
     menu_update(id: String!,input:UpdMenu!):Boolean! @perm(entity: "menu",perm: "U",remark:"菜单修改")
     menu_reload(menus:[MenuLocal!]!):Boolean! @root
 }
@@ -16,6 +17,8 @@ input QMenu{
 type Menu @goModel(model:"github.com/zhanghup/go-app/beans.Menu") {
     id: String
 
+    "菜单类型{dict:SYS010}"
+    type: String
     "菜单名称"
     name: String
     "菜单标题"
@@ -29,6 +32,19 @@ type Menu @goModel(model:"github.com/zhanghup/go-app/beans.Menu") {
     created: Int
     "更新时间"
     updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+
+input NewMenu{
+    "菜单标题"
+    title: String
+    "菜单图标"
+    icon: String
+    "上级菜单"
+    parent: String
     "排序"
     weight: Int
     "状态{dict:STA001}"
@@ -50,6 +66,8 @@ input UpdMenu {
 
 input MenuLocal {
     id: String
+    "菜单类型"
+    type: String
     "菜单名称"
     name: String
     "菜单标题"

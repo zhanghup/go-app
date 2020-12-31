@@ -35,14 +35,12 @@ type IPermObj struct {
 
 type MenuLocal struct {
 	ID *string `json:"id" xorm:"id"`
+	// 菜单类型
+	Type *string `json:"type" xorm:"type"`
 	// 菜单名称
 	Name *string `json:"name" xorm:"name"`
 	// 菜单标题
 	Title *string `json:"title" xorm:"title"`
-	// 菜单路径
-	Path *string `json:"path" xorm:"path"`
-	// 菜单昵称
-	Alias *string `json:"alias" xorm:"alias"`
 	// 菜单图标
 	Icon *string `json:"icon" xorm:"icon"`
 	// 子菜单

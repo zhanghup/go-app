@@ -155,15 +155,14 @@ type ComplexityRoot struct {
 	}
 
 	Menu struct {
-		Alias   func(childComplexity int) int
 		Created func(childComplexity int) int
 		Icon    func(childComplexity int) int
 		Id      func(childComplexity int) int
 		Name    func(childComplexity int) int
 		Parent  func(childComplexity int) int
-		Path    func(childComplexity int) int
 		Status  func(childComplexity int) int
 		Title   func(childComplexity int) int
+		Type    func(childComplexity int) int
 		Updated func(childComplexity int) int
 		Weight  func(childComplexity int) int
 	}
@@ -1040,13 +1039,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DictItem.Weight(childComplexity), true
 
-	case "Menu.alias":
-		if e.complexity.Menu.Alias == nil {
-			break
-		}
-
-		return e.complexity.Menu.Alias(childComplexity), true
-
 	case "Menu.created":
 		if e.complexity.Menu.Created == nil {
 			break
@@ -1082,13 +1074,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Menu.Parent(childComplexity), true
 
-	case "Menu.path":
-		if e.complexity.Menu.Path == nil {
-			break
-		}
-
-		return e.complexity.Menu.Path(childComplexity), true
-
 	case "Menu.status":
 		if e.complexity.Menu.Status == nil {
 			break
@@ -1102,6 +1087,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Menu.Title(childComplexity), true
+
+	case "Menu.type":
+		if e.complexity.Menu.Type == nil {
+			break
+		}
+
+		return e.complexity.Menu.Type(childComplexity), true
 
 	case "Menu.updated":
 		if e.complexity.Menu.Updated == nil {
@@ -3471,14 +3463,12 @@ input QMenu{
 type Menu @goModel(model:"github.com/zhanghup/go-app/beans.Menu") {
     id: String
 
+    "菜单类型{dict:SYS010}"
+    type: String
     "菜单名称"
     name: String
     "菜单标题"
     title: String
-    "菜单路径"
-    path: String
-    "菜单昵称"
-    alias: String
     "菜单图标"
     icon: String
     "上级菜单"
@@ -3509,14 +3499,12 @@ input UpdMenu {
 
 input MenuLocal {
     id: String
+    "菜单类型"
+    type: String
     "菜单名称"
     name: String
     "菜单标题"
     title: String
-    "菜单路径"
-    path: String
-    "菜单昵称"
-    alias: String
     "菜单图标"
     icon: String
     "子菜单"
@@ -7733,6 +7721,38 @@ func (ec *executionContext) _Menu_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Menu_type(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Menu",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Menu_name(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -7784,70 +7804,6 @@ func (ec *executionContext) _Menu_title(ctx context.Context, field graphql.Colle
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Title, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Menu_path(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Menu",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Path, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Menu_alias(ctx context.Context, field graphql.CollectedField, obj *beans.Menu) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Menu",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Alias, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17154,6 +17110,14 @@ func (ec *executionContext) unmarshalInputMenuLocal(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			it.Type, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "name":
 			var err error
 
@@ -17167,22 +17131,6 @@ func (ec *executionContext) unmarshalInputMenuLocal(ctx context.Context, obj int
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
 			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "path":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
-			it.Path, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "alias":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alias"))
-			it.Alias, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19712,14 +19660,12 @@ func (ec *executionContext) _Menu(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = graphql.MarshalString("Menu")
 		case "id":
 			out.Values[i] = ec._Menu_id(ctx, field, obj)
+		case "type":
+			out.Values[i] = ec._Menu_type(ctx, field, obj)
 		case "name":
 			out.Values[i] = ec._Menu_name(ctx, field, obj)
 		case "title":
 			out.Values[i] = ec._Menu_title(ctx, field, obj)
-		case "path":
-			out.Values[i] = ec._Menu_path(ctx, field, obj)
-		case "alias":
-			out.Values[i] = ec._Menu_alias(ctx, field, obj)
 		case "icon":
 			out.Values[i] = ec._Menu_icon(ctx, field, obj)
 		case "parent":

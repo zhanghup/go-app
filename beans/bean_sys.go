@@ -33,12 +33,12 @@ type User struct {
 // 账户
 type Account struct {
 	Bean     `xorm:"extends"`
-	Uid      *string `json:"uid" xorm:"index"`           // 用户ID
-	Type     *string `json:"type"`          // 字典
-	Username *string `json:"username"`      // 用户名
-	Password *string `json:"password"`      // 密码
-	Salt     *string `json:"-" xorm:"salt"` // 加盐
-	Default  *int    `json:"default"`       // 是否为默认账户
+	Uid      *string `json:"uid" xorm:"index"` // 用户ID
+	Type     *string `json:"type"`             // 字典
+	Username *string `json:"username"`         // 用户名
+	Password *string `json:"password"`         // 密码
+	Salt     *string `json:"-" xorm:"salt"`    // 加盐
+	Default  *int    `json:"default"`          // 是否为默认账户
 }
 
 // 授权
@@ -53,11 +53,11 @@ type Token struct {
 
 // 数据字典
 type Dict struct {
-	Bean   `xorm:"extends"`
-	Code   *string `json:"code" xorm:"unique"` // 字典编码
-	Name   *string `json:"name"`               // 字典名称
-	Type   *string `json:"type"`               // 字典类型
-	Remark *string `json:"remark"`             // 备注
+	Bean     `xorm:"extends"`
+	Code     *string `json:"code" xorm:"unique"` // 字典编码
+	Name     *string `json:"name"`               // 字典名称
+	Type     *string `json:"type"`               // 字典类型
+	Remark   *string `json:"remark"`             // 备注
 	Disabled *int    `json:"disabled"`
 }
 type DictItem struct {
@@ -100,6 +100,7 @@ type PermObject struct {
 // 菜单
 type Menu struct {
 	Bean   `xorm:"extends"`
+	Type   *string `json:"type"` // dict: SYS010
 	Name   *string `json:"name"`
 	Title  *string `json:"title"`
 	Icon   *string `json:"icon"`
