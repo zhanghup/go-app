@@ -97,7 +97,7 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 			return nil, errors.New("[10] 未授权")
 		}
 		user.User = u
-		if u.Admin != nil && *u.Admin == "1" {
+		if (u.Admin != nil && *u.Admin == "1") || *u.Id == "root" {
 			user.Admin = true
 		} else {
 			user.Admin = false
