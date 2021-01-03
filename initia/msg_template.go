@@ -32,7 +32,6 @@ func InitMsgTemplateCode(db *xorm.Engine, name, code, typ, level, target, remark
 			Remark:       &remark,
 			Delay:        tools.Ptr.Int64(5),
 			Alert:        tools.Ptr.Int64(86400), // 提前一天开始提醒
-			Expire:       tools.Ptr.Int64(86400), // 消息推送后一天未确认过期
 			TemplateCode: &templateCode,
 		})
 		if err != nil {

@@ -21,11 +21,14 @@ func (r *mutationResolver) MenuReload(ctx context.Context, menus []source.MenuLo
 		return false, err
 	}
 
+	weight := 0
 	insert := func(pid *string, m source.MenuLocal) error {
+		weight += 1
 		err := r.Sess(ctx).Insert(beans.Menu{
 			Bean: beans.Bean{
 				Id:     m.ID,
 				Status: tools.Ptr.String("1"),
+				Weight: &weight,
 			},
 			Name:   m.Name,
 			Title:  m.Title,
@@ -70,19 +73,22 @@ func (r *queryResolver) Menus(ctx context.Context, query source.QMenu) ([]beans.
 			p.* 
 		from 
 			menu p 
-		join (
-			select menu.id id from user join menu where user.id = :uid and user.admin = '1'
-			union 
-			select perm.oid id from role_user  
-			join perm on perm.role = role_user.role and role_user.uid = :uid and type = 'menu'
-		) s on p.id = s.id
+		{{ if .no_admin }}
+			join (
+				select menu.id id from menu where type = '0'
+				union 
+				select perm.oid id from role_user  
+				join perm on perm.role = role_user.role and role_user.uid = :uid and type = 'menu'
+			) s on p.id = s.id
+		{{ end }}
 		where 1 = 1 
 			{{ if .status }} and p.status = :status {{ end }}
 		`,
 		map[string]interface{}{
 			"uid":    *r.Me(ctx).Info.User.Id,
+			"no_admin":  !r.Me(ctx).Info.Admin,
 			"status": query.Status,
-		}).Find(&plans)
+		}).Order("weight").Find(&plans)
 	return plans, err
 }
 

@@ -470,8 +470,6 @@ type UpdMsgTemplate struct {
 	Target *string `json:"target" xorm:"target"`
 	// 是否推送管理员{dict:STA005}
 	ToAdmin *string `json:"to_admin" xorm:"to_admin"`
-	// 消息超时时间（秒）
-	Expire *int64 `json:"expire" xorm:"expire"`
 	// 消息提示图片
 	ImgPath *string `json:"img_path" xorm:"img_path"`
 	// 备注

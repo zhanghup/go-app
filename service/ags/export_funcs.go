@@ -14,11 +14,6 @@ func MessageSend(tpl beans.MsgTemplate, uid, uname, otype, oid, defaultContent s
 	return defaultMessage.NewMessage(tpl, uid, uname, otype, oid, defaultContent, model)
 }
 
-// 消息过期处理
-func MessageTimeoutMark() error {
-	return defaultMessage.TimeoutMark()
-}
-
 // ----- 上传方法
 
 func UploaderUploadIO(read io.Reader, name, contentType string) (string, error) {

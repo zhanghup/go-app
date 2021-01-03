@@ -7,7 +7,6 @@ import (
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-app/initia"
-	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-app/service/job"
 	"github.com/zhanghup/go-tools/database/txorm"
@@ -44,7 +43,6 @@ type IBoot interface {
 	Init(fns ...func(db *xorm.Engine)) IBoot
 	SyncTables(fn ...func(db *xorm.Engine)) IBoot
 	Jobs(name, spec string, fn func(db *xorm.Engine) error, flag ...bool) IBoot
-	JobsMessageDealTimeout() IBoot
 	Router(fn ...func(g *gin.Engine, db *xorm.Engine)) IBoot
 	StartRouter()
 }
@@ -115,16 +113,6 @@ func (this *stru) Jobs(name, spec string, fn func(db *xorm.Engine) error, flag .
 		spec: spec,
 		fn:   fn,
 		flag: flag,
-	})
-	return this
-}
-
-/*
-	初始化内置的消息任务
-*/
-func (this *stru) JobsMessageDealTimeout() IBoot {
-	this.Jobs("消息超时处理任务", "0 * * * * *", func(db *xorm.Engine) error {
-		return ags.MessageTimeoutMark()
 	})
 	return this
 }

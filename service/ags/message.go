@@ -14,7 +14,6 @@ import (
 
 type IMessage interface {
 	NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, defaultContent string, model map[string]string) error
-	TimeoutMark() error
 }
 
 type message struct {
@@ -34,10 +33,6 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 	tags := strings.Split(*tpl.Target, ",")
 
 	nowtime := time.Now().Unix()
-	timeout := int64(86400 * 365 * 100) // 一百年过期
-	if tpl.Expire != nil {
-		timeout = nowtime + *tpl.Expire
-	}
 
 	content := defaultContent
 	if tpl.Template != nil {
@@ -57,7 +52,6 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 		Template:     tpl.Id,
 		Level:        tpl.Level,
 		Target:       tpl.Target,
-		Timeout:      &timeout,
 		State:        tools.Ptr.String("1"), // 未读
 		SendTime:     tools.Ptr.Int64(nowtime),
 		Otype:        &otype,
@@ -126,7 +120,6 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 		Template:     info.Template,
 		Level:        info.Level,
 		Target:       info.Target,
-		Timeout:      info.Timeout,
 		State:        info.State, // 未读
 		SendTime:     info.SendTime,
 		Otype:        info.Otype,
@@ -148,22 +141,6 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 	}
 
 	return nil
-}
-
-/*
-	历史消息标记
-	将历史的已过期的数据标记为已过期状态，包含已读已过期和未读已过期
-*/
-func (this *message) TimeoutMark() error {
-	return this.dbs.SF(`
-		update 
-			msg_info mi
-		set state = case 
-			when mi.state = '0' then '2'  
-			when mi.state = '1' then '3'
-		end
-		where mi.timeout < unix_timestamp(now())
-	`).Exec()
 }
 
 var defaultMessage IMessage

@@ -34,7 +34,7 @@ func main() {
 			"name": tools.Str.RandString(8),
 			"time": tools.Time.HMS(),
 		})
-	}).JobsMessageDealTimeout().Router(func(g *gin.Engine, db *xorm.Engine) {
+	}).Router(func(g *gin.Engine, db *xorm.Engine) {
 		ags.GinAgs(g.Group(""), g.Group(""))
 		ags.GinStatic(box, g.Group(""), "zpw")
 		api.Gin(g.Group(""), db)

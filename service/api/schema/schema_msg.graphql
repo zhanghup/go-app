@@ -64,8 +64,6 @@ type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
     level: String
     "消息接收平台{dict:SYS007}"
     target: String
-    "消息超时时间"
-    timeout: Int64
     "确认平台{dict:SYS007}"
     confirm_target: String
     "已读平台{dict:SYS007}"
@@ -128,8 +126,6 @@ type MsgHistory @goModel(model:"github.com/zhanghup/go-app/beans.MsgHistory")  {
     level: String
     "消息接收平台{dict:SYS007}"
     target: String
-    "消息超时时间"
-    timeout: Int64
     "确认平台{dict:SYS007}"
     confirm_target: String
     "已读平台{dict:SYS007}"
@@ -183,8 +179,6 @@ type MsgTemplate @goModel(model:"github.com/zhanghup/go-app/beans.MsgTemplate") 
     target: String
     "是否推送管理员{dict:STA005}"
     to_admin: String
-    "消息超时时间（秒）"
-    expire: Int64
     "消息延时"
     delay: Int64
     "消息提前提醒时间"
@@ -219,8 +213,6 @@ input UpdMsgTemplate{
     target: String
     "是否推送管理员{dict:STA005}"
     to_admin: String
-    "消息超时时间（秒）"
-    expire: Int64
     "消息提示图片"
     img_path: String
     "备注"

@@ -194,7 +194,6 @@ type ComplexityRoot struct {
 		Status        func(childComplexity int) int
 		Target        func(childComplexity int) int
 		Template      func(childComplexity int) int
-		Timeout       func(childComplexity int) int
 		Title         func(childComplexity int) int
 		Type          func(childComplexity int) int
 		Updated       func(childComplexity int) int
@@ -222,7 +221,6 @@ type ComplexityRoot struct {
 		Status        func(childComplexity int) int
 		Target        func(childComplexity int) int
 		Template      func(childComplexity int) int
-		Timeout       func(childComplexity int) int
 		Title         func(childComplexity int) int
 		Type          func(childComplexity int) int
 		Updated       func(childComplexity int) int
@@ -234,7 +232,6 @@ type ComplexityRoot struct {
 		Code         func(childComplexity int) int
 		Created      func(childComplexity int) int
 		Delay        func(childComplexity int) int
-		Expire       func(childComplexity int) int
 		Id           func(childComplexity int) int
 		ImgPath      func(childComplexity int) int
 		Level        func(childComplexity int) int
@@ -1273,13 +1270,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgHistory.Template(childComplexity), true
 
-	case "MsgHistory.timeout":
-		if e.complexity.MsgHistory.Timeout == nil {
-			break
-		}
-
-		return e.complexity.MsgHistory.Timeout(childComplexity), true
-
 	case "MsgHistory.title":
 		if e.complexity.MsgHistory.Title == nil {
 			break
@@ -1448,13 +1438,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgInfo.Template(childComplexity), true
 
-	case "MsgInfo.timeout":
-		if e.complexity.MsgInfo.Timeout == nil {
-			break
-		}
-
-		return e.complexity.MsgInfo.Timeout(childComplexity), true
-
 	case "MsgInfo.title":
 		if e.complexity.MsgInfo.Title == nil {
 			break
@@ -1510,13 +1493,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgTemplate.Delay(childComplexity), true
-
-	case "MsgTemplate.expire":
-		if e.complexity.MsgTemplate.Expire == nil {
-			break
-		}
-
-		return e.complexity.MsgTemplate.Expire(childComplexity), true
 
 	case "MsgTemplate.id":
 		if e.complexity.MsgTemplate.Id == nil {
@@ -3614,8 +3590,6 @@ type MsgInfo @goModel(model:"github.com/zhanghup/go-app/beans.MsgInfo")  {
     level: String
     "消息接收平台{dict:SYS007}"
     target: String
-    "消息超时时间"
-    timeout: Int64
     "确认平台{dict:SYS007}"
     confirm_target: String
     "已读平台{dict:SYS007}"
@@ -3678,8 +3652,6 @@ type MsgHistory @goModel(model:"github.com/zhanghup/go-app/beans.MsgHistory")  {
     level: String
     "消息接收平台{dict:SYS007}"
     target: String
-    "消息超时时间"
-    timeout: Int64
     "确认平台{dict:SYS007}"
     confirm_target: String
     "已读平台{dict:SYS007}"
@@ -3733,8 +3705,6 @@ type MsgTemplate @goModel(model:"github.com/zhanghup/go-app/beans.MsgTemplate") 
     target: String
     "是否推送管理员{dict:STA005}"
     to_admin: String
-    "消息超时时间（秒）"
-    expire: Int64
     "消息延时"
     delay: Int64
     "消息提前提醒时间"
@@ -3769,8 +3739,6 @@ input UpdMsgTemplate{
     target: String
     "是否推送管理员{dict:STA005}"
     to_admin: String
-    "消息超时时间（秒）"
-    expire: Int64
     "消息提示图片"
     img_path: String
     "备注"
@@ -8384,38 +8352,6 @@ func (ec *executionContext) _MsgHistory_target(ctx context.Context, field graphq
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _MsgHistory_timeout(ctx context.Context, field graphql.CollectedField, obj *beans.MsgHistory) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "MsgHistory",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Timeout, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int64)
-	fc.Result = res
-	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _MsgHistory_confirm_target(ctx context.Context, field graphql.CollectedField, obj *beans.MsgHistory) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9184,38 +9120,6 @@ func (ec *executionContext) _MsgInfo_target(ctx context.Context, field graphql.C
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _MsgInfo_timeout(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "MsgInfo",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Timeout, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int64)
-	fc.Result = res
-	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _MsgInfo_confirm_target(ctx context.Context, field graphql.CollectedField, obj *beans.MsgInfo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9982,38 +9886,6 @@ func (ec *executionContext) _MsgTemplate_to_admin(ctx context.Context, field gra
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _MsgTemplate_expire(ctx context.Context, field graphql.CollectedField, obj *beans.MsgTemplate) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "MsgTemplate",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Expire, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int64)
-	fc.Result = res
-	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MsgTemplate_delay(ctx context.Context, field graphql.CollectedField, obj *beans.MsgTemplate) (ret graphql.Marshaler) {
@@ -19089,14 +18961,6 @@ func (ec *executionContext) unmarshalInputUpdMsgTemplate(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
-		case "expire":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expire"))
-			it.Expire, err = ec.unmarshalOInt642ᚖint64(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "img_path":
 			var err error
 
@@ -19931,8 +19795,6 @@ func (ec *executionContext) _MsgHistory(ctx context.Context, sel ast.SelectionSe
 			out.Values[i] = ec._MsgHistory_level(ctx, field, obj)
 		case "target":
 			out.Values[i] = ec._MsgHistory_target(ctx, field, obj)
-		case "timeout":
-			out.Values[i] = ec._MsgHistory_timeout(ctx, field, obj)
 		case "confirm_target":
 			out.Values[i] = ec._MsgHistory_confirm_target(ctx, field, obj)
 		case "read_target":
@@ -20003,8 +19865,6 @@ func (ec *executionContext) _MsgInfo(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._MsgInfo_level(ctx, field, obj)
 		case "target":
 			out.Values[i] = ec._MsgInfo_target(ctx, field, obj)
-		case "timeout":
-			out.Values[i] = ec._MsgInfo_timeout(ctx, field, obj)
 		case "confirm_target":
 			out.Values[i] = ec._MsgInfo_confirm_target(ctx, field, obj)
 		case "read_target":
@@ -20075,8 +19935,6 @@ func (ec *executionContext) _MsgTemplate(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = ec._MsgTemplate_target(ctx, field, obj)
 		case "to_admin":
 			out.Values[i] = ec._MsgTemplate_to_admin(ctx, field, obj)
-		case "expire":
-			out.Values[i] = ec._MsgTemplate_expire(ctx, field, obj)
 		case "delay":
 			out.Values[i] = ec._MsgTemplate_delay(ctx, field, obj)
 		case "alert":

@@ -9,7 +9,6 @@ type MsgTemplate struct {
 	Level        *string `json:"level"`                     // 消息等级 [0:严重、1:重要、2:次要、3:普通]
 	Target       *string `json:"target"`                    // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
 	ToAdmin      *string `json:"to_admin"`                  // 是否推送管理员用户
-	Expire       *int64  `json:"expire"`                    // 消息超时时间（秒）
 	Delay        *int64  `json:"delay"`                     // 消息延时
 	Alert        *int64  `json:"alert"`                     // 消息提前提醒时间
 	ImgPath      *string `json:"img_path"`                  // 消息提示图片
@@ -27,7 +26,6 @@ type MsgInfo struct {
 	Type          *string `json:"type" xorm:"index"`     // 消息分类 - dict
 	Level         *string `json:"level"`                 // 消息等级 [0:严重、1:重要、2:次要、3:普通]
 	Target        *string `json:"target" xorm:"target"`  // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
-	Timeout       *int64  `json:"timeout"`               // 消息超时时间
 	ConfirmTarget *string `json:"confirm_target"`        // 确认平台 [web,app,mini,sms...] - dict
 	ReadTarget    *string `json:"read_target"`           // 已读平台 [web,app,mini,sms...] - dict
 	State         *string `json:"state"`                 // 消息状态 [0:已读、1:未读、2:已读过期、3:未读过期、4:已确认] dict
@@ -54,7 +52,6 @@ type MsgHistory struct {
 	Type          *string `json:"type"`                 // 消息分类 - dict
 	Level         *string `json:"level"`                // 消息等级 [0:严重、1:重要、2:次要、3:普通]
 	Target        *string `json:"target" xorm:"target"` // 推送目标，多个使用逗号分隔 [web,app,mini,sms...] - dict
-	Timeout       *int64  `json:"timeout"`              // 消息超时时间
 	ConfirmTarget *string `json:"confirm_target"`       // 确认平台 [web,app,mini,sms...] - dict
 	ReadTarget    *string `json:"read_target"`          // 已读平台 [web,app,mini,sms...] - dict
 	State         *string `json:"state"`                // 消息状态 [0:已读、1:未读、2:已读过期、3:未读过期、4:已确认] dict
