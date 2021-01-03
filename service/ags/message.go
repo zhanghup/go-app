@@ -79,6 +79,9 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 
 	// 更新消息或者插入消息
 	if ok {
+		if oldInfo.State == nil{
+			oldInfo.State = tools.Ptr.String("1")
+		}
 		/*
 			已读的消息分2中情况
 				a)	（消息、通知） 将不再推送

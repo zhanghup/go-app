@@ -7,6 +7,10 @@ import (
 	"github.com/zhanghup/go-tools"
 )
 
+func (r *mutationResolver) MenuCreate(ctx context.Context, input source.NewMenu) (string, error) {
+	return r.Create(ctx, &beans.Menu{}, input)
+}
+
 func (r *mutationResolver) MenuUpdate(ctx context.Context, id string, input source.UpdMenu) (bool, error) {
 	return r.Update(ctx, &beans.Menu{}, id, input)
 }
@@ -66,10 +70,17 @@ func (r *queryResolver) Menus(ctx context.Context, query source.QMenu) ([]beans.
 			p.* 
 		from 
 			menu p 
+		join (
+			select menu.id id from user join menu where user.id = :uid and user.admin = '1'
+			union 
+			select perm.oid id from role_user  
+			join perm on perm.role = role_user.role and role_user.uid = :uid and type = 'menu'
+		) s on p.id = s.id
 		where 1 = 1 
 			{{ if .status }} and p.status = :status {{ end }}
 		`,
 		map[string]interface{}{
+			"uid":    *r.Me(ctx).Info.User.Id,
 			"status": query.Status,
 		}).Find(&plans)
 	return plans, err

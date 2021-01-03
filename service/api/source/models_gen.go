@@ -120,6 +120,19 @@ type NewDictItem struct {
 	Status *string `json:"status" xorm:"status"`
 }
 
+type NewMenu struct {
+	// 菜单标题
+	Title *string `json:"title" xorm:"title"`
+	// 菜单图标
+	Icon *string `json:"icon" xorm:"icon"`
+	// 上级菜单
+	Parent *string `json:"parent" xorm:"parent"`
+	// 排序
+	Weight *int `json:"weight" xorm:"weight"`
+	// 状态{dict:STA001}
+	Status *string `json:"status" xorm:"status"`
+}
+
 type NewMsgConfirm struct {
 	// 确认备注
 	Remark *string `json:"remark" xorm:"remark"`
@@ -455,6 +468,8 @@ type UpdMsgTemplate struct {
 	Level *string `json:"level" xorm:"level"`
 	// 消息推送平台{dict:SYS007}
 	Target *string `json:"target" xorm:"target"`
+	// 是否推送管理员{dict:STA005}
+	ToAdmin *string `json:"to_admin" xorm:"to_admin"`
 	// 消息超时时间（秒）
 	Expire *int64 `json:"expire" xorm:"expire"`
 	// 消息提示图片

@@ -181,6 +181,8 @@ type MsgTemplate @goModel(model:"github.com/zhanghup/go-app/beans.MsgTemplate") 
     level: String
     "消息推送平台{dict:SYS007}"
     target: String
+    "是否推送管理员{dict:STA005}"
+    to_admin: String
     "消息超时时间（秒）"
     expire: Int64
     "消息延时"
@@ -215,6 +217,8 @@ input UpdMsgTemplate{
     level: String
     "消息推送平台{dict:SYS007}"
     target: String
+    "是否推送管理员{dict:STA005}"
+    to_admin: String
     "消息超时时间（秒）"
     expire: Int64
     "消息提示图片"

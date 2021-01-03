@@ -244,6 +244,7 @@ type ComplexityRoot struct {
 		Target       func(childComplexity int) int
 		Template     func(childComplexity int) int
 		TemplateCode func(childComplexity int) int
+		ToAdmin      func(childComplexity int) int
 		Type         func(childComplexity int) int
 		Updated      func(childComplexity int) int
 		Weight       func(childComplexity int) int
@@ -266,6 +267,7 @@ type ComplexityRoot struct {
 		DictItemUpdate    func(childComplexity int, id string, input UpdDictItem) int
 		DictRemoves       func(childComplexity int, ids []string) int
 		DictUpdate        func(childComplexity int, id string, input UpdDict) int
+		MenuCreate        func(childComplexity int, input NewMenu) int
 		MenuReload        func(childComplexity int, menus []MenuLocal) int
 		MenuUpdate        func(childComplexity int, id string, input UpdMenu) int
 		MsgTemplateUpdate func(childComplexity int, id string, input UpdMsgTemplate) int
@@ -447,6 +449,7 @@ type MutationResolver interface {
 	DictItemSort(ctx context.Context, code string, items []string) (bool, error)
 	MyMsgInfoConfirm(ctx context.Context, id string, input NewMsgConfirm) (bool, error)
 	MyMsgInfoRead(ctx context.Context, id string) (bool, error)
+	MenuCreate(ctx context.Context, input NewMenu) (string, error)
 	MenuUpdate(ctx context.Context, id string, input UpdMenu) (bool, error)
 	MenuReload(ctx context.Context, menus []MenuLocal) (bool, error)
 	MsgTemplateUpdate(ctx context.Context, id string, input UpdMsgTemplate) (bool, error)
@@ -1578,6 +1581,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgTemplate.TemplateCode(childComplexity), true
 
+	case "MsgTemplate.to_admin":
+		if e.complexity.MsgTemplate.ToAdmin == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplate.ToAdmin(childComplexity), true
+
 	case "MsgTemplate.type":
 		if e.complexity.MsgTemplate.Type == nil {
 			break
@@ -1790,6 +1800,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DictUpdate(childComplexity, args["id"].(string), args["input"].(UpdDict)), true
+
+	case "Mutation.menu_create":
+		if e.complexity.Mutation.MenuCreate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_menu_create_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MenuCreate(childComplexity, args["input"].(NewMenu)), true
 
 	case "Mutation.menu_reload":
 		if e.complexity.Mutation.MenuReload == nil {
@@ -3451,6 +3473,7 @@ type MyInfo @goModel(model:"github.com/zhanghup/go-app/beans.User"){
 }
 
 extend type Mutation {
+    menu_create(input:NewMenu!):String!
     menu_update(id: String!,input:UpdMenu!):Boolean! @perm(entity: "menu",perm: "U",remark:"菜单修改")
     menu_reload(menus:[MenuLocal!]!):Boolean! @root
 }
@@ -3478,6 +3501,19 @@ type Menu @goModel(model:"github.com/zhanghup/go-app/beans.Menu") {
     created: Int
     "更新时间"
     updated: Int
+    "排序"
+    weight: Int
+    "状态{dict:STA001}"
+    status: String
+}
+
+input NewMenu{
+    "菜单标题"
+    title: String
+    "菜单图标"
+    icon: String
+    "上级菜单"
+    parent: String
     "排序"
     weight: Int
     "状态{dict:STA001}"
@@ -3695,6 +3731,8 @@ type MsgTemplate @goModel(model:"github.com/zhanghup/go-app/beans.MsgTemplate") 
     level: String
     "消息推送平台{dict:SYS007}"
     target: String
+    "是否推送管理员{dict:STA005}"
+    to_admin: String
     "消息超时时间（秒）"
     expire: Int64
     "消息延时"
@@ -3729,6 +3767,8 @@ input UpdMsgTemplate{
     level: String
     "消息推送平台{dict:SYS007}"
     target: String
+    "是否推送管理员{dict:STA005}"
+    to_admin: String
     "消息超时时间（秒）"
     expire: Int64
     "消息提示图片"
@@ -4460,6 +4500,21 @@ func (ec *executionContext) field_Mutation_dict_update_args(ctx context.Context,
 		}
 	}
 	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_menu_create_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 NewMenu
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewMenu2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewMenu(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -9897,6 +9952,38 @@ func (ec *executionContext) _MsgTemplate_target(ctx context.Context, field graph
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _MsgTemplate_to_admin(ctx context.Context, field graphql.CollectedField, obj *beans.MsgTemplate) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MsgTemplate",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ToAdmin, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _MsgTemplate_expire(ctx context.Context, field graphql.CollectedField, obj *beans.MsgTemplate) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -11547,6 +11634,48 @@ func (ec *executionContext) _Mutation_my_msg_info_read(ctx context.Context, fiel
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_menu_create(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_menu_create_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MenuCreate(rctx, args["input"].(NewMenu))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_menu_update(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -17447,6 +17576,58 @@ func (ec *executionContext) unmarshalInputNewDictItem(ctx context.Context, obj i
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewMenu(ctx context.Context, obj interface{}) (NewMenu, error) {
+	var it NewMenu
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "icon":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("icon"))
+			it.Icon, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "parent":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parent"))
+			it.Parent, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "weight":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weight"))
+			it.Weight, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewMsgConfirm(ctx context.Context, obj interface{}) (NewMsgConfirm, error) {
 	var it NewMsgConfirm
 	var asMap = obj.(map[string]interface{})
@@ -18900,6 +19081,14 @@ func (ec *executionContext) unmarshalInputUpdMsgTemplate(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
+		case "to_admin":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("to_admin"))
+			it.ToAdmin, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "expire":
 			var err error
 
@@ -19884,6 +20073,8 @@ func (ec *executionContext) _MsgTemplate(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = ec._MsgTemplate_level(ctx, field, obj)
 		case "target":
 			out.Values[i] = ec._MsgTemplate_target(ctx, field, obj)
+		case "to_admin":
+			out.Values[i] = ec._MsgTemplate_to_admin(ctx, field, obj)
 		case "expire":
 			out.Values[i] = ec._MsgTemplate_expire(ctx, field, obj)
 		case "delay":
@@ -20021,6 +20212,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "my_msg_info_read":
 			out.Values[i] = ec._Mutation_my_msg_info_read(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "menu_create":
+			out.Values[i] = ec._Mutation_menu_create(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -21274,6 +21470,11 @@ func (ec *executionContext) unmarshalNNewDict2githubᚗcomᚋzhanghupᚋgoᚑapp
 
 func (ec *executionContext) unmarshalNNewDictItem2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewDictItem(ctx context.Context, v interface{}) (NewDictItem, error) {
 	res, err := ec.unmarshalInputNewDictItem(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewMenu2githubᚗcomᚋzhanghupᚋgoᚑappᚋserviceᚋapiᚋsourceᚐNewMenu(ctx context.Context, v interface{}) (NewMenu, error) {
+	res, err := ec.unmarshalInputNewMenu(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
