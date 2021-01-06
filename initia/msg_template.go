@@ -8,10 +8,10 @@ import (
 )
 
 func InitMsgTemplate(db *xorm.Engine) {
-	InitMsgTemplateCode(db, "系统消息", "system", "notice", "1", "web", "系统消息", "")
+	InitMsgTemplateCode(db, "系统消息", "system", "notice", "1", "web", "系统消息", "", "1", 5, 86400)
 }
 
-func InitMsgTemplateCode(db *xorm.Engine, name, code, typ, level, target, remark, templateCode string) {
+func InitMsgTemplateCode(db *xorm.Engine, name, code, typ, level, target, remark, templateCode, toadmin string, delay, alert int64) {
 	oldTpl := beans.MsgTemplate{}
 	ok, err := db.Table(&oldTpl).Where("code = ?", code).Get(&oldTpl)
 	if err != nil {
@@ -30,8 +30,9 @@ func InitMsgTemplateCode(db *xorm.Engine, name, code, typ, level, target, remark
 			Level:        &level,
 			Target:       &target,
 			Remark:       &remark,
-			Delay:        tools.Ptr.Int64(5),
-			Alert:        tools.Ptr.Int64(86400), // 提前一天开始提醒
+			Delay:        &delay,
+			Alert:        &alert, // 提前一天开始提醒
+			ToAdmin:      &toadmin,
 			TemplateCode: &templateCode,
 		})
 		if err != nil {
