@@ -280,12 +280,12 @@ type ComplexityRoot struct {
 		RolePermMenuCreate func(childComplexity int, id string, perms []string) int
 		RolePermObjCreate  func(childComplexity int, id string, perms []IPermObj) int
 		RoleRemoves        func(childComplexity int, ids []string) int
-		RoleToUser         func(childComplexity int, uid string, roles []string) int
 		RoleUpdate         func(childComplexity int, id string, input UpdRole) int
 		RoleWithUser       func(childComplexity int, role string, uids []string) int
 		UserCreate         func(childComplexity int, input NewUser) int
 		UserRemoves        func(childComplexity int, ids []string) int
 		UserUpdate         func(childComplexity int, id string, input UpdUser) int
+		UserWithRole       func(childComplexity int, uid string, roles []string) int
 		World              func(childComplexity int) int
 	}
 
@@ -461,11 +461,11 @@ type MutationResolver interface {
 	RoleRemoves(ctx context.Context, ids []string) (bool, error)
 	RolePermMenuCreate(ctx context.Context, id string, perms []string) (bool, error)
 	RolePermObjCreate(ctx context.Context, id string, perms []IPermObj) (bool, error)
-	RoleToUser(ctx context.Context, uid string, roles []string) (bool, error)
 	RoleWithUser(ctx context.Context, role string, uids []string) (bool, error)
 	UserCreate(ctx context.Context, input NewUser) (string, error)
 	UserUpdate(ctx context.Context, id string, input UpdUser) (bool, error)
 	UserRemoves(ctx context.Context, ids []string) (bool, error)
+	UserWithRole(ctx context.Context, uid string, roles []string) (bool, error)
 }
 type MyInfoResolver interface {
 	ODept(ctx context.Context, obj *beans.User) (*beans.Dept, error)
@@ -1969,18 +1969,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RoleRemoves(childComplexity, args["ids"].([]string)), true
 
-	case "Mutation.role_to_user":
-		if e.complexity.Mutation.RoleToUser == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_role_to_user_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.RoleToUser(childComplexity, args["uid"].(string), args["roles"].([]string)), true
-
 	case "Mutation.role_update":
 		if e.complexity.Mutation.RoleUpdate == nil {
 			break
@@ -2040,6 +2028,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UserUpdate(childComplexity, args["id"].(string), args["input"].(UpdUser)), true
+
+	case "Mutation.user_with_role":
+		if e.complexity.Mutation.UserWithRole == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_user_with_role_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UserWithRole(childComplexity, args["uid"].(string), args["roles"].([]string)), true
 
 	case "Mutation.world":
 		if e.complexity.Mutation.World == nil {
@@ -3048,9 +3048,9 @@ input UpdAccount {
 }
 
 extend type Mutation {
-    cron_stop(id: String!):Boolean! @perm(entity: "cron",perm: "MStop",remark: "定时任务开启")
-    cron_start(id: String!):Boolean! @perm(entity: "cron",perm: "MStart",remark: "定时任务暂停")
-    cron_run(id: String!):Boolean! @perm(entity: "cron",perm: "MRun",remark: "定时任务立即执行一次")
+    cron_stop(id: String!):Boolean! @perm(entity: "cron",perm: "MSO",remark: "定时任务开启")
+    cron_start(id: String!):Boolean! @perm(entity: "cron",perm: "MST",remark: "定时任务暂停")
+    cron_run(id: String!):Boolean! @perm(entity: "cron",perm: "MR",remark: "定时任务立即执行一次")
 }
 
 input QCron{
@@ -3910,12 +3910,11 @@ extend type Mutation {
     role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "role",perm: "U",remark:"角色更新")
     "角色批量删除"
     role_removes(ids: [String!]): Boolean! @perm(entity: "role",perm: "D",remark:"角色删除")
-    "新增权限"
-    role_perm_menu_create(id: String!, perms: [String!]!): Boolean! @perm(entity: "role",perm: "MP",remark:"角色权限新增")
+    "菜单角色权限新增"
+    role_perm_menu_create(id: String!, perms: [String!]!): Boolean! @perm(entity: "role",perm: "MPM",remark:"菜单角色权限新增")
     "新增对象权限"
     role_perm_obj_create(id: String!, perms:[IPermObj!]!): Boolean! @perm(entity: "role",perm: "MO",remark:"角色对象权限新增")
-    "角色分配"
-    role_to_user(uid: String!,roles:[String!]!): Boolean! @perm(entity: "role",perm: "MTU",remark:"角色分配")
+
     "角色分配"
     role_with_user(role: String!,uids:[String!]!): Boolean! @perm(entity: "role",perm: "MWU",remark:"角色分配")
 }
@@ -4006,6 +4005,8 @@ extend type Mutation {
     user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U",remark:"用户修改")
     "用户批量删除"
     user_removes(ids: [String!]):Boolean! @perm(entity: "user",perm: "D",remark:"用户删除")
+    "角色分配"
+    user_with_role(uid: String!,roles:[String!]!): Boolean! @perm(entity: "user",perm: "MR",remark:"角色分配")
 }
 
 input QUser{
@@ -4774,30 +4775,6 @@ func (ec *executionContext) field_Mutation_role_removes_args(ctx context.Context
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_role_to_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["uid"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uid"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["uid"] = arg0
-	var arg1 []string
-	if tmp, ok := rawArgs["roles"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
-		arg1, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["roles"] = arg1
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_role_update_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4897,6 +4874,30 @@ func (ec *executionContext) field_Mutation_user_update_args(ctx context.Context,
 		}
 	}
 	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_user_with_role_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["uid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uid"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["uid"] = arg0
+	var arg1 []string
+	if tmp, ok := rawArgs["roles"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
+		arg1, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["roles"] = arg1
 	return args, nil
 }
 
@@ -10486,7 +10487,7 @@ func (ec *executionContext) _Mutation_cron_stop(ctx context.Context, field graph
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "MStop")
+			perm, err := ec.unmarshalNString2string(ctx, "MSO")
 			if err != nil {
 				return nil, err
 			}
@@ -10560,7 +10561,7 @@ func (ec *executionContext) _Mutation_cron_start(ctx context.Context, field grap
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "MStart")
+			perm, err := ec.unmarshalNString2string(ctx, "MST")
 			if err != nil {
 				return nil, err
 			}
@@ -10634,7 +10635,7 @@ func (ec *executionContext) _Mutation_cron_run(ctx context.Context, field graphq
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "MRun")
+			perm, err := ec.unmarshalNString2string(ctx, "MR")
 			if err != nil {
 				return nil, err
 			}
@@ -12226,11 +12227,11 @@ func (ec *executionContext) _Mutation_role_perm_menu_create(ctx context.Context,
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "MP")
+			perm, err := ec.unmarshalNString2string(ctx, "MPM")
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色权限新增")
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "菜单角色权限新增")
 			if err != nil {
 				return nil, err
 			}
@@ -12305,80 +12306,6 @@ func (ec *executionContext) _Mutation_role_perm_obj_create(ctx context.Context, 
 				return nil, err
 			}
 			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色对象权限新增")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Perm == nil {
-				return nil, errors.New("directive perm is not implemented")
-			}
-			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(bool); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_role_to_user(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_role_to_user_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().RoleToUser(rctx, args["uid"].(string), args["roles"].([]string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			entity, err := ec.unmarshalNString2string(ctx, "role")
-			if err != nil {
-				return nil, err
-			}
-			perm, err := ec.unmarshalNString2string(ctx, "MTU")
-			if err != nil {
-				return nil, err
-			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色分配")
 			if err != nil {
 				return nil, err
 			}
@@ -12675,6 +12602,80 @@ func (ec *executionContext) _Mutation_user_removes(ctx context.Context, field gr
 				return nil, err
 			}
 			remark, err := ec.unmarshalOString2ᚖstring(ctx, "用户删除")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Perm == nil {
+				return nil, errors.New("directive perm is not implemented")
+			}
+			return ec.directives.Perm(ctx, nil, directive0, entity, perm, remark)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_user_with_role(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_user_with_role_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UserWithRole(rctx, args["uid"].(string), args["roles"].([]string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			entity, err := ec.unmarshalNString2string(ctx, "user")
+			if err != nil {
+				return nil, err
+			}
+			perm, err := ec.unmarshalNString2string(ctx, "MR")
+			if err != nil {
+				return nil, err
+			}
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "角色分配")
 			if err != nil {
 				return nil, err
 			}
@@ -20139,11 +20140,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "role_to_user":
-			out.Values[i] = ec._Mutation_role_to_user(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "role_with_user":
 			out.Values[i] = ec._Mutation_role_with_user(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -20161,6 +20157,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "user_removes":
 			out.Values[i] = ec._Mutation_user_removes(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "user_with_role":
+			out.Values[i] = ec._Mutation_user_with_role(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

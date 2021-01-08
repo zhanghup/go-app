@@ -18,12 +18,10 @@ extend type Mutation {
     role_update(id: String!, input: UpdRole!): Boolean! @perm(entity: "role",perm: "U",remark:"角色更新")
     "角色批量删除"
     role_removes(ids: [String!]): Boolean! @perm(entity: "role",perm: "D",remark:"角色删除")
-    "新增权限"
-    role_perm_menu_create(id: String!, perms: [String!]!): Boolean! @perm(entity: "role",perm: "MPM",remark:"角色权限新增")
+    "菜单角色权限新增"
+    role_perm_menu_create(id: String!, perms: [String!]!): Boolean! @perm(entity: "role",perm: "MPM",remark:"菜单角色权限新增")
     "新增对象权限"
     role_perm_obj_create(id: String!, perms:[IPermObj!]!): Boolean! @perm(entity: "role",perm: "MO",remark:"角色对象权限新增")
-    "角色分配"
-    role_to_user(uid: String!,roles:[String!]!): Boolean! @perm(entity: "role",perm: "MTU",remark:"角色分配")
     "角色分配"
     role_with_user(role: String!,uids:[String!]!): Boolean! @perm(entity: "role",perm: "MWU",remark:"角色分配")
 }

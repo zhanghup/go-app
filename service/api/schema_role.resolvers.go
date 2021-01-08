@@ -8,10 +8,8 @@ import (
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
-	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
-	"github.com/zhanghup/go-tools/tog"
 )
 
 func (r *mutationResolver) RoleCreate(ctx context.Context, input source.NewRole) (bool, error) {
@@ -88,50 +86,6 @@ func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, per
 		return nil
 	})
 
-	return err == nil, err
-}
-
-func (r *mutationResolver) RoleToUser(ctx context.Context, uid string, roles []string) (bool, error) {
-	sess := r.Sess(ctx)
-	err := sess.TS(func(sess txorm.ISession) error {
-		err := sess.SF(`delete from role_user where uid = :uid`, map[string]interface{}{
-			"uid": uid,
-		}).Exec()
-		if err != nil {
-			return err
-		}
-
-		for i, o := range roles {
-			p := beans.RoleUser{
-				Bean: beans.Bean{
-					Id:     tools.Ptr.Uid(),
-					Status: tools.Ptr.String("1"),
-					Weight: &i,
-				},
-				Role: &o,
-				Uid:  &uid,
-			}
-			err := sess.Insert(p)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-
-	// 用户角色变化推送
-	go func() {
-		user, err := r.UserLoader(ctx, uid)
-		if err != nil {
-			tog.Error(err.Error())
-			return
-		}
-		if user != nil {
-			tog.Error("用户不存在")
-			return
-		}
-		event.UserRoleChange(*user)
-	}()
 	return err == nil, err
 }
 

@@ -12,6 +12,8 @@ extend type Mutation {
     user_update(id: String!,input:UpdUser!):Boolean! @perm(entity: "user",perm: "U",remark:"用户修改")
     "用户批量删除"
     user_removes(ids: [String!]):Boolean! @perm(entity: "user",perm: "D",remark:"用户删除")
+    "角色分配"
+    user_with_role(uid: String!,roles:[String!]!): Boolean! @perm(entity: "user",perm: "MR",remark:"角色分配")
 }
 
 input QUser{
