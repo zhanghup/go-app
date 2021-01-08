@@ -8,9 +8,9 @@ extend type Query{
 }
 
 extend type Mutation {
-    cron_stop(id: String!):Boolean! @perm(entity: "cron",perm: "MStop",remark: "定时任务开启")
-    cron_start(id: String!):Boolean! @perm(entity: "cron",perm: "MStart",remark: "定时任务暂停")
-    cron_run(id: String!):Boolean! @perm(entity: "cron",perm: "MRun",remark: "定时任务立即执行一次")
+    cron_stop(id: String!):Boolean! @perm(entity: "cron",perm: "MSO",remark: "定时任务开启")
+    cron_start(id: String!):Boolean! @perm(entity: "cron",perm: "MST",remark: "定时任务暂停")
+    cron_run(id: String!):Boolean! @perm(entity: "cron",perm: "MR",remark: "定时任务立即执行一次")
 }
 
 input QCron{

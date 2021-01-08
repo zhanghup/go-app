@@ -20,7 +20,7 @@ extend type Mutation {
     "字典项批量删除"
     dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict_item",perm: "D",remark:"字典项删除")
     "字典项重新排序"
-    dict_item_sort(code: String!,items:[String!]): Boolean! @perm(entity: "dict_item",perm: "MSort",remark:"字典项排序")
+    dict_item_sort(code: String!,items:[String!]): Boolean! @perm(entity: "dict_item",perm: "MST",remark:"字典项排序")
 }
 
 input QDict{

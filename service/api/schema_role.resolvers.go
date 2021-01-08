@@ -30,9 +30,9 @@ func (r *mutationResolver) RoleRemoves(ctx context.Context, ids []string) (bool,
 	return r.Removes(ctx, new(beans.Role), ids)
 }
 
-func (r *mutationResolver) RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error) {
+func (r *mutationResolver) RolePermMenuCreate(ctx context.Context, id string,  perms []string) (bool, error) {
 	err := r.Sess(ctx).SF(`delete from perm where role = :id and type = :type`, map[string]interface{}{
-		"type": typeArg,
+		"type": "menu",
 		"id":   id,
 	}).Exec()
 	if err != nil {
@@ -46,7 +46,7 @@ func (r *mutationResolver) RolePermCreate(ctx context.Context, id string, typeAr
 				Status: tools.Ptr.String("1"),
 				Weight: &i,
 			},
-			Type: &typeArg,
+			Type: tools.Ptr.String("menu"),
 			Role: &id,
 			Oid:  &o,
 		}

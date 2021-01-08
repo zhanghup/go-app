@@ -248,45 +248,45 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AccountCreate     func(childComplexity int, input NewAccount) int
-		AccountRemoves    func(childComplexity int, ids []string) int
-		AccountUpdate     func(childComplexity int, id string, input UpdAccount) int
-		CronRun           func(childComplexity int, id string) int
-		CronStart         func(childComplexity int, id string) int
-		CronStop          func(childComplexity int, id string) int
-		DeptCreate        func(childComplexity int, input NewDept) int
-		DeptRemoves       func(childComplexity int, ids []string) int
-		DeptUpdate        func(childComplexity int, id string, input UpdDept) int
-		DictCreate        func(childComplexity int, input NewDict) int
-		DictItemCreate    func(childComplexity int, input NewDictItem) int
-		DictItemRemoves   func(childComplexity int, ids []string) int
-		DictItemSort      func(childComplexity int, code string, items []string) int
-		DictItemUpdate    func(childComplexity int, id string, input UpdDictItem) int
-		DictRemoves       func(childComplexity int, ids []string) int
-		DictUpdate        func(childComplexity int, id string, input UpdDict) int
-		MenuCreate        func(childComplexity int, input NewMenu) int
-		MenuReload        func(childComplexity int, menus []MenuLocal) int
-		MenuUpdate        func(childComplexity int, id string, input UpdMenu) int
-		MsgTemplateUpdate func(childComplexity int, id string, input UpdMsgTemplate) int
-		MyMsgInfoConfirm  func(childComplexity int, id string, input NewMsgConfirm) int
-		MyMsgInfoRead     func(childComplexity int, id string) int
-		PlanCreate        func(childComplexity int, input NewPlan) int
-		PlanRemoves       func(childComplexity int, ids []string) int
-		PlanStepCreate    func(childComplexity int, input NewPlanStep) int
-		PlanStepRemoves   func(childComplexity int, ids []string) int
-		PlanStepUpdate    func(childComplexity int, id string, input UpdPlanStep) int
-		PlanUpdate        func(childComplexity int, id string, input UpdPlan) int
-		RoleCreate        func(childComplexity int, input NewRole) int
-		RolePermCreate    func(childComplexity int, id string, typeArg string, perms []string) int
-		RolePermObjCreate func(childComplexity int, id string, perms []IPermObj) int
-		RoleRemoves       func(childComplexity int, ids []string) int
-		RoleToUser        func(childComplexity int, uid string, roles []string) int
-		RoleUpdate        func(childComplexity int, id string, input UpdRole) int
-		RoleWithUser      func(childComplexity int, role string, uids []string) int
-		UserCreate        func(childComplexity int, input NewUser) int
-		UserRemoves       func(childComplexity int, ids []string) int
-		UserUpdate        func(childComplexity int, id string, input UpdUser) int
-		World             func(childComplexity int) int
+		AccountCreate      func(childComplexity int, input NewAccount) int
+		AccountRemoves     func(childComplexity int, ids []string) int
+		AccountUpdate      func(childComplexity int, id string, input UpdAccount) int
+		CronRun            func(childComplexity int, id string) int
+		CronStart          func(childComplexity int, id string) int
+		CronStop           func(childComplexity int, id string) int
+		DeptCreate         func(childComplexity int, input NewDept) int
+		DeptRemoves        func(childComplexity int, ids []string) int
+		DeptUpdate         func(childComplexity int, id string, input UpdDept) int
+		DictCreate         func(childComplexity int, input NewDict) int
+		DictItemCreate     func(childComplexity int, input NewDictItem) int
+		DictItemRemoves    func(childComplexity int, ids []string) int
+		DictItemSort       func(childComplexity int, code string, items []string) int
+		DictItemUpdate     func(childComplexity int, id string, input UpdDictItem) int
+		DictRemoves        func(childComplexity int, ids []string) int
+		DictUpdate         func(childComplexity int, id string, input UpdDict) int
+		MenuCreate         func(childComplexity int, input NewMenu) int
+		MenuReload         func(childComplexity int, menus []MenuLocal) int
+		MenuUpdate         func(childComplexity int, id string, input UpdMenu) int
+		MsgTemplateUpdate  func(childComplexity int, id string, input UpdMsgTemplate) int
+		MyMsgInfoConfirm   func(childComplexity int, id string, input NewMsgConfirm) int
+		MyMsgInfoRead      func(childComplexity int, id string) int
+		PlanCreate         func(childComplexity int, input NewPlan) int
+		PlanRemoves        func(childComplexity int, ids []string) int
+		PlanStepCreate     func(childComplexity int, input NewPlanStep) int
+		PlanStepRemoves    func(childComplexity int, ids []string) int
+		PlanStepUpdate     func(childComplexity int, id string, input UpdPlanStep) int
+		PlanUpdate         func(childComplexity int, id string, input UpdPlan) int
+		RoleCreate         func(childComplexity int, input NewRole) int
+		RolePermMenuCreate func(childComplexity int, id string, perms []string) int
+		RolePermObjCreate  func(childComplexity int, id string, perms []IPermObj) int
+		RoleRemoves        func(childComplexity int, ids []string) int
+		RoleToUser         func(childComplexity int, uid string, roles []string) int
+		RoleUpdate         func(childComplexity int, id string, input UpdRole) int
+		RoleWithUser       func(childComplexity int, role string, uids []string) int
+		UserCreate         func(childComplexity int, input NewUser) int
+		UserRemoves        func(childComplexity int, ids []string) int
+		UserUpdate         func(childComplexity int, id string, input UpdUser) int
+		World              func(childComplexity int) int
 	}
 
 	MyInfo struct {
@@ -459,7 +459,7 @@ type MutationResolver interface {
 	RoleCreate(ctx context.Context, input NewRole) (bool, error)
 	RoleUpdate(ctx context.Context, id string, input UpdRole) (bool, error)
 	RoleRemoves(ctx context.Context, ids []string) (bool, error)
-	RolePermCreate(ctx context.Context, id string, typeArg string, perms []string) (bool, error)
+	RolePermMenuCreate(ctx context.Context, id string, perms []string) (bool, error)
 	RolePermObjCreate(ctx context.Context, id string, perms []IPermObj) (bool, error)
 	RoleToUser(ctx context.Context, uid string, roles []string) (bool, error)
 	RoleWithUser(ctx context.Context, role string, uids []string) (bool, error)
@@ -1933,17 +1933,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RoleCreate(childComplexity, args["input"].(NewRole)), true
 
-	case "Mutation.role_perm_create":
-		if e.complexity.Mutation.RolePermCreate == nil {
+	case "Mutation.role_perm_menu_create":
+		if e.complexity.Mutation.RolePermMenuCreate == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_role_perm_create_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_role_perm_menu_create_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.RolePermCreate(childComplexity, args["id"].(string), args["type"].(string), args["perms"].([]string)), true
+		return e.complexity.Mutation.RolePermMenuCreate(childComplexity, args["id"].(string), args["perms"].([]string)), true
 
 	case "Mutation.role_perm_obj_create":
 		if e.complexity.Mutation.RolePermObjCreate == nil {
@@ -2952,7 +2952,7 @@ type Subscription {
 }
 
 extend type Mutation {
-    account_create(input:NewAccount!):String! @perm(entity: "account",perm: "R",remark: "添加查询")
+    account_create(input:NewAccount!):String! @perm(entity: "account",perm: "R",remark: "账户新增")
     account_update(id: String!,input:UpdAccount!):Boolean! @perm(entity: "account",perm: "R",remark: "账户修改")
     account_removes(ids: [String!]):Boolean! @perm(entity: "account",perm: "R",remark: "账户删除")
 }
@@ -3268,7 +3268,7 @@ extend type Mutation {
     "字典项批量删除"
     dict_item_removes(ids: [String!]):Boolean!  @perm(entity: "dict_item",perm: "D",remark:"字典项删除")
     "字典项重新排序"
-    dict_item_sort(code: String!,items:[String!]): Boolean! @perm(entity: "dict_item",perm: "MSort",remark:"字典项排序")
+    dict_item_sort(code: String!,items:[String!]): Boolean! @perm(entity: "dict_item",perm: "MST",remark:"字典项排序")
 }
 
 input QDict{
@@ -3911,7 +3911,7 @@ extend type Mutation {
     "角色批量删除"
     role_removes(ids: [String!]): Boolean! @perm(entity: "role",perm: "D",remark:"角色删除")
     "新增权限"
-    role_perm_create(id: String!, type: String!, perms: [String!]!): Boolean! @perm(entity: "role",perm: "MP",remark:"角色权限新增")
+    role_perm_menu_create(id: String!, perms: [String!]!): Boolean! @perm(entity: "role",perm: "MP",remark:"角色权限新增")
     "新增对象权限"
     role_perm_obj_create(id: String!, perms:[IPermObj!]!): Boolean! @perm(entity: "role",perm: "MO",remark:"角色对象权限新增")
     "角色分配"
@@ -4711,7 +4711,7 @@ func (ec *executionContext) field_Mutation_role_create_args(ctx context.Context,
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_role_perm_create_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_role_perm_menu_create_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -4723,24 +4723,15 @@ func (ec *executionContext) field_Mutation_role_perm_create_args(ctx context.Con
 		}
 	}
 	args["id"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["type"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["type"] = arg1
-	var arg2 []string
+	var arg1 []string
 	if tmp, ok := rawArgs["perms"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("perms"))
-		arg2, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+		arg1, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["perms"] = arg2
+	args["perms"] = arg1
 	return args, nil
 }
 
@@ -10277,7 +10268,7 @@ func (ec *executionContext) _Mutation_account_create(ctx context.Context, field 
 			if err != nil {
 				return nil, err
 			}
-			remark, err := ec.unmarshalOString2ᚖstring(ctx, "添加查询")
+			remark, err := ec.unmarshalOString2ᚖstring(ctx, "账户新增")
 			if err != nil {
 				return nil, err
 			}
@@ -11383,7 +11374,7 @@ func (ec *executionContext) _Mutation_dict_item_sort(ctx context.Context, field 
 			if err != nil {
 				return nil, err
 			}
-			perm, err := ec.unmarshalNString2string(ctx, "MSort")
+			perm, err := ec.unmarshalNString2string(ctx, "MST")
 			if err != nil {
 				return nil, err
 			}
@@ -12202,7 +12193,7 @@ func (ec *executionContext) _Mutation_role_removes(ctx context.Context, field gr
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_role_perm_create(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_role_perm_menu_create(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -12219,7 +12210,7 @@ func (ec *executionContext) _Mutation_role_perm_create(ctx context.Context, fiel
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_role_perm_create_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_role_perm_menu_create_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -12228,7 +12219,7 @@ func (ec *executionContext) _Mutation_role_perm_create(ctx context.Context, fiel
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().RolePermCreate(rctx, args["id"].(string), args["type"].(string), args["perms"].([]string))
+			return ec.resolvers.Mutation().RolePermMenuCreate(rctx, args["id"].(string), args["perms"].([]string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			entity, err := ec.unmarshalNString2string(ctx, "role")
@@ -20138,8 +20129,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "role_perm_create":
-			out.Values[i] = ec._Mutation_role_perm_create(ctx, field)
+		case "role_perm_menu_create":
+			out.Values[i] = ec._Mutation_role_perm_menu_create(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
