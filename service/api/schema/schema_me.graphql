@@ -50,6 +50,9 @@ type MyInfo @goModel(model:"github.com/zhanghup/go-app/beans.User"){
     sex: String
     "移动电话"
     mobile: String
+    "是否管理员"
+    admin: String
 
     o_dept:Dept
+    perm_objects: Any
 }

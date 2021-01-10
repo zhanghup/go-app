@@ -290,15 +290,17 @@ type ComplexityRoot struct {
 	}
 
 	MyInfo struct {
-		Avatar func(childComplexity int) int
-		Birth  func(childComplexity int) int
-		Id     func(childComplexity int) int
-		IdCard func(childComplexity int) int
-		Mobile func(childComplexity int) int
-		Name   func(childComplexity int) int
-		ODept  func(childComplexity int) int
-		Sex    func(childComplexity int) int
-		Type   func(childComplexity int) int
+		Admin       func(childComplexity int) int
+		Avatar      func(childComplexity int) int
+		Birth       func(childComplexity int) int
+		Id          func(childComplexity int) int
+		IdCard      func(childComplexity int) int
+		Mobile      func(childComplexity int) int
+		Name        func(childComplexity int) int
+		ODept       func(childComplexity int) int
+		PermObjects func(childComplexity int) int
+		Sex         func(childComplexity int) int
+		Type        func(childComplexity int) int
 	}
 
 	PermObj struct {
@@ -469,6 +471,7 @@ type MutationResolver interface {
 }
 type MyInfoResolver interface {
 	ODept(ctx context.Context, obj *beans.User) (*beans.Dept, error)
+	PermObjects(ctx context.Context, obj *beans.User) (interface{}, error)
 }
 type QueryResolver interface {
 	Stat(ctx context.Context) (interface{}, error)
@@ -2048,6 +2051,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.World(childComplexity), true
 
+	case "MyInfo.admin":
+		if e.complexity.MyInfo.Admin == nil {
+			break
+		}
+
+		return e.complexity.MyInfo.Admin(childComplexity), true
+
 	case "MyInfo.avatar":
 		if e.complexity.MyInfo.Avatar == nil {
 			break
@@ -2096,6 +2106,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MyInfo.ODept(childComplexity), true
+
+	case "MyInfo.perm_objects":
+		if e.complexity.MyInfo.PermObjects == nil {
+			break
+		}
+
+		return e.complexity.MyInfo.PermObjects(childComplexity), true
 
 	case "MyInfo.sex":
 		if e.complexity.MyInfo.Sex == nil {
@@ -3440,8 +3457,11 @@ type MyInfo @goModel(model:"github.com/zhanghup/go-app/beans.User"){
     sex: String
     "移动电话"
     mobile: String
+    "是否管理员"
+    admin: String
 
     o_dept:Dept
+    perm_objects: Any
 }`, BuiltIn: false},
 	{Name: "schema/schema_menu.graphql", Input: `extend type Query{
     menus(query:QMenu!):[Menu!]
@@ -3914,7 +3934,6 @@ extend type Mutation {
     role_perm_menu_create(id: String!, perms: [String!]!): Boolean! @perm(entity: "role",perm: "MPM",remark:"菜单角色权限新增")
     "新增对象权限"
     role_perm_obj_create(id: String!, perms:[IPermObj!]!): Boolean! @perm(entity: "role",perm: "MO",remark:"角色对象权限新增")
-
     "角色分配"
     role_with_user(role: String!,uids:[String!]!): Boolean! @perm(entity: "role",perm: "MWU",remark:"角色分配")
 }
@@ -12968,6 +12987,38 @@ func (ec *executionContext) _MyInfo_mobile(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _MyInfo_admin(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MyInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Admin, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _MyInfo_o_dept(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12998,6 +13049,38 @@ func (ec *executionContext) _MyInfo_o_dept(ctx context.Context, field graphql.Co
 	res := resTmp.(*beans.Dept)
 	fc.Result = res
 	return ec.marshalODept2ᚖgithubᚗcomᚋzhanghupᚋgoᚑappᚋbeansᚐDept(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MyInfo_perm_objects(ctx context.Context, field graphql.CollectedField, obj *beans.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MyInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.MyInfo().PermObjects(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(interface{})
+	fc.Result = res
+	return ec.marshalOAny2interface(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _PermObj_object(ctx context.Context, field graphql.CollectedField, obj *PermObj) (ret graphql.Marshaler) {
@@ -20203,6 +20286,8 @@ func (ec *executionContext) _MyInfo(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._MyInfo_sex(ctx, field, obj)
 		case "mobile":
 			out.Values[i] = ec._MyInfo_mobile(ctx, field, obj)
+		case "admin":
+			out.Values[i] = ec._MyInfo_admin(ctx, field, obj)
 		case "o_dept":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -20212,6 +20297,17 @@ func (ec *executionContext) _MyInfo(ctx context.Context, sel ast.SelectionSet, o
 					}
 				}()
 				res = ec._MyInfo_o_dept(ctx, field, obj)
+				return res
+			})
+		case "perm_objects":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MyInfo_perm_objects(ctx, field, obj)
 				return res
 			})
 		default:

@@ -113,34 +113,38 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 				Mask   string `json:"mask"`
 			}, 0)
 			err := dbs.SF(`
-						select p.object,p.mask from user u 
-						join role_user ru on u.id = ru.uid
-						join perm_object p on p.role = ru.id
-					`).Find(&permObjects)
+				select p.object,p.mask from user u 
+				join role_user ru on u.id = ru.uid
+				join perm_object p on p.role = ru.role
+				where u.id = :uid
+			`, map[string]interface{}{
+				"uid": user.User.Id,
+			}).Find(&permObjects)
 			if err != nil {
 				return err.Error(), errors.New("[12] 未授权")
 			}
+			newPerm := map[string][]string{}
 			for _, p := range permObjects {
-				if o, ok := myPermObj[p.Object]; ok {
-					myPermObj[p.Object] = o + p.Mask
+				if _, ok := newPerm[p.Object]; ok {
+					newPerm[p.Object] = append(newPerm[p.Object], p.Mask)
 				} else {
-					myPermObj[p.Object] = p.Mask
+					newPerm[p.Object] = []string{p.Mask}
 				}
 			}
+
 			// myPermObj去重
-			for k, v := range myPermObj {
-				vs := strings.Split(v, "")
+			for k, v := range newPerm {
+				vs := strings.Split(strings.Join(v, ","), ",")
 				t := map[string]bool{}
 				for _, str := range vs {
 					t[str] = true
 				}
-				str := ""
+				str := make([]string, 0)
 				for kk := range t {
-					str += kk
+					str = append(str, kk)
 				}
-				myPermObj[k] = str
+				myPermObj[k] = strings.Join(str, ",")
 			}
-
 		}
 
 		user.PermObjects = myPermObj

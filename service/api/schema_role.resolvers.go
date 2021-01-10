@@ -5,6 +5,7 @@ package api
 
 import (
 	"context"
+	"github.com/zhanghup/go-app/service/ca"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -25,10 +26,29 @@ func (r *mutationResolver) RoleUpdate(ctx context.Context, id string, input sour
 }
 
 func (r *mutationResolver) RoleRemoves(ctx context.Context, ids []string) (bool, error) {
-	return r.Removes(ctx, new(beans.Role), ids)
+	ok, err := r.Removes(ctx, new(beans.Role), ids)
+	if err != nil {
+		return false, err
+	}
+	if ok {
+		err := r.Sess(ctx).SF(`delete from role_user where role in :roles`, map[string]interface{}{"roles": ids}).Exec()
+		if err != nil{
+			return false,err
+		}
+		err = r.Sess(ctx).SF(`delete from perm where role in :roles`, map[string]interface{}{"roles": ids}).Exec()
+		if err != nil{
+			return false,err
+		}
+		err = r.Sess(ctx).SF(`delete from perm_object where role in :roles`, map[string]interface{}{"roles": ids}).Exec()
+		if err != nil{
+			return false,err
+		}
+		ca.UserCache.Clear()
+	}
+	return true, nil
 }
 
-func (r *mutationResolver) RolePermMenuCreate(ctx context.Context, id string,  perms []string) (bool, error) {
+func (r *mutationResolver) RolePermMenuCreate(ctx context.Context, id string, perms []string) (bool, error) {
 	err := r.Sess(ctx).SF(`delete from perm where role = :id and type = :type`, map[string]interface{}{
 		"type": "menu",
 		"id":   id,
@@ -53,6 +73,7 @@ func (r *mutationResolver) RolePermMenuCreate(ctx context.Context, id string,  p
 			return false, err
 		}
 	}
+	ca.UserCache.Clear()
 	return true, nil
 }
 
@@ -83,6 +104,7 @@ func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, per
 				return err
 			}
 		}
+		ca.UserCache.Clear()
 		return nil
 	})
 
@@ -114,6 +136,7 @@ func (r *mutationResolver) RoleWithUser(ctx context.Context, role string, uids [
 				return err
 			}
 		}
+		ca.UserCache.Clear()
 		return nil
 	})
 
@@ -123,14 +146,15 @@ func (r *mutationResolver) RoleWithUser(ctx context.Context, role string, uids [
 func (r *queryResolver) Roles(ctx context.Context, query source.QRole) (*source.Roles, error) {
 	roles := make([]beans.Role, 0)
 	total, err := r.DBS(ctx).SF(`
-		select * from role u
+		select u.* from role u
+		join with_role on u.id = with_role.id
 		where 1 = 1
 		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
 		{{ if .status }} and u.status = :status {{ end }}
 	`, map[string]interface{}{
 		"keyword": query.Keyword,
 		"status":  query.Status,
-	}).Page2(query.Index, query.Size, query.Count, &roles)
+	}).With("with_role").Page2(query.Index, query.Size, query.Count, &roles)
 	return &source.Roles{Data: roles, Total: &total}, err
 }
 

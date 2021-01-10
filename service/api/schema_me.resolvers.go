@@ -93,3 +93,7 @@ func (r *queryResolver) MyMsgInfos(ctx context.Context, query source.QMyMsgInfo)
 func (r *Resolver) MyInfo() source.MyInfoResolver { return &myInfoResolver{r} }
 
 type myInfoResolver struct{ *Resolver }
+
+func (r *myInfoResolver) PermObjects(ctx context.Context, obj *beans.User) (interface{}, error) {
+	return r.Me(ctx).Info.PermObjects, nil
+}
