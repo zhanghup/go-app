@@ -83,7 +83,22 @@ func (this *dictCache) GetName(dictCode, value string) string {
 		}
 	}
 	return ""
+}
 
+func (this *dictCache) GetValue(dictCode, name string) string {
+	_, items, ok := this.Get(dictCode)
+	if !ok {
+		return ""
+	}
+	if items == nil {
+		return ""
+	}
+	for _, s := range items {
+		if s.Name != nil && *s.Name == name {
+			return *s.Value
+		}
+	}
+	return ""
 }
 
 func init() {
