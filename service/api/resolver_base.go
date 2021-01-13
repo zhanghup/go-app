@@ -5,6 +5,7 @@ import (
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"reflect"
+	"time"
 )
 
 func (this *ResolverTools) Create(ctx context.Context, tab interface{}, obj interface{}) (string, error) {
@@ -27,6 +28,12 @@ func (this *ResolverTools) Create(ctx context.Context, tab interface{}, obj inte
 				if t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.String {
 					if v.Pointer() == 0 {
 						v.Set(reflect.ValueOf(tools.Ptr.String("1")))
+					}
+				}
+			case "Weight":
+				if t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.Int {
+					if v.Pointer() == 0 {
+						v.Set(reflect.ValueOf(tools.Ptr.Int(int(time.Now().Unix() - 1610541047))))
 					}
 				}
 			}
