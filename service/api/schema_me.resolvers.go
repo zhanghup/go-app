@@ -28,7 +28,10 @@ func (r *mutationResolver) MyMsgInfoConfirm(ctx context.Context, id string, inpu
 			confirm_remark = :confirm_remark,
 			confirm_time =  unix_timestamp(now()), 
 			confirm_target = 'web',
-			state = '4'
+			read_time = unix_timestamp(now()), 
+			read_target = 'web',
+			state = '4',
+			updated =  unix_timestamp(now()) 
 		where id = :id
 	`,
 		map[string]interface{}{
@@ -54,7 +57,8 @@ func (r *mutationResolver) MyMsgInfoRead(ctx context.Context, id string) (bool, 
 		set 
 			read_time = unix_timestamp(now()), 
 			read_target = 'web',
-			state = '0'
+			state = '0',
+			updated =  unix_timestamp(now()) 
 		where id = :id
 	`, map[string]interface{}{
 		"id": id,
