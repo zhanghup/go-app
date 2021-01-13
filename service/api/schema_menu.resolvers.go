@@ -5,10 +5,10 @@ package api
 
 import (
 	"context"
-	"github.com/zhanghup/go-tools"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
+	"github.com/zhanghup/go-tools"
 )
 
 func (r *mutationResolver) MenuCreate(ctx context.Context, input source.NewMenu) (string, error) {
