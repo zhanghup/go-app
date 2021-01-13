@@ -4,5 +4,5 @@ upload
 conf/
 boot/test_main/conf
 logs/
-service/api/cmd/gqlgen.yml
 service/api/cmd/source/
+service/api/cmd/test/

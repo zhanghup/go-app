@@ -53,8 +53,8 @@ func (r *queryResolver) Depts(ctx context.Context, query source.QDept) (*source.
 		map[string]interface{}{
 			"pid":    query.Pid,
 			"status": query.Status,
-			"code": query.Code,
-			"name": query.Name,
+			"code":   query.Code,
+			"name":   query.Name,
 		}).Order("d.weight").Page2(query.Index, query.Size, query.Count, &depts)
 	return &source.Depts{Total: &i, Data: depts}, err
 }

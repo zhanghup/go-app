@@ -5,10 +5,10 @@ package api
 
 import (
 	"context"
-	"github.com/zhanghup/go-app/service/ca"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
+	"github.com/zhanghup/go-app/service/ca"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
 )
@@ -32,16 +32,16 @@ func (r *mutationResolver) RoleRemoves(ctx context.Context, ids []string) (bool,
 	}
 	if ok {
 		err := r.Sess(ctx).SF(`delete from role_user where role in :roles`, map[string]interface{}{"roles": ids}).Exec()
-		if err != nil{
-			return false,err
+		if err != nil {
+			return false, err
 		}
 		err = r.Sess(ctx).SF(`delete from perm where role in :roles`, map[string]interface{}{"roles": ids}).Exec()
-		if err != nil{
-			return false,err
+		if err != nil {
+			return false, err
 		}
 		err = r.Sess(ctx).SF(`delete from perm_object where role in :roles`, map[string]interface{}{"roles": ids}).Exec()
-		if err != nil{
-			return false,err
+		if err != nil {
+			return false, err
 		}
 		ca.UserCache.Clear()
 	}

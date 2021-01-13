@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/99designs/gqlgen/plugin/modelgen"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -16,13 +17,16 @@ func main() {
 	log.SetOutput(ioutil.Discard)
 
 	cfg, err := config.LoadConfigFromDefaultLocations()
+	if os.IsNotExist(errors.Cause(err)) {
+		cfg, err = config.LoadDefaultConfig()
+	}
 
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "failed to load config", err.Error())
+		fmt.Fprintln(os.Stderr, "failed to load config：", err.Error())
 		os.Exit(2)
 	}
 
-	options := []api.Option{api.NoPlugins()}
+	options := []api.Option{}
 	options = append(options, api.AddPlugin(&modelgen.Plugin{
 		MutateHook: func(b *modelgen.ModelBuild) *modelgen.ModelBuild {
 			for _, model := range b.Models {

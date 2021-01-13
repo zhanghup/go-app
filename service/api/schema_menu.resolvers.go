@@ -1,10 +1,14 @@
 package api
 
+// This file will be automatically regenerated based on the schema, any resolver implementations
+// will be copied through when generating and any unknown code will be moved to the end.
+
 import (
 	"context"
+	"github.com/zhanghup/go-tools"
+
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
-	"github.com/zhanghup/go-tools"
 )
 
 func (r *mutationResolver) MenuCreate(ctx context.Context, input source.NewMenu) (string, error) {
@@ -85,9 +89,9 @@ func (r *queryResolver) Menus(ctx context.Context, query source.QMenu) ([]beans.
 			{{ if .status }} and p.status = :status {{ end }}
 		`,
 		map[string]interface{}{
-			"uid":    *r.Me(ctx).Info.User.Id,
-			"no_admin":  !r.Me(ctx).Info.Admin,
-			"status": query.Status,
+			"uid":      *r.Me(ctx).Info.User.Id,
+			"no_admin": !r.Me(ctx).Info.Admin,
+			"status":   query.Status,
 		}).Order("weight").Find(&plans)
 	return plans, err
 }
