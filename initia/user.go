@@ -24,6 +24,7 @@ func InitUser(db *xorm.Engine) {
 				Status: tools.Ptr.String("1"),
 				Weight: tools.Ptr.Int(0),
 			},
+			Name: tools.Ptr.String("超级管理员"),
 		}
 		err := sess.Insert(user)
 		if err != nil {
