@@ -57,8 +57,8 @@ func (this *uploader) UploadIO(read io.Reader, name, contentType string) (string
 	if old.Id == nil {
 		res := beans.Resource{
 			Bean: beans.Bean{
-				Id:     tools.Ptr.Uid(),
-				Status: tools.Ptr.String("1"),
+				Id:     tools.PtrOfUUID(),
+				Status: tools.PtrOfString("1"),
 			},
 			ContentType: contentType,
 			MD5:         md5,

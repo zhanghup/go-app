@@ -16,8 +16,8 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 		user := MyInfo(ctx)
 		lg := beans.OperateLog{
 			Bean: beans.Bean{
-				Id:     tools.Ptr.Uid(),
-				Status: tools.Ptr.String("1"),
+				Id:     tools.PtrOfUUID(),
+				Status: tools.PtrOfString("1"),
 			},
 			Type:  &entity,
 			Opt:   &perm,
@@ -29,20 +29,20 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 		if user.Info.User.Id != nil && *user.Info.User.Id == "root" {
 			res, err = next(ctx)
 			if err != nil {
-				lg.State = tools.Ptr.String("error") // 失败
-				lg.Msg = tools.Ptr.String(err.Error())
+				lg.State = tools.PtrOfString("error") // 失败
+				lg.Msg = tools.PtrOfString(err.Error())
 			} else {
-				lg.State = tools.Ptr.String("success") // 成功
+				lg.State = tools.PtrOfString("success") // 成功
 			}
 		} else {
 			// 管理员
 			if user.Info.Admin {
 				res, err = next(ctx)
 				if err != nil {
-					lg.State = tools.Ptr.String("error") // 失败
-					lg.Msg = tools.Ptr.String(err.Error())
+					lg.State = tools.PtrOfString("error") // 失败
+					lg.Msg = tools.PtrOfString(err.Error())
 				} else {
-					lg.State = tools.Ptr.String("success") // 成功
+					lg.State = tools.PtrOfString("success") // 成功
 				}
 			} else {
 				// 非管理员
@@ -50,10 +50,10 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 				//if ok && strings.Contains(data, perm) {
 				res, err = next(ctx)
 				if err != nil {
-					lg.State = tools.Ptr.String("error") // 失败
-					lg.Msg = tools.Ptr.String(err.Error())
+					lg.State = tools.PtrOfString("error") // 失败
+					lg.Msg = tools.PtrOfString(err.Error())
 				} else {
-					lg.State = tools.Ptr.String("success") // 成功
+					lg.State = tools.PtrOfString("success") // 成功
 				}
 				//} else {
 				//	lg.State = tools.Ptr.String("refuse") // 拒绝
@@ -64,7 +64,7 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 		// 不记录查询操作
 		input := graphql.GetOperationContext(ctx)
 		lg.Gql = &input.RawQuery
-		lg.GqlVariables = tools.Ptr.String(tools.Str.JSONString(input.Variables))
+		lg.GqlVariables = tools.PtrOfString(tools.JSONString(input.Variables))
 		go db.Insert(lg)
 
 		return

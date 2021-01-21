@@ -76,11 +76,11 @@ func AddJob(name, spec string, action func(db *xorm.Engine) error, flag ...bool)
 		model := beans.Cron{
 			Bean: beans.Bean{
 				Id:     &id,
-				Status: tools.Ptr.String("1"),
+				Status: tools.PtrOfString("1"),
 			},
 			Name:       &name,
 			Expression: &spec,
-			State:      tools.Ptr.String("start"),
+			State:      tools.PtrOfString("start"),
 		}
 		_, err := job.db.Insert(&model)
 		if err != nil {
@@ -242,16 +242,16 @@ func Run(id string) func() {
 		}
 		lg := beans.CronLog{
 			Bean: beans.Bean{
-				Id:     tools.Ptr.Uid(),
-				Status: tools.Ptr.String("1"),
+				Id:     tools.PtrOfUUID(),
+				Status: tools.PtrOfString("1"),
 			},
 			Name:       &ji.name,
 			Expression: &ji.spec,
 			Cron:       &id,
 			Message:    &message,
 			Result:     &result,
-			Start:      tools.Ptr.Int64(l1 / int64(time.Second)),
-			End:        tools.Ptr.Int64(l2 / int64(time.Second)),
+			Start:      tools.PtrOfInt64(l1 / int64(time.Second)),
+			End:        tools.PtrOfInt64(l2 / int64(time.Second)),
 		}
 		_, err = job.db.Insert(lg)
 		if err != nil {

@@ -80,20 +80,20 @@ func InitTestUser(db *xorm.Engine) {
 
 		users = append(users, beans.User{
 			Bean: beans.Bean{
-				Id:     tools.Ptr.Uid(),
-				Status: tools.Ptr.String("1"),
+				Id:     tools.PtrOfUUID(),
+				Status: tools.PtrOfString("1"),
 			},
-			Dept:   tools.Ptr.String(deptIds[rand.Intn(len(deptIds))]),
-			Type:   tools.Ptr.String("1"),
+			Dept:   tools.PtrOfString(deptIds[rand.Intn(len(deptIds))]),
+			Type:   tools.PtrOfString("1"),
 			Name:   &nn,
 			Py:     &py,
 			Pinyin: &pinyin,
 			Avatar: nil,
-			IdCard: tools.Ptr.String(fmt.Sprintf("330411%s%04d", strings.ReplaceAll(birth, "-", ""), i)),
-			Birth:  tools.Ptr.Int64(tools.Time.MustParseYMD(birth).Unix()),
+			IdCard: tools.PtrOfString(fmt.Sprintf("330411%s%04d", strings.ReplaceAll(birth, "-", ""), i)),
+			Birth:  tools.PtrOfInt64(tools.Time.MustParseYMD(birth).Unix()),
 			Sex:    &sex,
-			Sn:     tools.Ptr.String(fmt.Sprintf("X%04d", i)),
-			Mobile: tools.Ptr.String(fmt.Sprintf("15%d%d%d%d%d%d%d%d%d", rand.Intn(10), rand.Intn(10), rand.Intn(10), rand.Intn(10), rand.Intn(10), rand.Intn(10), rand.Intn(10), rand.Intn(10), rand.Intn(10))),
+			Sn:     tools.PtrOfString(fmt.Sprintf("X%04d", i)),
+			Mobile: tools.PtrOfString(fmt.Sprintf("15%d%d%d%d%d%d%d%d%d", rand.Intn(10), rand.Intn(10), rand.Intn(10), rand.Intn(10), rand.Intn(10), rand.Intn(10), rand.Intn(10), rand.Intn(10), rand.Intn(10))),
 		})
 	}
 

@@ -31,7 +31,7 @@ func main() {
 		}
 
 		return ags.MessageSend(tpl, "root", "root", "user", "root", "今天天气好晴朗，处处好风光", map[string]string{
-			"name": tools.Str.RandString(8),
+			"name": tools.StrOfRand(8),
 			"time": tools.Time.HMS(),
 		})
 	}).Router(func(g *gin.Engine, db *xorm.Engine) {

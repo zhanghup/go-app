@@ -59,7 +59,7 @@ func (r *queryResolver) MsgInfos(ctx context.Context, query source.QMsgInfo) ([]
 		"confirm_target": query.ConfirmTarget,
 		"read_target":    query.ReadTarget,
 		"status":         query.Status,
-	}).Page2(query.Index, query.Size, tools.Ptr.Bool(false), &infos)
+	}).Page2(query.Index, query.Size, tools.PtrOfBool(false), &infos)
 	return infos, err
 }
 
@@ -71,7 +71,7 @@ func (r *queryResolver) MsgHistorys(ctx context.Context, query source.QMsgHistor
 		{{ if .info }} and his.info = :info {{ end }}
 	`, map[string]interface{}{
 		"info": query.Info,
-	}).Order("-his.created").Page2(query.Index, query.Size, tools.Ptr.Bool(false), &infos)
+	}).Order("-his.created").Page2(query.Index, query.Size, tools.PtrOfBool(false), &infos)
 	return infos, err
 }
 

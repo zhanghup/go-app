@@ -16,24 +16,24 @@ func (this *ResolverTools) Create(ctx context.Context, tab interface{}, obj inte
 			case "Id":
 				if t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.String {
 					if v.Pointer() == 0 {
-						id = tools.Str.Uid()
+						id = tools.UUID()
 						v.Set(reflect.ValueOf(&id))
 					}
 				} else if t.Kind() == reflect.String {
 					if v.String() == "" {
-						v.Set(reflect.ValueOf(tools.Str.Uid()))
+						v.Set(reflect.ValueOf(tools.UUID()))
 					}
 				}
 			case "Status":
 				if t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.String {
 					if v.Pointer() == 0 {
-						v.Set(reflect.ValueOf(tools.Ptr.String("1")))
+						v.Set(reflect.ValueOf(tools.PtrOfString("1")))
 					}
 				}
 			case "Weight":
 				if t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.Int {
 					if v.Pointer() == 0 {
-						v.Set(reflect.ValueOf(tools.Ptr.Int(int(time.Now().Unix() - 1610541047))))
+						v.Set(reflect.ValueOf(tools.PtrOfInt(int(time.Now().Unix() - 1610541047))))
 					}
 				}
 			}

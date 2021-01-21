@@ -31,7 +31,7 @@ func (r *mutationResolver) MenuReload(ctx context.Context, menus []source.MenuLo
 		err := r.Sess(ctx).Insert(beans.Menu{
 			Bean: beans.Bean{
 				Id:     m.ID,
-				Status: tools.Ptr.String("1"),
+				Status: tools.PtrOfString("1"),
 				Weight: &weight,
 			},
 			Name:   m.Name,
