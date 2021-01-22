@@ -59,7 +59,9 @@ func (this *ResolverTools) Update(ctx context.Context, tab interface{}, id strin
 		if err != nil {
 			return err
 		}
-		_, err = sess.S().Table(tab).Where("id = ?", id).AllCols().Update(obj)
+		if obj != nil{
+			_, err = sess.S().Table(tab).Where("id = ?", id).AllCols().Update(obj)
+		}
 		return err
 	})
 
