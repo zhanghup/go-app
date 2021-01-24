@@ -241,7 +241,6 @@ func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.
 			u.* 
 		from 
 			user u
-		join with_role_user on u.id = with_role_user.id
 		where 1 = 1
 		{{ if .keyword }} 
 			and (
@@ -268,7 +267,7 @@ func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.
 		"sex":     query.Sex,
 		"admin":   query.Admin,
 		"name":    query.Name,
-	}).With("with_role_user").Page2(query.Index, query.Size, query.Count, &users)
+	}).Page2(query.Index, query.Size, query.Count, &users)
 	return &source.Users{Data: users, Total: &total}, err
 }
 
