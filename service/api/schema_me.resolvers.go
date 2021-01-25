@@ -6,7 +6,6 @@ package api
 import (
 	"context"
 	"errors"
-
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
 	"github.com/zhanghup/go-tools"
@@ -75,17 +74,17 @@ func (r *myInfoResolver) ODept(ctx context.Context, obj *beans.User) (*beans.Dep
 }
 
 func (r *myInfoResolver) PermObjects(ctx context.Context, obj *beans.User) (interface{}, error) {
-	return r.Me(ctx).Info.PermObjects, nil
+	return r.Me(ctx).PermObjects(), nil
 }
 
 func (r *queryResolver) MyInfo(ctx context.Context) (*beans.User, error) {
-	user := r.Me(ctx).Info.User
+	user := r.Me(ctx).User
 	return &user, nil
 }
 
 func (r *queryResolver) MyMsgInfos(ctx context.Context, query source.QMyMsgInfo) ([]beans.MsgInfo, error) {
 	return r.Query().MsgInfos(ctx, source.QMsgInfo{
-		Receiver:      r.Me(ctx).Info.User.Id,
+		Receiver:      r.Me(ctx).User.Id,
 		Type:          query.Type,
 		Level:         query.Level,
 		Target:        tools.PtrOfString("web"),

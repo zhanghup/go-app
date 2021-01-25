@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/ags/source"
+	"github.com/zhanghup/go-app/service/ca"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
@@ -16,7 +17,7 @@ type Resolver struct {
 	DB     *xorm.Engine
 	DBS    txorm.IEngine
 	Gin    func(g context.Context) *gin.Context
-	Me     func(ctx context.Context) directive.Me
+	Me     func(ctx context.Context) *ca.User
 	Loader func(ctx context.Context) tgql.Loader
 }
 

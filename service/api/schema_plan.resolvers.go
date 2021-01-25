@@ -11,10 +11,10 @@ import (
 )
 
 func (r *mutationResolver) PlanCreate(ctx context.Context, input source.NewPlan) (string, error) {
-	user := r.Me(ctx).Info.User
+	user := r.Me(ctx)
 	plan := beans.Plan{
-		Puid:   user.Id,
-		Puname: user.Name,
+		Puid:   &user.Id,
+		Puname: &user.Name,
 	}
 	return r.Create(ctx, &plan, input)
 }

@@ -6,11 +6,10 @@ import (
 	"github.com/zhanghup/go-app/service/ca"
 )
 
-type Me ca.User
-
-func MyInfo(g context.Context) Me {
+func MyInfo(g context.Context) *ca.User {
 	gg := g.Value(GIN_CONTEXT)
 	ggg := gg.(*gin.Context)
 	user, _ := ggg.Get(GIN_USER)
-	return Me(user.(ca.User))
+	u := user.(ca.User)
+	return &u
 }

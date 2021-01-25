@@ -85,8 +85,8 @@ func (r *subscriptionResolver) Message(ctx context.Context) (<-chan *source.Mess
 		}
 	}
 
-	event.MsgNewSubscribe(*r.Me(ctx).Info.User.Id, event.MsgTargetWeb, fn)
-	go event.MsgNewUnSubscribeWithContext(ctx, *r.Me(ctx).Info.User.Id, event.MsgTargetWeb, fn)
+	event.MsgNewSubscribe(r.Me(ctx).Id, event.MsgTargetWeb, fn)
+	go event.MsgNewUnSubscribeWithContext(ctx, r.Me(ctx).Id, event.MsgTargetWeb, fn)
 
 	return datas, nil
 }

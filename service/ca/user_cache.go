@@ -21,13 +21,22 @@ type User struct {
 	permObjects map[string]map[string]bool
 }
 
+func (this *User) PermObjects() map[string]map[string]bool {
+	return this.permObjects
+}
+
 func (this *User) EntityPermAdd(entity, mask string) {
+
 	if this.permObjects == nil {
 		this.permObjects = map[string]map[string]bool{}
 	}
 
 	if _, ok := this.permObjects[entity]; !ok {
 		this.permObjects[entity] = map[string]bool{}
+	}
+
+	if mask == ""{
+		return
 	}
 
 	ms := strings.Split(mask, ",")
@@ -39,7 +48,7 @@ func (this *User) EntityPermAdd(entity, mask string) {
 func (this *User) EntityPerm(entity, opt string) bool {
 	ent, ok := this.permObjects[entity]
 	if !ok {
-		return false
+		return true
 	}
 	o, ok := ent[opt]
 	return o && ok

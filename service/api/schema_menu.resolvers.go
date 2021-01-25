@@ -89,8 +89,8 @@ func (r *queryResolver) Menus(ctx context.Context, query source.QMenu) ([]beans.
 			{{ if .status }} and p.status = :status {{ end }}
 		`,
 		map[string]interface{}{
-			"uid":      *r.Me(ctx).Info.User.Id,
-			"no_admin": !r.Me(ctx).Info.Admin,
+			"uid":      r.Me(ctx).Id,
+			"no_admin": !r.Me(ctx).Admin,
 			"status":   query.Status,
 		}).Order("weight").Find(&plans)
 	return plans, err

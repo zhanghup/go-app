@@ -2,6 +2,7 @@ package directive
 
 import (
 	"context"
+	"errors"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-tools"
@@ -46,18 +47,18 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 				}
 			} else {
 				// 非管理员
-				//data, ok := user.Info.PermObjects[entity]
-				//if ok && strings.Contains(data, perm) {
-				res, err = next(ctx)
-				if err != nil {
-					lg.State = tools.PtrOfString("error") // 失败
-					lg.Msg = tools.PtrOfString(err.Error())
+				if user.EntityPerm(entity, perm) {
+					res, err = next(ctx)
+					if err != nil {
+						lg.State = tools.PtrOfString("error") // 失败
+						lg.Msg = tools.PtrOfString(err.Error())
+					} else {
+						lg.State = tools.PtrOfString("success") // 成功
+					}
 				} else {
-					lg.State = tools.PtrOfString("success") // 成功
+					lg.State = tools.PtrOfString("refuse") // 拒绝
+					err = errors.New("权限不足，请求被拒绝！")
 				}
-				//} else {
-				//	lg.State = tools.Ptr.String("refuse") // 拒绝
-				//}
 			}
 		}
 

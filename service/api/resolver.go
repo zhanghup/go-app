@@ -8,6 +8,7 @@ import (
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/api/source"
+	"github.com/zhanghup/go-app/service/ca"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgql"
@@ -40,7 +41,7 @@ type ResolverTools struct {
 	DBS       func(ctx context.Context) txorm.ISession
 	Sess      func(ctx context.Context) txorm.ISession
 	Loader    func(ctx context.Context) tgql.Loader
-	Me        func(ctx context.Context) directive.Me
+	Me        func(ctx context.Context) *ca.User
 	DictCache func(dict string) (*beans.Dict, []beans.DictItem, bool)
 }
 
