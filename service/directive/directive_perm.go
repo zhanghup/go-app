@@ -21,12 +21,12 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 			},
 			Type:  &entity,
 			Opt:   &perm,
-			Uid:   user.Info.User.Id,
-			Uname: user.Info.User.Name,
+			Uid:   &user.Id,
+			Uname: &user.Name,
 		}
 
 		// root 无限操作权限
-		if user.Info.User.Id != nil && *user.Info.User.Id == "root" {
+		if user.Id == "root" {
 			res, err = next(ctx)
 			if err != nil {
 				lg.State = tools.Ptr.String("error") // 失败
@@ -36,7 +36,7 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 			}
 		} else {
 			// 管理员
-			if user.Info.Admin {
+			if user.Admin {
 				res, err = next(ctx)
 				if err != nil {
 					lg.State = tools.Ptr.String("error") // 失败
@@ -61,7 +61,6 @@ func Perm(db *xorm.Engine) func(ctx context.Context, obj interface{}, next graph
 			}
 		}
 
-		// 不记录查询操作
 		input := graphql.GetOperationContext(ctx)
 		lg.Gql = &input.RawQuery
 		lg.GqlVariables = tools.Ptr.String(tools.Str.JSONString(input.Variables))

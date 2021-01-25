@@ -4,21 +4,49 @@ import (
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
+	"strings"
 	"time"
 	"xorm.io/xorm"
 )
 
 type User struct {
+	Id          string
+	Name        string
+	Admin       bool
+	TokenString string
+
 	User        beans.User
 	Account     beans.Account
 	Token       beans.Token
-	PermObjects map[string]string
-	Admin       bool
-	TokenString string
+	permObjects map[string]map[string]bool
+}
+
+func (this *User) EntityPermAdd(entity, mask string) {
+	if this.permObjects == nil {
+		this.permObjects = map[string]map[string]bool{}
+	}
+
+	if _, ok := this.permObjects[entity]; !ok {
+		this.permObjects[entity] = map[string]bool{}
+	}
+
+	ms := strings.Split(mask, ",")
+	for _, s := range ms {
+		this.permObjects[entity][s] = true
+	}
+}
+
+func (this *User) EntityPerm(entity, opt string) bool {
+	ent, ok := this.permObjects[entity]
+	if !ok {
+		return false
+	}
+	o, ok := ent[opt]
+	return o && ok
 }
 
 type userCache struct {
-	usermap     tools.ICache
+	usermap  tools.ICache
 	tokenmap tools.ICache
 	db       *xorm.Engine
 }
@@ -73,7 +101,7 @@ var UserCache *userCache
 func init() {
 	event.XormDefaultInitSubscribeOnce(func(db *xorm.Engine) {
 		UserCache = &userCache{
-			usermap:     tools.CacheCreate(true),
+			usermap:  tools.CacheCreate(true),
 			tokenmap: tools.CacheCreate(true),
 			db:       db,
 		}

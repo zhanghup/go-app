@@ -6,7 +6,6 @@ import (
 	"github.com/zhanghup/go-app/service/ca"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
-	"strings"
 	"time"
 	"xorm.io/xorm"
 
@@ -102,52 +101,34 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 		} else {
 			user.Admin = false
 		}
+		user.Id = *u.Id
+		if u.Name != nil {
+			user.Name = *u.Name
+		}
 	}
 
 	if !user.Admin {
 		// 读取对象权限
-		myPermObj := PermObjects{}
-		{
-			permObjects := make([]struct {
-				Object string `json:"object"`
-				Mask   string `json:"mask"`
-			}, 0)
-			err := dbs.SF(`
+		permObjects := make([]struct {
+			Object string `json:"object"`
+			Mask   string `json:"mask"`
+		}, 0)
+		err := dbs.SF(`
 				select p.object,p.mask from user u 
 				join role_user ru on u.id = ru.uid
 				join perm_object p on p.role = ru.role
 				where u.id = :uid
 			`, map[string]interface{}{
-				"uid": user.User.Id,
-			}).Find(&permObjects)
-			if err != nil {
-				return err.Error(), errors.New("[12] 未授权")
-			}
-			newPerm := map[string][]string{}
-			for _, p := range permObjects {
-				if _, ok := newPerm[p.Object]; ok {
-					newPerm[p.Object] = append(newPerm[p.Object], p.Mask)
-				} else {
-					newPerm[p.Object] = []string{p.Mask}
-				}
-			}
-
-			// myPermObj去重
-			for k, v := range newPerm {
-				vs := strings.Split(strings.Join(v, ","), ",")
-				t := map[string]bool{}
-				for _, str := range vs {
-					t[str] = true
-				}
-				str := make([]string, 0)
-				for kk := range t {
-					str = append(str, kk)
-				}
-				myPermObj[k] = strings.Join(str, ",")
-			}
+			"uid": user.User.Id,
+		}).Find(&permObjects)
+		if err != nil {
+			return err.Error(), errors.New("[12] 未授权")
 		}
+		for i := range permObjects {
+			user.EntityPermAdd(permObjects[i].Object, permObjects[i].Mask)
+		}
+	}else{
 
-		user.PermObjects = myPermObj
 	}
 
 	c.Set(GIN_USER, user)
