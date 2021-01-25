@@ -12,7 +12,7 @@ import (
 )
 
 func (r *mutationResolver) World(ctx context.Context) (*string, error) {
-	return tools.Ptr.String("world"), nil
+	return tools.PtrOfString("world"), nil
 }
 
 func (r *queryResolver) Stat(ctx context.Context) (interface{}, error) {
@@ -20,13 +20,13 @@ func (r *queryResolver) Stat(ctx context.Context) (interface{}, error) {
 }
 
 func (r *queryResolver) Hello(ctx context.Context) (*string, error) {
-	return tools.Ptr.String("hello"), nil
+	return tools.PtrOfString("hello"), nil
 }
 
 func (r *subscriptionResolver) Hello(ctx context.Context) (<-chan *string, error) {
 	c := make(chan *string, 10)
 	go tools.RunWithContext(time.Second, ctx, func() {
-		c <- tools.Ptr.String("hello world")
+		c <- tools.PtrOfString("hello world")
 	})
 	return c, nil
 }

@@ -22,8 +22,8 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser)
 		user := new(beans.User)
 		if input.User.Name != nil {
 			name := *input.User.Name
-			user.Py = tools.Ptr.String(tools.Pin.Py(name))
-			user.Py = tools.Ptr.String(tools.Pin.Pinyin(name))
+			user.Py = tools.PtrOfString(tools.Pin.Py(name))
+			user.Py = tools.PtrOfString(tools.Pin.Pinyin(name))
 		}
 		id, err := r.Create(ctx, user, input.User)
 		if err != nil {
@@ -33,7 +33,7 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser)
 	}
 
 	{ // 添加账户
-		input.Account.Default = tools.Ptr.Int(1)
+		input.Account.Default = tools.PtrOfInt(1)
 		input.Account.UID = &uid
 		_, err := r.AccountCreate(ctx, *input.Account)
 		if err != nil {
@@ -84,8 +84,8 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 		upduser := beans.User{}
 		if input.User.Name != nil {
 			name := *input.User.Name
-			upduser.Py = tools.Ptr.String(tools.Pin.Py(name))
-			upduser.Pinyin = tools.Ptr.String(tools.Pin.Pinyin(name))
+			upduser.Py = tools.PtrOfString(tools.Pin.Py(name))
+			upduser.Pinyin = tools.PtrOfString(tools.Pin.Pinyin(name))
 		}
 		ok, err := r.Update(ctx, &upduser, id, input.User)
 		if err != nil {
@@ -107,13 +107,13 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 				Type:     input.Account.Type,
 				Username: input.Account.Username,
 				Password: input.Account.Password,
-				Default:  tools.Ptr.Int(1),
+				Default:  tools.PtrOfInt(1),
 			})
 			if err != nil {
 				return false, err
 			}
 		} else {
-			input.Account.Default = tools.Ptr.Int(1)
+			input.Account.Default = tools.PtrOfInt(1)
 
 			_, err = r.AccountUpdate(ctx, *acc.Id, *input.Account)
 			if err != nil {
@@ -148,7 +148,7 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool, error) {
 	sess := r.Sess(ctx)
 
-	if tools.Str.Contains(ids, "root") {
+	if tools.StrContains(ids, "root") {
 		return false, errors.New("root用户无法删除")
 	}
 
@@ -203,8 +203,8 @@ func (r *mutationResolver) UserWithRole(ctx context.Context, uid string, roles [
 		for i, o := range roles {
 			p := beans.RoleUser{
 				Bean: beans.Bean{
-					Id:     tools.Ptr.Uid(),
-					Status: tools.Ptr.String("1"),
+					Id:     tools.PtrOfUUID(),
+					Status: tools.PtrOfString("1"),
 					Weight: &i,
 				},
 				Role: &o,
@@ -241,7 +241,6 @@ func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.
 			u.* 
 		from 
 			user u
-		join with_role_user on u.id = with_role_user.id
 		where 1 = 1
 		{{ if .keyword }} 
 			and (
@@ -268,7 +267,7 @@ func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.
 		"sex":     query.Sex,
 		"admin":   query.Admin,
 		"name":    query.Name,
-	}).With("with_role_user").Page2(query.Index, query.Size, query.Count, &users)
+	}).Page2(query.Index, query.Size, query.Count, &users)
 	return &source.Users{Data: users, Total: &total}, err
 }
 

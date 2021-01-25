@@ -113,7 +113,7 @@ func GinStatic(box *rice.Box, g gin.IRouter, prefix string) {
 	g.GET("/"+prefix+"/*path", func(c *gin.Context) {
 
 		path, _ := c.Params.Get("path")
-		if tools.Str.Contains([]string{"/", "index.html"}, path) {
+		if tools.StrContains([]string{"/", "index.html"}, path) {
 			path = "index.html"
 		}
 		if strings.Index(path,"/") == 0{

@@ -15,7 +15,7 @@ import (
 
 func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAccount) (string, error) {
 	acc := new(beans.Account)
-	acc.Salt = tools.Ptr.Uid()
+	acc.Salt = tools.PtrOfUUID()
 	if *input.Type == "password" {
 		if input.Username == nil || input.Password == nil {
 			return "", errors.New("用户名密码不能为空")
@@ -49,7 +49,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 	}
 
 	if acc.Salt == nil {
-		acc.Salt = tools.Ptr.Uid()
+		acc.Salt = tools.PtrOfUUID()
 		err := r.Sess(ctx).SF("update account set salt = :salt", map[string]interface{}{"salt": acc.Salt}).Exec()
 		if err != nil {
 			return false, err

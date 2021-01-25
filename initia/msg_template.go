@@ -21,8 +21,8 @@ func InitMsgTemplateCode(db *xorm.Engine, name, code, typ, level, target, remark
 	if !ok {
 		_, err = db.Insert(beans.MsgTemplate{
 			Bean: beans.Bean{
-				Id:     tools.Ptr.Uid(),
-				Status: tools.Ptr.String("1"),
+				Id:     tools.PtrOfUUID(),
+				Status: tools.PtrOfString("1"),
 			},
 			Name:         &name,
 			Code:         &code,

@@ -36,15 +36,15 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 
 	content := defaultContent
 	if tpl.Template != nil {
-		content = tools.Str.Tmp(*tpl.Template, model).String()
+		content = tools.StrTmp(*tpl.Template, model).String()
 	}
 
-	title := tools.Str.Tmp(*tpl.Name, model).String()
+	title := tools.StrTmp(*tpl.Name, model).String()
 
 	info := beans.MsgInfo{
 		Bean: beans.Bean{
-			Id:     tools.Ptr.Uid(),
-			Status: tools.Ptr.String("1"),
+			Id:     tools.PtrOfUUID(),
+			Status: tools.PtrOfString("1"),
 		},
 		Receiver:     &uid,
 		ReceiverName: &uname,
@@ -52,13 +52,13 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 		Template:     tpl.Id,
 		Level:        tpl.Level,
 		Target:       tpl.Target,
-		State:        tools.Ptr.String("1"), // 未读
-		SendTime:     tools.Ptr.Int64(nowtime),
+		State:        tools.PtrOfString("1"), // 未读
+		SendTime:     tools.PtrOfInt64(nowtime),
 		Otype:        &otype,
 		Oid:          &oid,
 		Title:        &title,
 		Content:      &content,
-		Model:        tools.Ptr.String(tools.Str.JSONString(model)),
+		Model:        tools.PtrOfString(tools.JSONString(model)),
 		ImgPath:      tpl.ImgPath,
 		Remark:       tpl.Remark,
 	}
@@ -73,19 +73,19 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 
 	// 更新消息或者插入消息
 	if ok {
-		if oldInfo.State == nil{
-			oldInfo.State = tools.Ptr.String("1")
+		if oldInfo.State == nil {
+			oldInfo.State = tools.PtrOfString("1")
 		}
 		/*
 			已读的消息分2中情况
 				a)	（消息、通知） 将不再推送
 				b)	（确认框） 将继续推送
 		*/
-		if *oldInfo.State == "0" && tools.Str.Contains([]string{"message", "notice"}, *tpl.Type) {
+		if *oldInfo.State == "0" && tools.StrContains([]string{"message", "notice"}, *tpl.Type) {
 			return nil
 		}
 		// 未确认的消息将一直推送，直到确认为止
-		if *oldInfo.State == "4" && tools.Str.Contains([]string{"confirm"}, *tpl.Type) {
+		if *oldInfo.State == "4" && tools.StrContains([]string{"confirm"}, *tpl.Type) {
 			return nil
 		}
 
@@ -99,7 +99,7 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 			return err
 		}
 	} else {
-		info.State = tools.Ptr.String("1") // 未读
+		info.State = tools.PtrOfString("1") // 未读
 		_, err := this.db.Insert(info)
 		if err != nil {
 			tog.Error("【消息推送】 Error: " + err.Error())
@@ -110,8 +110,8 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 	// 新增一条历史记录
 	history := beans.MsgHistory{
 		Bean: beans.Bean{
-			Id:     tools.Ptr.Uid(),
-			Status: tools.Ptr.String("1"),
+			Id:     tools.PtrOfUUID(),
+			Status: tools.PtrOfString("1"),
 		},
 		Info:         info.Id,
 		Receiver:     info.Receiver,

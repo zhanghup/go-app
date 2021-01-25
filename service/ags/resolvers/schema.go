@@ -44,13 +44,13 @@ func (this *mutationResolver) Token(ctx context.Context, uid, aid string) (strin
 		if e != nil {
 			return e
 		}
-		token.Id = tools.Ptr.Uid()
-		token.Status = tools.Ptr.String("1")
+		token.Id = tools.PtrOfUUID()
+		token.Status = tools.PtrOfString("1")
 		token.Uid = &uid
 		token.Aid = &aid
-		token.Agent = tools.Ptr.String(this.Gin(ctx).Request.UserAgent())
-		token.Expire = tools.Ptr.Int64(2 * 60 * 60)
-		token.Ops = tools.Ptr.Int64(0)
+		token.Agent = tools.PtrOfString(this.Gin(ctx).Request.UserAgent())
+		token.Expire = tools.PtrOfInt64(2 * 60 * 60)
+		token.Ops = tools.PtrOfInt64(0)
 		e = sess.Insert(token)
 		if e != nil {
 			return e

@@ -20,30 +20,31 @@ func InitUser(db *xorm.Engine) {
 
 		user := beans.User{
 			Bean: beans.Bean{
-				Id:     tools.Ptr.String("root"),
-				Status: tools.Ptr.String("1"),
-				Weight: tools.Ptr.Int(0),
+				Id:     tools.PtrOfString("root"),
+				Status: tools.PtrOfString("1"),
+				Weight: tools.PtrOfInt(0),
 			},
+			Name: tools.PtrOfString("超级管理员"),
 		}
 		err := sess.Insert(user)
 		if err != nil {
 			return err
 		}
 
-		salt := tools.Str.Uid()
+		salt := tools.UUID()
 		password := tools.Crypto.Password("Aa123456.", salt)
 		err = sess.Insert(beans.Account{
 			Bean: beans.Bean{
-				Id:     tools.Ptr.String("root"),
-				Status: tools.Ptr.String("1"),
-				Weight: tools.Ptr.Int(0),
+				Id:     tools.PtrOfString("root"),
+				Status: tools.PtrOfString("1"),
+				Weight: tools.PtrOfInt(0),
 			},
-			Type:     tools.Ptr.String("password"),
+			Type:     tools.PtrOfString("password"),
 			Uid:      user.Id,
-			Username: tools.Ptr.String("root"),
+			Username: tools.PtrOfString("root"),
 			Password: &password,
 			Salt:     &salt,
-			Default:  tools.Ptr.Int(1),
+			Default:  tools.PtrOfInt(1),
 		})
 		return err
 	})

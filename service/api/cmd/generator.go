@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/99designs/gqlgen/plugin/modelgen"
+	"github.com/99designs/gqlgen/plugin/resolvergen"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"
@@ -26,7 +27,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	options := []api.Option{}
+	options := []api.Option{api.NoPlugins(), api.AddPlugin(resolvergen.New())}
 	options = append(options, api.AddPlugin(&modelgen.Plugin{
 		MutateHook: func(b *modelgen.ModelBuild) *modelgen.ModelBuild {
 			for _, model := range b.Models {

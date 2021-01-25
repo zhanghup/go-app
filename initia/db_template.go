@@ -36,7 +36,7 @@ func InitDBTemplate(db *xorm.Engine) {
 func InitDBTemplateFn(sqlstr string) func(ctx context.Context) string {
 	return func(ctx context.Context) string {
 		user := directive.MyInfo(ctx).Info
-		return tools.Str.Tmp(sqlstr, map[string]interface{}{
+		return tools.StrTmp(sqlstr, map[string]interface{}{
 			"uid":   user.User.Id,
 			"admin": user.Admin,
 		}).String()

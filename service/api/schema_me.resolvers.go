@@ -88,7 +88,7 @@ func (r *queryResolver) MyMsgInfos(ctx context.Context, query source.QMyMsgInfo)
 		Receiver:      r.Me(ctx).Info.User.Id,
 		Type:          query.Type,
 		Level:         query.Level,
-		Target:        tools.Ptr.String("web"),
+		Target:        tools.PtrOfString("web"),
 		ConfirmTarget: query.ConfirmTarget,
 		ReadTarget:    query.ReadTarget,
 		State:         query.State,

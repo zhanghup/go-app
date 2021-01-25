@@ -60,11 +60,11 @@ func (r *mutationResolver) RolePermMenuCreate(ctx context.Context, id string, pe
 	for i, o := range perms {
 		p := beans.Perm{
 			Bean: beans.Bean{
-				Id:     tools.Ptr.Uid(),
-				Status: tools.Ptr.String("1"),
+				Id:     tools.PtrOfUUID(),
+				Status: tools.PtrOfString("1"),
 				Weight: &i,
 			},
-			Type: tools.Ptr.String("menu"),
+			Type: tools.PtrOfString("menu"),
 			Role: &id,
 			Oid:  &o,
 		}
@@ -91,8 +91,8 @@ func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, per
 		for i, o := range perms {
 			p := beans.PermObject{
 				Bean: beans.Bean{
-					Id:     tools.Ptr.Uid(),
-					Status: tools.Ptr.String("1"),
+					Id:     tools.PtrOfUUID(),
+					Status: tools.PtrOfString("1"),
 					Weight: &i,
 				},
 				Role:   &id,
@@ -124,8 +124,8 @@ func (r *mutationResolver) RoleWithUser(ctx context.Context, role string, uids [
 		for i, o := range uids {
 			p := beans.RoleUser{
 				Bean: beans.Bean{
-					Id:     tools.Ptr.Uid(),
-					Status: tools.Ptr.String("1"),
+					Id:     tools.PtrOfUUID(),
+					Status: tools.PtrOfString("1"),
 					Weight: &i,
 				},
 				Role: &role,

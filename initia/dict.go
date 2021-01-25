@@ -145,7 +145,7 @@ func InitDictItem(db *xorm.Engine, code, id, name, value, ext string, weight, di
 		Bean: beans.Bean{
 			Id:     &itemid,
 			Weight: &weight,
-			Status: tools.Ptr.String("1"),
+			Status: tools.PtrOfString("1"),
 		},
 		Code:     &code,
 		Name:     &name,
@@ -179,7 +179,7 @@ func InitDictCode(db *xorm.Engine, typeArg, code, name string, disabled int, ite
 	}
 	if !ok {
 		hisDict.Id = &id
-		hisDict.Status = tools.Ptr.String("1")
+		hisDict.Status = tools.PtrOfString("1")
 		hisDict.Code = &id
 		hisDict.Name = &name
 		hisDict.Type = &typeArg
@@ -191,7 +191,7 @@ func InitDictCode(db *xorm.Engine, typeArg, code, name string, disabled int, ite
 		}
 	} else {
 		hisDict.Id = &id
-		hisDict.Status = tools.Ptr.String("1")
+		hisDict.Status = tools.PtrOfString("1")
 		hisDict.Code = &id
 		hisDict.Name = &name
 		hisDict.Type = &typeArg
@@ -220,7 +220,7 @@ func InitDictCode(db *xorm.Engine, typeArg, code, name string, disabled int, ite
 			Bean: beans.Bean{
 				Id:     &itemid,
 				Weight: &i,
-				Status: tools.Ptr.String("1"),
+				Status: tools.PtrOfString("1"),
 			},
 			Code:     &id,
 			Name:     &item.Name,
