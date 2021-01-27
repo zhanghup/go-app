@@ -35,6 +35,9 @@ func main() {
 			"time": tools.Time.HMS(),
 		})
 	}).Router(func(g *gin.Engine, db *xorm.Engine) {
+		g.GET("/", func(ctx *gin.Context) {
+			ctx.Redirect(302, "zpw")
+		})
 		ags.GinAgs(g.Group(""), g.Group(""))
 		ags.GinStatic(box, g.Group(""), "zpw")
 		api.Gin(g.Group(""), db)

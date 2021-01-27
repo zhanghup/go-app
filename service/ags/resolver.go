@@ -107,11 +107,7 @@ func GinAgs(auth, any gin.IRouter) {
 }
 
 func GinStatic(box *rice.Box, g gin.IRouter, prefix string) {
-	g.GET("/", func(ctx *gin.Context) {
-		ctx.Redirect(302, prefix)
-	})
 	g.GET("/"+prefix+"/*path", func(c *gin.Context) {
-
 		path, _ := c.Params.Get("path")
 		if tools.StrContains([]string{"/", "index.html"}, path) {
 			path = "index.html"
@@ -138,7 +134,6 @@ func GinStatic(box *rice.Box, g gin.IRouter, prefix string) {
 				http.ServeContent(c.Writer, c.Request, c.Request.URL.Path, stat.ModTime(), f)
 				return
 			}
-
 		}
 		c.String(404, "404")
 	})
