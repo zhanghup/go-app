@@ -12,7 +12,6 @@ import (
 	rice "github.com/GeertJohan/go.rice"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/vektah/gqlparser/v2/gqlerror"
 	"github.com/zhanghup/go-app/service/ags/resolvers"
 	"github.com/zhanghup/go-app/service/ags/source"
 	"github.com/zhanghup/go-app/service/directive"
@@ -53,41 +52,29 @@ func gqlschemaFmt(db *xorm.Engine, schema graphql.ExecutableSchema) func(c *gin.
 			return ctx, err
 		},
 	})
-	// 【graphql】 错误处理
-	srv.SetErrorPresenter(func(ctx context.Context, e error) *gqlerror.Error {
-		if e != nil {
-			// 【事务】 统一提交关闭回归事务
-			val := ctx.Value(txorm.CONTEXT_SESSION)
-			sess, ok := val.(txorm.ISession)
-			if ok {
-				sess.Rollback()
-				sess.AutoClose()
-			}
-		}
-		err := graphql.DefaultErrorPresenter(ctx, e)
-
-		return err
-	})
 	srv.Use(extension.Introspection{})
+	srv.AroundFields(func(ctx context.Context, next graphql.Resolver) (res interface{}, err error) {
+		// 统一建立session
+		sess := txorm.NewEngine(db).Session(ctx)
+		ctx = context.WithValue(ctx, txorm.CONTEXT_SESSION, sess)
+		res, err = next(ctx)
+		if err != nil {
+			sess.Rollback()
+			sess.AutoClose()
+		} else {
+			sess.Commit()
+			sess.AutoClose()
+		}
+		return res, err
+	})
 
 	hu := tgql.DataLoadenMiddleware(db, srv)
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
-		// 统一建立session
-		ctx = context.WithValue(ctx, txorm.CONTEXT_SESSION, txorm.NewEngine(db).Session(ctx))
 		// 统一关联gin对象
 		ctx = context.WithValue(ctx, directive.GIN_CONTEXT, c)
-
 		c.Header("Content-Type", "application/json")
 		hu.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
-
-		// 【事务】 统一提交关闭事务
-		val := ctx.Value(txorm.CONTEXT_SESSION)
-		sess, ok := val.(txorm.ISession)
-		if ok {
-			sess.Commit()
-			sess.AutoClose()
-		}
 	}
 }
 
@@ -112,7 +99,7 @@ func GinStatic(box *rice.Box, g gin.IRouter, prefix string) {
 		if tools.StrContains([]string{"/", "index.html"}, path) {
 			path = "index.html"
 		}
-		if strings.Index(path,"/") == 0{
+		if strings.Index(path, "/") == 0 {
 			path = path[1:]
 		}
 

@@ -22,8 +22,8 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input source.NewUser)
 		user := new(beans.User)
 		if input.User.Name != nil {
 			name := *input.User.Name
-			user.Py = tools.PtrOfString(tools.Pin.Py(name))
-			user.Py = tools.PtrOfString(tools.Pin.Pinyin(name))
+			user.Py = tools.PtrOfString(tools.Py(name))
+			user.Py = tools.PtrOfString(tools.Pinyin(name))
 		}
 		id, err := r.Create(ctx, user, input.User)
 		if err != nil {
@@ -84,8 +84,8 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 		upduser := beans.User{}
 		if input.User.Name != nil {
 			name := *input.User.Name
-			upduser.Py = tools.PtrOfString(tools.Pin.Py(name))
-			upduser.Pinyin = tools.PtrOfString(tools.Pin.Pinyin(name))
+			upduser.Py = tools.PtrOfString(tools.Py(name))
+			upduser.Pinyin = tools.PtrOfString(tools.Pinyin(name))
 		}
 		ok, err := r.Update(ctx, &upduser, id, input.User)
 		if err != nil {

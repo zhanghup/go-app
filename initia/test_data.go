@@ -70,8 +70,8 @@ func InitTestUser(db *xorm.Engine) {
 
 	for i, name := range names {
 		nn := fmt.Sprintf("%s", name)
-		py := tools.Pin.Py(nn)
-		pinyin := tools.Pin.Pinyin(nn)
+		py := tools.Py(nn)
+		pinyin := tools.Pinyin(nn)
 		birth := fmt.Sprintf("19%d-%02d-%02d", 70+rand.Intn(30), 1+rand.Intn(12), 1+rand.Intn(28))
 		sex := "1"
 		if rand.Intn(10)%2 == 0 {
