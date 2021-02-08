@@ -5,6 +5,7 @@ package api
 
 import (
 	"context"
+	"time"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -25,7 +26,10 @@ func (r *mutationResolver) DictCreate(ctx context.Context, input source.NewDict)
 	if err != nil {
 		return false, err
 	}
-	go event.DictChange()
+	go func() {
+		time.Sleep(time.Second*3)
+		event.DictChange()
+	}()
 	return true, nil
 }
 
@@ -35,7 +39,10 @@ func (r *mutationResolver) DictUpdate(ctx context.Context, id string, input sour
 		return false, err
 	}
 	if ok {
-		go event.DictChange()
+		go func() {
+			time.Sleep(time.Second*3)
+			event.DictChange()
+		}()
 	}
 	return ok, err
 }
@@ -46,7 +53,10 @@ func (r *mutationResolver) DictRemoves(ctx context.Context, ids []string) (bool,
 		return false, err
 	}
 	if ok {
-		go event.DictChange()
+		go func() {
+			time.Sleep(time.Second*3)
+			event.DictChange()
+		}()
 	}
 	return ok, err
 }
@@ -56,7 +66,10 @@ func (r *mutationResolver) DictItemCreate(ctx context.Context, input source.NewD
 	if err != nil {
 		return false, err
 	}
-	go event.DictChange()
+	go func() {
+		time.Sleep(time.Second*3)
+		event.DictChange()
+	}()
 	return true, nil
 }
 
@@ -66,7 +79,10 @@ func (r *mutationResolver) DictItemUpdate(ctx context.Context, id string, input 
 		return false, err
 	}
 	if ok {
-		go event.DictChange()
+		go func() {
+			time.Sleep(time.Second*3)
+			event.DictChange()
+		}()
 	}
 	return ok, err
 }
@@ -77,7 +93,10 @@ func (r *mutationResolver) DictItemRemoves(ctx context.Context, ids []string) (b
 		return false, err
 	}
 	if ok {
-		go event.DictChange()
+		go func() {
+			time.Sleep(time.Second*3)
+			event.DictChange()
+		}()
 	}
 	return ok, err
 }
