@@ -32,7 +32,7 @@ func main() {
 		MutateHook: func(b *modelgen.ModelBuild) *modelgen.ModelBuild {
 			for _, model := range b.Models {
 				for _, field := range model.Fields {
-					field.Tag += ` xorm:"` + field.Name + `"`
+					field.Tag += ` xorm:"'` + field.Name + `'"`
 				}
 			}
 			return b

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/99designs/gqlgen/plugin/modelgen"
+	"github.com/99designs/gqlgen/plugin/resolvergen"
 	"io/ioutil"
 	"log"
 	"os"
@@ -22,12 +23,12 @@ func main() {
 		os.Exit(2)
 	}
 
-	options := []api.Option{api.NoPlugins()}
+	options := []api.Option{api.NoPlugins(), api.AddPlugin(resolvergen.New())}
 	options = append(options, api.AddPlugin(&modelgen.Plugin{
 		MutateHook: func(b *modelgen.ModelBuild) *modelgen.ModelBuild {
 			for _, model := range b.Models {
 				for _, field := range model.Fields {
-					field.Tag += ` xorm:"` + field.Name + `"`
+					field.Tag += ` xorm:"'` + field.Name + `'"`
 				}
 			}
 			return b

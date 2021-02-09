@@ -27,7 +27,7 @@ func (r *mutationResolver) DictCreate(ctx context.Context, input source.NewDict)
 		return false, err
 	}
 	go func() {
-		time.Sleep(time.Second*3)
+		time.Sleep(time.Second * 3)
 		event.DictChange()
 	}()
 	return true, nil
@@ -40,7 +40,7 @@ func (r *mutationResolver) DictUpdate(ctx context.Context, id string, input sour
 	}
 	if ok {
 		go func() {
-			time.Sleep(time.Second*3)
+			time.Sleep(time.Second * 3)
 			event.DictChange()
 		}()
 	}
@@ -54,7 +54,7 @@ func (r *mutationResolver) DictRemoves(ctx context.Context, ids []string) (bool,
 	}
 	if ok {
 		go func() {
-			time.Sleep(time.Second*3)
+			time.Sleep(time.Second * 3)
 			event.DictChange()
 		}()
 	}
@@ -67,7 +67,7 @@ func (r *mutationResolver) DictItemCreate(ctx context.Context, input source.NewD
 		return false, err
 	}
 	go func() {
-		time.Sleep(time.Second*3)
+		time.Sleep(time.Second * 3)
 		event.DictChange()
 	}()
 	return true, nil
@@ -80,7 +80,7 @@ func (r *mutationResolver) DictItemUpdate(ctx context.Context, id string, input 
 	}
 	if ok {
 		go func() {
-			time.Sleep(time.Second*3)
+			time.Sleep(time.Second * 3)
 			event.DictChange()
 		}()
 	}
@@ -94,7 +94,7 @@ func (r *mutationResolver) DictItemRemoves(ctx context.Context, ids []string) (b
 	}
 	if ok {
 		go func() {
-			time.Sleep(time.Second*3)
+			time.Sleep(time.Second * 3)
 			event.DictChange()
 		}()
 	}

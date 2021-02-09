@@ -154,7 +154,7 @@ func (r *queryResolver) Roles(ctx context.Context, query source.QRole) (*source.
 	`, map[string]interface{}{
 		"keyword": query.Keyword,
 		"status":  query.Status,
-	}).With("with_role").Order("weight","created").Page2(query.Index, query.Size, query.Count, &roles)
+	}).With("with_role").Order("weight", "created").Page2(query.Index, query.Size, query.Count, &roles)
 	return &source.Roles{Data: roles, Total: &total}, err
 }
 

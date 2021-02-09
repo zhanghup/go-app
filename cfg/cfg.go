@@ -11,6 +11,10 @@ type config struct {
 	box      *rice.Box
 	Database txorm.Config `yaml:"database"`
 	Web      tgin.Config  `yaml:"web"`
+	Wxmp     struct {
+		Appid     string `yaml:"appid"`
+		Appsecret string `yaml:"appsecret"`
+	} `yaml:"wxmp"`
 }
 
 var DB txorm.Config

@@ -6,7 +6,9 @@ package resolvers
 import (
 	"context"
 	"errors"
+	"github.com/go-resty/resty/v2"
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-app/service/ca"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-app/service/event"
@@ -58,9 +60,21 @@ func (r *mutationResolver) Login(ctx context.Context, username string, password 
 	return tok, nil
 }
 
+func (r *mutationResolver) LoginWxmp(ctx context.Context, code string) (string, error) {
+	res, err := resty.New().R().Get(tools.StrTmp(`https://api.weixin.qq.com/sns/jscode2session?appid={{.appid}}&secret={{.appsecret}}&js_code={{.code}}&grant_type=authorization_code`, map[string]interface{}{
+		"appid":     cfg.Config.Wxmp.Appid,
+		"appsecret": cfg.Config.Wxmp.Appsecret,
+		"code":      code,
+	}).String())
+	if err != nil {
+		return "", err
+	}
+	
+}
+
 func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 	tok, err := r.Gin(ctx).Cookie(directive.GIN_TOKEN)
-	if err != nil || tok == ""{
+	if err != nil || tok == "" {
 		tok = r.Gin(ctx).GetHeader(directive.GIN_AUTHORIZATION)
 	}
 
@@ -77,6 +91,6 @@ func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 }
 
 func (r *queryResolver) LoginStatus(ctx context.Context) (bool, error) {
-	_,err := directive.WebAuthFunc(r.DB,r.Gin(ctx))
-	return err == nil,nil
+	_, err := directive.WebAuthFunc(r.DB, r.Gin(ctx))
+	return err == nil, nil
 }

@@ -6,6 +6,8 @@ extend type Query {
 extend type Mutation {
     "用户登录"
     login(username:String!,password:String!): String!
+    "微信小程序登录"
+    login_wxmp(code: String!): String!
 
     "登出"
     logout:Boolean!

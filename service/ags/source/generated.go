@@ -42,14 +42,15 @@ type ResolverRoot interface {
 
 type DirectiveRoot struct {
 	Perm func(ctx context.Context, obj interface{}, next graphql.Resolver, entity string, perm string) (res interface{}, err error)
-	User func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Root func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
 	Mutation struct {
-		Hello  func(childComplexity int) int
-		Login  func(childComplexity int, username string, password string) int
-		Logout func(childComplexity int) int
+		Hello     func(childComplexity int) int
+		Login     func(childComplexity int, username string, password string) int
+		LoginWxmp func(childComplexity int, code string) int
+		Logout    func(childComplexity int) int
 	}
 
 	Query struct {
@@ -65,6 +66,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	Hello(ctx context.Context) (*string, error)
 	Login(ctx context.Context, username string, password string) (string, error)
+	LoginWxmp(ctx context.Context, code string) (string, error)
 	Logout(ctx context.Context) (bool, error)
 }
 type QueryResolver interface {
@@ -108,6 +110,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Login(childComplexity, args["username"].(string), args["password"].(string)), true
+
+	case "Mutation.login_wxmp":
+		if e.complexity.Mutation.LoginWxmp == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_login_wxmp_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.LoginWxmp(childComplexity, args["code"].(string)), true
 
 	case "Mutation.logout":
 		if e.complexity.Mutation.Logout == nil {
@@ -222,7 +236,7 @@ var sources = []*ast.Source{
 
 "数据操作权限"
 directive @perm(entity:String!, perm: String!) on FIELD_DEFINITION
-directive @user on FIELD_DEFINITION
+directive @root on FIELD_DEFINITION
 
 directive @goModel(model: String, models: [String!]) on OBJECT
     | INPUT_OBJECT
@@ -254,6 +268,8 @@ type Subscription {
 extend type Mutation {
     "用户登录"
     login(username:String!,password:String!): String!
+    "微信小程序登录"
+    login_wxmp(code: String!): String!
 
     "登出"
     logout:Boolean!
@@ -311,6 +327,21 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 		}
 	}
 	args["password"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_login_wxmp_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["code"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["code"] = arg0
 	return args, nil
 }
 
@@ -425,6 +456,48 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().Login(rctx, args["username"].(string), args["password"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_login_wxmp(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_login_wxmp_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().LoginWxmp(rctx, args["code"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1770,6 +1843,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_hello(ctx, field)
 		case "login":
 			out.Values[i] = ec._Mutation_login(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "login_wxmp":
+			out.Values[i] = ec._Mutation_login_wxmp(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
