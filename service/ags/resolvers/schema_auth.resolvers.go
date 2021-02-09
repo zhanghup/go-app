@@ -5,6 +5,7 @@ package resolvers
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"github.com/go-resty/resty/v2"
 	"github.com/zhanghup/go-app/beans"
@@ -69,7 +70,22 @@ func (r *mutationResolver) LoginWxmp(ctx context.Context, code string) (string, 
 	if err != nil {
 		return "", err
 	}
-	
+
+	restru := struct {
+		Openid     string `json:"openid"`
+		SessionKey string `json:"session_key"`
+		Unionid    string `json:"unionid"`
+		Errcode    int    `json:"errcode"`
+		Errmsg     string `json:"errmsg"`
+	}{}
+	err = json.Unmarshal(res.Body(), &restru)
+	if err != nil {
+		return "", err
+	}
+
+
+	return "", nil
+
 }
 
 func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
