@@ -112,7 +112,7 @@ func WxmpAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 		user.TokenString = tok
 	}
 
-	c.Set(GIN_WXUSER, wxuser)
+	c.Set(GIN_WXUSER, user)
 	ca.WxuserCache.Set(user.Id, user)
 	c.Next()
 	return nil, nil

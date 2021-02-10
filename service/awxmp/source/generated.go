@@ -46,15 +46,17 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Me struct {
-		City     func(childComplexity int) int
-		Country  func(childComplexity int) int
-		Gender   func(childComplexity int) int
-		Id       func(childComplexity int) int
-		Language func(childComplexity int) int
-		Mobile   func(childComplexity int) int
-		Nickname func(childComplexity int) int
-		Openid   func(childComplexity int) int
-		Province func(childComplexity int) int
+		AvatarUrl func(childComplexity int) int
+		City      func(childComplexity int) int
+		Country   func(childComplexity int) int
+		Gender    func(childComplexity int) int
+		Id        func(childComplexity int) int
+		Language  func(childComplexity int) int
+		Mobile    func(childComplexity int) int
+		Nickname  func(childComplexity int) int
+		Openid    func(childComplexity int) int
+		Province  func(childComplexity int) int
+		Updated   func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -102,6 +104,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Me.avatar_url":
+		if e.complexity.Me.AvatarUrl == nil {
+			break
+		}
+
+		return e.complexity.Me.AvatarUrl(childComplexity), true
 
 	case "Me.city":
 		if e.complexity.Me.City == nil {
@@ -165,6 +174,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Me.Province(childComplexity), true
+
+	case "Me.updated":
+		if e.complexity.Me.Updated == nil {
+			break
+		}
+
+		return e.complexity.Me.Updated(childComplexity), true
 
 	case "Mutation.user_register":
 		if e.complexity.Mutation.UserRegister == nil {
@@ -354,6 +370,8 @@ type Me  @goModel(model:"github.com/zhanghup/go-app/beans.WxmpUser")  {
     openid:String
     "昵称"
     nickname: String
+    "头像"
+    avatar_url: String
     "性别"
     gender: String
     "国家"
@@ -364,6 +382,8 @@ type Me  @goModel(model:"github.com/zhanghup/go-app/beans.WxmpUser")  {
     city: String
     "语言"
     language: String
+    "更新时间"
+    updated: Int64
 }
 
 input NewUserRegister{
@@ -595,6 +615,38 @@ func (ec *executionContext) _Me_nickname(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Me_avatar_url(ctx context.Context, field graphql.CollectedField, obj *beans.WxmpUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Me",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AvatarUrl, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Me_gender(ctx context.Context, field graphql.CollectedField, obj *beans.WxmpUser) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -753,6 +805,38 @@ func (ec *executionContext) _Me_language(ctx context.Context, field graphql.Coll
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Me_updated(ctx context.Context, field graphql.CollectedField, obj *beans.WxmpUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Me",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Updated, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_world(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2272,6 +2356,8 @@ func (ec *executionContext) _Me(ctx context.Context, sel ast.SelectionSet, obj *
 			out.Values[i] = ec._Me_openid(ctx, field, obj)
 		case "nickname":
 			out.Values[i] = ec._Me_nickname(ctx, field, obj)
+		case "avatar_url":
+			out.Values[i] = ec._Me_avatar_url(ctx, field, obj)
 		case "gender":
 			out.Values[i] = ec._Me_gender(ctx, field, obj)
 		case "country":
@@ -2282,6 +2368,8 @@ func (ec *executionContext) _Me(ctx context.Context, sel ast.SelectionSet, obj *
 			out.Values[i] = ec._Me_city(ctx, field, obj)
 		case "language":
 			out.Values[i] = ec._Me_language(ctx, field, obj)
+		case "updated":
+			out.Values[i] = ec._Me_updated(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2970,6 +3058,21 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
+}
+
+func (ec *executionContext) unmarshalOInt642ᚖint64(ctx context.Context, v interface{}) (*int64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt64(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt642ᚖint64(ctx context.Context, sel ast.SelectionSet, v *int64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalInt64(*v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

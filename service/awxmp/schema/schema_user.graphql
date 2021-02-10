@@ -20,6 +20,8 @@ type Me  @goModel(model:"github.com/zhanghup/go-app/beans.WxmpUser")  {
     openid:String
     "昵称"
     nickname: String
+    "头像"
+    avatar_url: String
     "性别"
     gender: String
     "国家"
@@ -30,6 +32,8 @@ type Me  @goModel(model:"github.com/zhanghup/go-app/beans.WxmpUser")  {
     city: String
     "语言"
     language: String
+    "更新时间"
+    updated: Int64
 }
 
 input NewUserRegister{

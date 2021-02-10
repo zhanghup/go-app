@@ -5,6 +5,7 @@ package awxmp
 
 import (
 	"context"
+
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/awxmp/source"
 	"github.com/zhanghup/go-app/service/event"
@@ -16,7 +17,7 @@ func (r *mutationResolver) UserRegister(ctx context.Context, input source.NewUse
 	if err != nil {
 		return false, err
 	}
-	_, err = r.Sess(ctx).S().Where("id = ?", me.Id).Update(map[string]interface{}{
+	_, err = r.Sess(ctx).S().Table(beans.WxmpUser{}).Where("id = ?", me.Id).Update(map[string]interface{}{
 		"nickname":   user.Nickname,
 		"gender":     user.Gender,
 		"city":       user.City,
@@ -43,7 +44,7 @@ func (r *mutationResolver) UserRegisterMobile(ctx context.Context, input source.
 	if err != nil {
 		return false, err
 	}
-	_, err = r.Sess(ctx).S().Where("id = ?", me.Id).Update(map[string]interface{}{
+	_, err = r.Sess(ctx).S().Table(beans.WxmpUser{}).Where("id = ?", me.Id).Update(map[string]interface{}{
 		"mobile": mobile.PhoneNumber,
 	})
 	if err != nil {
