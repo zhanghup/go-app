@@ -13,3 +13,11 @@ func MyInfo(g context.Context) *ca.User {
 	u := user.(ca.User)
 	return &u
 }
+
+func MyWxmpUser(g context.Context) *ca.WxmpUser {
+	gg := g.Value(GIN_CONTEXT)
+	ggg := gg.(*gin.Context)
+	user, _ := ggg.Get(GIN_WXUSER)
+	u := user.(ca.WxmpUser)
+	return &u
+}

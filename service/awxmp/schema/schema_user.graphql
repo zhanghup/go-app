@@ -1,0 +1,45 @@
+extend type Query {
+    "登录状态查询"
+    me: Me!
+    "通过数据库直接查用户"
+    user: Me!
+}
+
+extend type Mutation {
+    "用户注册"
+    user_register(input: NewUserRegister!): Boolean!
+    user_register_mobile(input: NewUserRegisterMobile!): Boolean!
+}
+
+type Me  @goModel(model:"github.com/zhanghup/go-app/beans.WxmpUser")  {
+    "用户id"
+    id: String
+    "手机号"
+    mobile: String
+    "openID"
+    openid:String
+    "昵称"
+    nickname: String
+    "性别"
+    gender: String
+    "国家"
+    country: String
+    "省份"
+    province: String
+    "城市"
+    city: String
+    "语言"
+    language: String
+}
+
+input NewUserRegister{
+    raw_data: String!
+    encrypted_data: String!
+    signature: String!
+    iv: String!
+}
+
+input NewUserRegisterMobile{
+    encrypted_data: String!
+    iv: String!
+}

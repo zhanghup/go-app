@@ -5,4 +5,5 @@ const (
 	GIN_TOKEN         = "gin-token"
 	GIN_AUTHORIZATION = "Authorization"
 	GIN_USER          = "user_info"
+	GIN_WXUSER        = "wxuser_info"
 )

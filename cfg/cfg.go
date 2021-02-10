@@ -5,20 +5,19 @@ import (
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
+	"github.com/zhanghup/go-tools/wx/wxmp"
 )
 
 type config struct {
 	box      *rice.Box
 	Database txorm.Config `yaml:"database"`
 	Web      tgin.Config  `yaml:"web"`
-	Wxmp     struct {
-		Appid     string `yaml:"appid"`
-		Appsecret string `yaml:"appsecret"`
-	} `yaml:"wxmp"`
+	Wxmp     wxmp.Option  `yaml:"wxmp"`
 }
 
 var DB txorm.Config
 var Web tgin.Config
+var Wxmp wxmp.Option
 var Config *config
 
 func InitConfig(box *rice.Box) *config {
@@ -34,6 +33,7 @@ func InitConfig(box *rice.Box) *config {
 	Config = cc
 	DB = cc.Database
 	Web = cc.Web
+	Wxmp = cc.Wxmp
 	return Config
 }
 

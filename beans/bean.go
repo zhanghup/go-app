@@ -39,4 +39,8 @@ func Sync(db *xorm.Engine) {
 	if err != nil {
 		panic(err)
 	}
+	err = db.Sync2(wxmp_tables()...)
+	if err != nil{
+		panic(err)
+	}
 }

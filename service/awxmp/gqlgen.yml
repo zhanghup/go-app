@@ -1,0 +1,28 @@
+# .gqlgen.yml example
+#
+# Refer to https://gqlgen.com/config/
+# for detailed .gqlgen.yml documentation.
+
+schema:
+  - schema/schema*.graphql
+exec:
+  filename: source/generated.go
+  package: source
+model:
+  filename: source/models_gen.go
+  package: source
+resolver:
+  layout: follow-schema
+  dir: .
+  package: awxmp
+omit_slice_element_pointers: true
+
+models:
+  Int:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int
+      - github.com/99designs/gqlgen/graphql.Int64
+  Int64:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int64
+

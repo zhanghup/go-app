@@ -10,6 +10,7 @@ import (
 	"github.com/zhanghup/go-app/initia"
 	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/api"
+	"github.com/zhanghup/go-app/service/awxmp"
 	"github.com/zhanghup/go-tools"
 	"xorm.io/xorm"
 )
@@ -41,6 +42,7 @@ func main() {
 		ags.GinAgs(g.Group(""), g.Group(""))
 		ags.GinStatic(box, g.Group(""), "zpw")
 		api.Gin(g.Group(""), db)
+		awxmp.Gin(g.Group(""), db)
 	}).
 		Cmd(func(db *xorm.Engine) []cli.Command {
 			return []cli.Command{

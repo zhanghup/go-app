@@ -5,9 +5,8 @@ package resolvers
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"github.com/go-resty/resty/v2"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-app/service/ca"
@@ -19,7 +18,7 @@ import (
 func (r *mutationResolver) Login(ctx context.Context, username string, password string) (string, error) {
 	acc := beans.Account{}
 	// 1. 找到账户
-	ok, err := r.DB.Where("username = ? and status = '1' and type = 'password'", username).Get(&acc)
+	ok, err := r.DBS(ctx).SF("select * from account where username = ? and status = '1' and type = 'password'", username).Get(&acc)
 	if err != nil {
 		return "", err
 	}
@@ -44,7 +43,7 @@ func (r *mutationResolver) Login(ctx context.Context, username string, password 
 
 	// 3. 找到用户
 	user := beans.User{}
-	ok, err = r.DB.Where("id = ? and status = '1'", acc.Uid).Get(&user)
+	ok, err = r.DBS(ctx).SF("select * from user where id = ? and status = '1'", acc.Uid).Get(&user)
 	if err != nil {
 		return "", err
 	}
@@ -62,30 +61,49 @@ func (r *mutationResolver) Login(ctx context.Context, username string, password 
 }
 
 func (r *mutationResolver) LoginWxmp(ctx context.Context, code string) (string, error) {
-	res, err := resty.New().R().Get(tools.StrTmp(`https://api.weixin.qq.com/sns/jscode2session?appid={{.appid}}&secret={{.appsecret}}&js_code={{.code}}&grant_type=authorization_code`, map[string]interface{}{
-		"appid":     cfg.Config.Wxmp.Appid,
-		"appsecret": cfg.Config.Wxmp.Appsecret,
-		"code":      code,
-	}).String())
+	res, err := r.Wxmp.Code2Session(code)
 	if err != nil {
 		return "", err
 	}
 
-	restru := struct {
-		Openid     string `json:"openid"`
-		SessionKey string `json:"session_key"`
-		Unionid    string `json:"unionid"`
-		Errcode    int    `json:"errcode"`
-		Errmsg     string `json:"errmsg"`
-	}{}
-	err = json.Unmarshal(res.Body(), &restru)
+	user := beans.WxmpUser{}
+
+	ok, err := r.DBS(ctx).SF(`select * from wxmp_user where appid = ? and openid = ?`, cfg.Wxmp.Appid, res.Openid).Get(&user)
 	if err != nil {
 		return "", err
 	}
+	if !ok {
+		user = beans.WxmpUser{
+			Bean: beans.Bean{
+				Id:     tools.PtrOfUUID(),
+				Status: tools.PtrOfString("1"),
+			},
+			Appid:   &cfg.Wxmp.Appid,
+			Openid:  &res.Openid,
+			Unionid: &res.Unionid,
+		}
+		err := r.Sess(ctx).Insert(user)
+		if err != nil {
+			return "", err
+		}
+		go event.WxmpUserCreate(user)
+	}
 
+	// Create the token
+	claims := jwt.MapClaims{
+		"uid":        *user.Id,
+		"sessionKey": res.SessionKey,
+	}
+	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
+	t, err := token.SignedString([]byte(tools.Crypto.MD5([]byte(cfg.DB.Uri))))
 
-	return "", nil
+	if err != nil {
+		return "", err
+	} else {
+		go event.WxmpUserLogin(user)
+	}
 
+	return t, nil
 }
 
 func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
@@ -97,7 +115,7 @@ func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 	if tok == "" {
 		return false, nil
 	}
-	_, err = r.DB.Table(beans.Token{}).Where("id = ?", tok).Update(map[string]interface{}{"status": 0})
+	_, err = r.DBS(ctx).E().Table(beans.Token{}).Where("id = ?", tok).Update(map[string]interface{}{"status": 0})
 	if err != nil {
 		return false, err
 	}
@@ -107,6 +125,6 @@ func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 }
 
 func (r *queryResolver) LoginStatus(ctx context.Context) (bool, error) {
-	_, err := directive.WebAuthFunc(r.DB, r.Gin(ctx))
+	_, err := directive.WebAuthFunc(r.DBS(ctx).E(), r.Gin(ctx))
 	return err == nil, nil
 }
