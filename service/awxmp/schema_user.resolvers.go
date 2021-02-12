@@ -12,7 +12,7 @@ import (
 )
 
 func (r *mutationResolver) UserRegister(ctx context.Context, input source.NewUserRegister) (bool, error) {
-	me := r.Me(ctx)
+	me := r.Wxme(ctx)
 	user, err := r.Wxmp.UserInfoDecrypt(me.SessionKey, input.RawData, input.EncryptedData, input.Signature, input.Iv)
 	if err != nil {
 		return false, err
@@ -39,7 +39,7 @@ func (r *mutationResolver) UserRegister(ctx context.Context, input source.NewUse
 }
 
 func (r *mutationResolver) UserRegisterMobile(ctx context.Context, input source.NewUserRegisterMobile) (bool, error) {
-	me := r.Me(ctx)
+	me := r.Wxme(ctx)
 	mobile, err := r.Wxmp.UserMobileDecrypt(me.SessionKey, input.EncryptedData, input.Iv)
 	if err != nil {
 		return false, err
@@ -60,12 +60,12 @@ func (r *mutationResolver) UserRegisterMobile(ctx context.Context, input source.
 }
 
 func (r *queryResolver) Me(ctx context.Context) (*beans.WxmpUser, error) {
-	me := r.Resolver.Me(ctx)
+	me := r.Resolver.Wxme(ctx)
 	return me.User, nil
 }
 
 func (r *queryResolver) User(ctx context.Context) (*beans.WxmpUser, error) {
-	me := r.Resolver.Me(ctx)
+	me := r.Resolver.Wxme(ctx)
 	wxuser := new(beans.WxmpUser)
 	_, err := r.Sess(ctx).SF(`select * from wxmp_user where id = ?`, me.Id).Get(wxuser)
 	return wxuser, err
