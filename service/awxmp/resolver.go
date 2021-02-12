@@ -40,7 +40,7 @@ type ResolverTools struct {
 	DBS    func(ctx context.Context) txorm.ISession
 	Sess   func(ctx context.Context) txorm.ISession
 	Loader func(ctx context.Context) tgql.Loader
-	Wxme     func(ctx context.Context) *ca.WxmpUser
+	Me     func(ctx context.Context) *ca.WxmpUser
 	Wxmp   wxmp.IEngine
 }
 
@@ -59,7 +59,7 @@ func NewResolverTools(db *xorm.Engine) *ResolverTools {
 			return sess
 		},
 		Loader: tgql.DataLoaden,
-		Wxme:     directive.MyWxmpUser,
+		Me:     directive.MyWxmpUser,
 		Wxmp:   wxmp.NewEngine(&cfg.Wxmp),
 	}
 }
