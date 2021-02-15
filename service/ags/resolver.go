@@ -53,20 +53,22 @@ func gqlschemaFmt(db *xorm.Engine, schema graphql.ExecutableSchema) func(c *gin.
 		},
 	})
 	srv.Use(extension.Introspection{})
-	srv.AroundFields(func(ctx context.Context, next graphql.Resolver) (res interface{}, err error) {
+	srv.AroundResponses(func(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
 		// 统一建立session
 		sess := txorm.NewEngine(db).Session(ctx)
 		ctx = context.WithValue(ctx, txorm.CONTEXT_SESSION, sess)
-		res, err = next(ctx)
-		if err != nil {
+		res := next(ctx)
+		if len(res.Errors) > 0 {
 			sess.Rollback()
 			sess.AutoClose()
 		} else {
 			sess.Commit()
 			sess.AutoClose()
 		}
-		return res, err
+
+		return res
 	})
+
 
 	hu := tgql.DataLoadenMiddleware(db, srv)
 	return func(c *gin.Context) {
