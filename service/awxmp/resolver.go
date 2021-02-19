@@ -30,6 +30,7 @@ func Gin(g gin.IRouter, db *xorm.Engine) {
 		},
 	}
 	ags.GinGql("/zpx/wxmp", g.Group("/", directive.WxmpAuth(db)), source.NewExecutableSchema(config), db)
+	g.POST("/zpx/wxmp/pay/callback",PayCallback)
 }
 
 type Resolver struct {
