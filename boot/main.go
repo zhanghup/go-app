@@ -1,6 +1,7 @@
 package boot
 
 import (
+	"errors"
 	rice "github.com/GeertJohan/go.rice"
 	"github.com/gin-gonic/gin"
 	"github.com/urfave/cli/v2"
@@ -12,6 +13,7 @@ import (
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
 	"github.com/zhanghup/go-tools/tog"
+	"github.com/zhanghup/go-tools/twindows"
 	"os"
 	"xorm.io/xorm"
 )
@@ -163,6 +165,26 @@ func (this *stru) runWeb() error {
 }
 
 func (this *stru) StartRouter() {
+	this.app.Commands = append(this.app.Commands, &cli.Command{
+		Name:  "service",
+		Usage: "服务安装卸载",
+		Description: `
+			service install
+			service uninstall
+			service start
+			service stop
+		`,
+		Action: func(c *cli.Context) error {
+			if len(os.Args) < 3 {
+				return errors.New("参数错误。。。")
+			}
+			cmd := c.Args().Get(0)
+			name := this.name
+
+			twindows.Service(cmd, name, c.Args().Slice()[1:]...)
+			return nil
+		},
+	})
 
 	this.app.Commands = append(this.app.Commands, &cli.Command{
 		Name:  "init",
@@ -182,7 +204,7 @@ func (this *stru) StartRouter() {
 
 	this.app.Commands = append(this.app.Commands, &cli.Command{
 		Name:  "sync",
-		Usage: "初始化基础数据数据",
+		Usage: "同步表结构到数据库",
 		Action: func(c *cli.Context) error {
 			beans.Sync(this.db)
 			if len(this.syncFns) > 0 {
