@@ -46,7 +46,7 @@ func WxmpAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 	// token 验证
 	{
 		token, err := jwt.ParseWithClaims(tok, &form, func(token *jwt.Token) (interface{}, error) {
-			return []byte(tools.Crypto.MD5([]byte(cfg.DB.Uri))), nil
+			return []byte(tools.MD5([]byte(cfg.DB.Uri))), nil
 		})
 
 		if err != nil {

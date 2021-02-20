@@ -14,6 +14,10 @@ func DefaultDBSet(db *xorm.Engine) {
 	defaultDB = db
 }
 
+func DefaultDB() *xorm.Engine {
+	return defaultDB
+}
+
 func init() {
 	event.XormDefaultInitSubscribeOnce(func(db *xorm.Engine) {
 		defaultDB = db

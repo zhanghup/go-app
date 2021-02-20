@@ -41,7 +41,7 @@ func (this *uploader) UploadIO(read io.Reader, name, contentType string) (string
 		return "[UploadIO] 读取文件失败【1】", err
 	}
 
-	md5 := tools.Crypto.MD5(data)
+	md5 := tools.MD5(data)
 	idx := strings.LastIndex(name, ".")
 	endStr := ""
 	if idx > -1 {

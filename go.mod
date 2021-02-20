@@ -1,6 +1,6 @@
 module github.com/zhanghup/go-app
 
-go 1.13
+go 1.16
 
 require (
 	github.com/99designs/gqlgen v0.13.0

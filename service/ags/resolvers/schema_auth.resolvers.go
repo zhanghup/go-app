@@ -33,7 +33,7 @@ func (r *mutationResolver) Login(ctx context.Context, username string, password 
 			flag = true
 		}
 	} else {
-		if *acc.Password == tools.Crypto.Password(password, *acc.Salt) {
+		if *acc.Password == tools.Password(password, *acc.Salt) {
 			flag = true
 		}
 	}
@@ -95,7 +95,7 @@ func (r *mutationResolver) LoginWxmp(ctx context.Context, code string) (string, 
 		"sessionKey": res.SessionKey,
 	}
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
-	t, err := token.SignedString([]byte(tools.Crypto.MD5([]byte(cfg.DB.Uri))))
+	t, err := token.SignedString([]byte(tools.MD5([]byte(cfg.DB.Uri))))
 
 	if err != nil {
 		return "", err

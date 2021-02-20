@@ -70,7 +70,7 @@ func InitJobs(db *xorm.Engine) error {
 */
 func AddJob(name, spec string, action func(db *xorm.Engine) error, flag ...bool) error {
 
-	id := tools.Crypto.MD5([]byte(name))
+	id := tools.MD5([]byte(name))
 	if job.data.Get(id) == nil {
 		// 纯粹的新任务，在数据库中没有任何记录
 		model := beans.Cron{

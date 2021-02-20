@@ -4,6 +4,7 @@ package awxmp
 
 import (
 	"context"
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/gin-gonic/gin"
 	"github.com/zhanghup/go-app/cfg"
 	"github.com/zhanghup/go-app/service/ags"
@@ -14,23 +15,25 @@ import (
 	"github.com/zhanghup/go-tools/tgql"
 	"github.com/zhanghup/go-tools/tog"
 	"github.com/zhanghup/go-tools/wx/wxmp"
-	"xorm.io/xorm"
 )
 
-func NewResolver(db *xorm.Engine) *Resolver {
+func NewResolver() *Resolver {
 	return &Resolver{
-		NewResolverTools(db),
+		NewResolverTools(),
 	}
 }
 
-func Gin(g gin.IRouter, db *xorm.Engine) {
-	config := source.Config{
-		Resolvers: NewResolver(db),
+func Gin(g gin.IRouter, sc ...graphql.ExecutableSchema) {
+	s := source.NewExecutableSchema(source.Config{
+		Resolvers: NewResolver(),
 		Directives: source.DirectiveRoot{
 		},
+	})
+	if len(sc) > 0 {
+		s = sc[0]
 	}
-	ags.GinGql("/zpx/wxmp", g.Group("/", directive.WxmpAuth(db)), source.NewExecutableSchema(config), db)
-	g.POST("/zpx/wxmp/pay/callback",PayCallback)
+	ags.GinGql("/zpx/wxmp", g.Group("/", directive.WxmpAuth(ags.DefaultDB())), s, ags.DefaultDB())
+	g.POST("/zpx/wxmp/pay/callback", PayCallback)
 }
 
 type Resolver struct {
@@ -41,12 +44,12 @@ type ResolverTools struct {
 	DBS    func(ctx context.Context) txorm.ISession
 	Sess   func(ctx context.Context) txorm.ISession
 	Loader func(ctx context.Context) tgql.Loader
-	Wxme     func(ctx context.Context) *ca.WxmpUser
+	Wxme   func(ctx context.Context) *ca.WxmpUser
 	Wxmp   wxmp.IEngine
 }
 
-func NewResolverTools(db *xorm.Engine) *ResolverTools {
-	dbs := txorm.NewEngine(db)
+func NewResolverTools() *ResolverTools {
+	dbs := txorm.NewEngine(ags.DefaultDB())
 	return &ResolverTools{
 		DBS: func(ctx context.Context) txorm.ISession {
 			return dbs.NewSession(true, ctx)
@@ -60,7 +63,7 @@ func NewResolverTools(db *xorm.Engine) *ResolverTools {
 			return sess
 		},
 		Loader: tgql.DataLoaden,
-		Wxme:     directive.MyWxmpUser,
+		Wxme:   directive.MyWxmpUser,
 		Wxmp:   wxmp.NewEngine(&cfg.Wxmp),
 	}
 }

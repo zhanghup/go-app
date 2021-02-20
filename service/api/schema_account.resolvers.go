@@ -20,7 +20,7 @@ func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAc
 		if input.Username == nil || input.Password == nil {
 			return "", errors.New("用户名密码不能为空")
 		}
-		password := tools.Crypto.Password(*input.Password, *acc.Salt)
+		password := tools.Password(*input.Password, *acc.Salt)
 		input.Password = &password
 	}
 
@@ -62,7 +62,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 		}
 
 		if len(*input.Password) != 136 {
-			password := tools.Crypto.Password(*input.Password, *acc.Salt)
+			password := tools.Password(*input.Password, *acc.Salt)
 			input.Password = &password
 		}
 

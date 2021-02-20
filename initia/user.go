@@ -32,7 +32,7 @@ func InitUser(db *xorm.Engine) {
 		}
 
 		salt := tools.UUID()
-		password := tools.Crypto.Password("Aa123456.", salt)
+		password := tools.Password("Aa123456.", salt)
 		err = sess.Insert(beans.Account{
 			Bean: beans.Bean{
 				Id:     tools.PtrOfString("root"),

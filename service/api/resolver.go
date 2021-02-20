@@ -4,6 +4,7 @@ package api
 
 import (
 	"context"
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/gin-gonic/gin"
 	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -12,24 +13,26 @@ import (
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgql"
 	"github.com/zhanghup/go-tools/tog"
-	"xorm.io/xorm"
 )
 
-func NewResolver(db *xorm.Engine) *Resolver {
+func NewResolver() *Resolver {
 	return &Resolver{
-		NewResolverTools(db),
+		NewResolverTools(),
 	}
 }
 
-func Gin(g gin.IRouter, db *xorm.Engine) {
-	config := source.Config{
-		Resolvers: NewResolver(db),
+func Gin(g gin.IRouter, sc ...graphql.ExecutableSchema) {
+	s := source.NewExecutableSchema(source.Config{
+		Resolvers: NewResolver(),
 		Directives: source.DirectiveRoot{
-			Perm: directive.Perm(db),
-			Root: directive.Root(db),
+			Perm: directive.Perm(ags.DefaultDB()),
+			Root: directive.Root(ags.DefaultDB()),
 		},
+	})
+	if len(sc) > 0 {
+		s = sc[0]
 	}
-	ags.GinGql("/zpx/api", g.Group("/", directive.WebAuth(db)), source.NewExecutableSchema(config), db)
+	ags.GinGql("/zpx/api", g.Group("/", directive.WebAuth(ags.DefaultDB())), s, ags.DefaultDB())
 }
 
 type Resolver struct {
@@ -43,8 +46,8 @@ type ResolverTools struct {
 	Me     func(ctx context.Context) *ca.User
 }
 
-func NewResolverTools(db *xorm.Engine) *ResolverTools {
-	dbs := txorm.NewEngine(db)
+func NewResolverTools() *ResolverTools {
+	dbs := txorm.NewEngine(ags.DefaultDB())
 	return &ResolverTools{
 		DBS: func(ctx context.Context) txorm.ISession {
 			return dbs.NewSession(true, ctx)

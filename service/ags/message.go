@@ -150,27 +150,16 @@ var defaultMessage IMessage
 	@db: db为空，初始化默认消息工具
 		 db不为空，返回一个新的消息工具，但是默认的不会被替换
 */
-func MessageInit(db ...*xorm.Engine) IMessage {
-	if defaultMessage != nil && len(db) == 0 {
+func MessageInit() IMessage {
+	if defaultMessage != nil {
 		return defaultMessage
 	}
 
-	var newdb *xorm.Engine
-	if len(db) == 0 {
-		newdb = defaultDB
-	} else {
-		newdb = db[0]
+	defaultMessage = &message{
+		db:  defaultDB,
+		dbs: txorm.NewEngine(defaultDB),
 	}
 
-	mmsg := &message{
-		db:  newdb,
-		dbs: txorm.NewEngine(newdb),
-	}
+	return defaultMessage
 
-	if len(db) == 0 {
-		defaultMessage = mmsg
-		return defaultMessage
-	} else {
-		return mmsg
-	}
 }
