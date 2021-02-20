@@ -5,14 +5,13 @@ package awxmp
 
 import (
 	"context"
-
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/awxmp/source"
 	"github.com/zhanghup/go-app/service/event"
 )
 
 func (r *mutationResolver) UserRegister(ctx context.Context, input source.NewUserRegister) (bool, error) {
-	me := r.Wxme(ctx)
+	me := r.Me(ctx)
 	user, err := r.Wxmp.UserInfoDecrypt(me.SessionKey, input.RawData, input.EncryptedData, input.Signature, input.Iv)
 	if err != nil {
 		return false, err
@@ -39,7 +38,7 @@ func (r *mutationResolver) UserRegister(ctx context.Context, input source.NewUse
 }
 
 func (r *mutationResolver) UserRegisterMobile(ctx context.Context, input source.NewUserRegisterMobile) (bool, error) {
-	me := r.Wxme(ctx)
+	me := r.Me(ctx)
 	mobile, err := r.Wxmp.UserMobileDecrypt(me.SessionKey, input.EncryptedData, input.Iv)
 	if err != nil {
 		return false, err
@@ -59,14 +58,12 @@ func (r *mutationResolver) UserRegisterMobile(ctx context.Context, input source.
 	return true, nil
 }
 
-func (r *queryResolver) Me(ctx context.Context) (*beans.WxmpUser, error) {
-	me := r.Resolver.Wxme(ctx)
-	return me.User, nil
+func (r *queryResolver) MyInfo(ctx context.Context) (*beans.WxmpUser, error) {
+	return r.Resolver.Me(ctx).User, nil
 }
 
 func (r *queryResolver) User(ctx context.Context) (*beans.WxmpUser, error) {
-	me := r.Resolver.Wxme(ctx)
 	wxuser := new(beans.WxmpUser)
-	_, err := r.Sess(ctx).SF(`select * from wxmp_user where id = ?`, me.Id).Get(wxuser)
+	_, err := r.Sess(ctx).SF(`select * from wxmp_user where id = ?`, r.Resolver.Me(ctx).Id).Get(wxuser)
 	return wxuser, err
 }

@@ -1,6 +1,6 @@
 extend type Query {
     "登录状态查询"
-    me: Me!
+    my_info: Me!
     "通过数据库直接查用户"
     user: Me!
 }

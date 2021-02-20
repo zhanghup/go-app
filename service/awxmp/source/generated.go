@@ -66,9 +66,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Hello func(childComplexity int) int
-		Me    func(childComplexity int) int
-		User  func(childComplexity int) int
+		Hello  func(childComplexity int) int
+		MyInfo func(childComplexity int) int
+		User   func(childComplexity int) int
 	}
 
 	Subscription struct {
@@ -83,7 +83,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Hello(ctx context.Context) (*string, error)
-	Me(ctx context.Context) (*beans.WxmpUser, error)
+	MyInfo(ctx context.Context) (*beans.WxmpUser, error)
 	User(ctx context.Context) (*beans.WxmpUser, error)
 }
 type SubscriptionResolver interface {
@@ -220,12 +220,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Hello(childComplexity), true
 
-	case "Query.me":
-		if e.complexity.Query.Me == nil {
+	case "Query.my_info":
+		if e.complexity.Query.MyInfo == nil {
 			break
 		}
 
-		return e.complexity.Query.Me(childComplexity), true
+		return e.complexity.Query.MyInfo(childComplexity), true
 
 	case "Query.user":
 		if e.complexity.Query.User == nil {
@@ -350,7 +350,7 @@ type Subscription {
 `, BuiltIn: false},
 	{Name: "schema/schema_user.graphql", Input: `extend type Query {
     "登录状态查询"
-    me: Me!
+    my_info: Me!
     "通过数据库直接查用户"
     user: Me!
 }
@@ -987,7 +987,7 @@ func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_me(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_my_info(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1005,7 +1005,7 @@ func (ec *executionContext) _Query_me(ctx context.Context, field graphql.Collect
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Me(rctx)
+		return ec.resolvers.Query().MyInfo(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2445,7 +2445,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_hello(ctx, field)
 				return res
 			})
-		case "me":
+		case "my_info":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -2453,7 +2453,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_me(ctx, field)
+				res = ec._Query_my_info(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
