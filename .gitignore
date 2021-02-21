@@ -6,3 +6,4 @@ boot/test_main/conf
 logs/
 service/api/cmd/source/
 service/api/cmd/test/
+*.exe
