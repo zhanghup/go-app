@@ -37,7 +37,7 @@ func (this *ResolverTools) Pay(ctx context.Context, opt *PayOption) (*wxmp.PayRe
 		Commit: tools.PtrOfInt64(time.Now().Unix()),
 		Price:  tools.PtrOfInt(opt.Price),
 	}
-	id, err := this.Create(ctx, order, nil)
+	id, err := this.Create(ctx, &order, nil)
 	if err != nil {
 		return nil, err
 	}
