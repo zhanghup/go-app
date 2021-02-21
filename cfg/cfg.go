@@ -10,6 +10,7 @@ import (
 
 type config struct {
 	box      *rice.Box
+	Host     string       `yaml:"host"`
 	Database txorm.Config `yaml:"database"`
 	Web      tgin.Config  `yaml:"web"`
 	Wxmp     wxmp.Option  `yaml:"wxmp"`
