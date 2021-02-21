@@ -11,6 +11,7 @@ import (
 	"github.com/zhanghup/go-tools/tog"
 	"github.com/zhanghup/go-tools/wx/wxmp"
 	"io"
+	"strings"
 	"time"
 )
 
@@ -37,7 +38,10 @@ func (this *ResolverTools) Pay(ctx context.Context, opt *PayOption) (*wxmp.PayRe
 		Commit: tools.PtrOfInt64(time.Now().Unix()),
 		Price:  tools.PtrOfInt(opt.Price),
 	}
-	id, err := this.Create(ctx, &order, nil)
+	id := tools.UUID()
+	id = strings.ReplaceAll(id, "-", "")
+	order.Id = &id
+	_, err := this.Create(ctx, &order, nil)
 	if err != nil {
 		return nil, err
 	}
