@@ -19,7 +19,7 @@ func (r *mutationResolver) PayError(ctx context.Context, id string, typeArg stri
 	if err != nil {
 		return false, err
 	}
-	return r.ResolverTools.PayCancel(ctx, id, typeArg)
+	return r.PayCancelAction(ctx, id, typeArg)
 }
 
 func (r *mutationResolver) PayCancel(ctx context.Context, id string, typeArg string) (bool, error) {
@@ -34,7 +34,7 @@ func (r *mutationResolver) PayCancel(ctx context.Context, id string, typeArg str
 	if err != nil {
 		return false, err
 	}
-	return r.ResolverTools.PayCancel(ctx, id, typeArg)
+	return r.PayCancelAction(ctx, id, typeArg)
 }
 
 func (r *mutationResolver) PaySuccess(ctx context.Context, id string, typeArg string) (bool, error) {
