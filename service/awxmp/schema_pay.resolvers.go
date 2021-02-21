@@ -16,7 +16,10 @@ func (r *mutationResolver) PayError(ctx context.Context, id string, typeArg stri
 			updated = unix_timestamp(now()) 
 		where oid = ? and otype = ? 
 	`, id, typeArg).Exec()
-	return err == nil, err
+	if err != nil {
+		return false, err
+	}
+	return r.ResolverTools.PayCancel(ctx, id, typeArg)
 }
 
 func (r *mutationResolver) PayCancel(ctx context.Context, id string, typeArg string) (bool, error) {
@@ -28,7 +31,10 @@ func (r *mutationResolver) PayCancel(ctx context.Context, id string, typeArg str
 			updated = unix_timestamp(now()) 
 		where oid = ? and otype = ? 
 	`, id, typeArg).Exec()
-	return err == nil, err
+	if err != nil {
+		return false, err
+	}
+	return r.ResolverTools.PayCancel(ctx, id, typeArg)
 }
 
 func (r *mutationResolver) PaySuccess(ctx context.Context, id string, typeArg string) (bool, error) {

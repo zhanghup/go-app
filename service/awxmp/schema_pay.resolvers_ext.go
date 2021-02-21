@@ -54,6 +54,15 @@ func (this *ResolverTools) Pay(ctx context.Context, opt *PayOption) (*wxmp.PayRe
 	})
 }
 
+func (this *ResolverTools) PayCancel(ctx context.Context, id, ty string) (bool, error) {
+	id, err := this.Sess(ctx).SF(`select id from wxmp_order where otype = ? and oid = ?`, ty, id).String()
+	if err != nil {
+		return false, err
+	}
+	err = this.Wxmp.PayCancel(id)
+	return err == nil, err
+}
+
 func PayCallback(c *gin.Context) {
 	data, err := io.ReadAll(c.Request.Body)
 	if err != nil {
