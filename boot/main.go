@@ -15,6 +15,7 @@ import (
 	"github.com/zhanghup/go-tools/tog"
 	"github.com/zhanghup/go-tools/twindows"
 	"os"
+	"runtime"
 	"xorm.io/xorm"
 )
 
@@ -166,8 +167,9 @@ func (this *stru) runWeb() error {
 
 func (this *stru) StartRouter() {
 	this.app.Commands = append(this.app.Commands, &cli.Command{
-		Name:  "service",
-		Usage: "服务安装卸载",
+		Name:   "service",
+		Usage:  "服务安装卸载",
+		Hidden: runtime.GOOS != "windows",
 		Description: `
 			service install
 			service uninstall
