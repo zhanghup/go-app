@@ -29,6 +29,7 @@ type WxmpOrder struct {
 	PrepayId      *string `json:"prepay_id"`
 	TransactionId *string `json:"transaction_id"`
 	PayTime       *int64  `json:"pay_time"`
+	Message       *string `json:"message"`
 }
 
 func wxmp_tables() []interface{} {

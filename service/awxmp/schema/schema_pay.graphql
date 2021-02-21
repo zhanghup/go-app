@@ -1,0 +1,9 @@
+extend type Mutation {
+    "支付失败"
+    pay_error(id: String!,type: String!):Boolean!
+    "支付取消"
+    pay_cancel(id: String!,type: String!):Boolean!
+    "支付成功"
+    pay_success(id: String!,type: String!): Boolean!
+
+}

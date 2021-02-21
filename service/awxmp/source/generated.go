@@ -60,6 +60,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		PayCancel          func(childComplexity int, id string, typeArg string) int
+		PayError           func(childComplexity int, id string, typeArg string) int
+		PaySuccess         func(childComplexity int, id string, typeArg string) int
 		UserRegister       func(childComplexity int, input NewUserRegister) int
 		UserRegisterMobile func(childComplexity int, input NewUserRegisterMobile) int
 		World              func(childComplexity int) int
@@ -78,6 +81,9 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	World(ctx context.Context) (*string, error)
+	PayError(ctx context.Context, id string, typeArg string) (bool, error)
+	PayCancel(ctx context.Context, id string, typeArg string) (bool, error)
+	PaySuccess(ctx context.Context, id string, typeArg string) (bool, error)
 	UserRegister(ctx context.Context, input NewUserRegister) (bool, error)
 	UserRegisterMobile(ctx context.Context, input NewUserRegisterMobile) (bool, error)
 }
@@ -181,6 +187,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Me.Updated(childComplexity), true
+
+	case "Mutation.pay_cancel":
+		if e.complexity.Mutation.PayCancel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_pay_cancel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PayCancel(childComplexity, args["id"].(string), args["type"].(string)), true
+
+	case "Mutation.pay_error":
+		if e.complexity.Mutation.PayError == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_pay_error_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PayError(childComplexity, args["id"].(string), args["type"].(string)), true
+
+	case "Mutation.pay_success":
+		if e.complexity.Mutation.PaySuccess == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_pay_success_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PaySuccess(childComplexity, args["id"].(string), args["type"].(string)), true
 
 	case "Mutation.user_register":
 		if e.complexity.Mutation.UserRegister == nil {
@@ -348,6 +390,16 @@ type Subscription {
     hello: String
 }
 `, BuiltIn: false},
+	{Name: "schema/schema_pay.graphql", Input: `extend type Mutation {
+    "支付失败"
+    pay_error(id: String!,type: String!):Boolean!
+    "支付取消"
+    pay_cancel(id: String!,type: String!):Boolean!
+    "支付成功"
+    pay_success(id: String!,type: String!): Boolean!
+
+}
+`, BuiltIn: false},
 	{Name: "schema/schema_user.graphql", Input: `extend type Query {
     "登录状态查询"
     my_info: Me!
@@ -403,6 +455,78 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_pay_cancel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["type"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["type"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_pay_error_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["type"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["type"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_pay_success_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["type"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["type"] = arg1
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_user_register_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -869,6 +993,132 @@ func (ec *executionContext) _Mutation_world(ctx context.Context, field graphql.C
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_pay_error(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_pay_error_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PayError(rctx, args["id"].(string), args["type"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_pay_cancel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_pay_cancel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PayCancel(rctx, args["id"].(string), args["type"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_pay_success(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_pay_success_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PaySuccess(rctx, args["id"].(string), args["type"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_user_register(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2398,6 +2648,21 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "world":
 			out.Values[i] = ec._Mutation_world(ctx, field)
+		case "pay_error":
+			out.Values[i] = ec._Mutation_pay_error(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pay_cancel":
+			out.Values[i] = ec._Mutation_pay_cancel(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pay_success":
+			out.Values[i] = ec._Mutation_pay_success(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "user_register":
 			out.Values[i] = ec._Mutation_user_register(ctx, field)
 			if out.Values[i] == graphql.Null {
