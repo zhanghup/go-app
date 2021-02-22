@@ -25,4 +25,4 @@ func WxmpUserRemoveSubscribe(fn func(wxmp beans.WxmpUser)) { EventSubscribe(wxmp
 
 // 微信小程序支付推送
 func WxmpPayCallbackPush(data []byte)                   { EventPublish(wxmp_pay, data) } // 用户删除
-func WxmpPayCallbackSubscribe(fn func(wxmp beans.WxmpUser)) { EventSubscribe(wxmp_pay, fn) } // 用户删除【订阅】
+func WxmpPayCallbackSubscribe(fn func(wxmp beans.WxmpOrder)) { EventSubscribe(wxmp_pay, fn) } // 用户删除【订阅】
