@@ -10,7 +10,7 @@ const (
 	wxmp_update = "wxmp:update"
 	wxmp_remove = "wxmp:remove"
 	wxmp_role   = "wxmp:role"
-	wxmp_pay   = "wxmp:pay"
+	wxmp_pay    = "wxmp:pay_callback"
 )
 
 // 微信用户事件
@@ -24,5 +24,5 @@ func WxmpUserRemove(wxmp beans.WxmpUser)                   { EventPublish(wxmp_r
 func WxmpUserRemoveSubscribe(fn func(wxmp beans.WxmpUser)) { EventSubscribe(wxmp_remove, fn) } // 用户删除【订阅】
 
 // 微信小程序支付推送
-func WxmpPayCallbackPush(data []byte)                   { EventPublish(wxmp_pay, data) } // 用户删除
-func WxmpPayCallbackSubscribe(fn func(wxmp beans.WxmpOrder)) { EventSubscribe(wxmp_pay, fn) } // 用户删除【订阅】
+func WxmpPayCallbackPush(order beans.WxmpOrder)               { EventPublish(wxmp_pay, order) } // 用户删除
+func WxmpPayCallbackSubscribe(fn func(order beans.WxmpOrder)) { EventSubscribe(wxmp_pay, fn) }  // 用户删除【订阅】

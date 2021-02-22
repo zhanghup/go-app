@@ -80,7 +80,7 @@ func PayCallback(wxEngine wxmp.IEngine) func(c *gin.Context) {
 			})
 			return
 		}
-		go event.WxmpPayCallbackPush(data)
+
 		res, err := wxEngine.PayDecrypt(data)
 		if err != nil {
 			tog.Error("【微信支付】 %s", err.Error())
@@ -90,7 +90,8 @@ func PayCallback(wxEngine wxmp.IEngine) func(c *gin.Context) {
 			})
 			return
 		}
-		dbs.SF(`update wxmp_order set 
+
+		err = dbs.SF(`update wxmp_order set 
 			updated = unix_timestamp(now()),
 			state = :state,
 			price_user = :price,
@@ -109,6 +110,40 @@ func PayCallback(wxEngine wxmp.IEngine) func(c *gin.Context) {
 					return "4"
 				}
 			}(),
+		}).Exec()
+		if err != nil {
+			tog.Error("【微信支付】 %s", err.Error())
+			c.JSON(200, map[string]interface{}{
+				"code":    "ERROR",
+				"message": err.Error(),
+			})
+			return
+		}
+
+		order := new(beans.WxmpOrder)
+		ok, err := ags.DefaultDB().Where("id = ?", res.OutTradeNo).Get(order)
+		if err != nil {
+			tog.Error("【微信支付】 %s", err.Error())
+			c.JSON(200, map[string]interface{}{
+				"code":    "ERROR",
+				"message": err.Error(),
+			})
+			return
+		}
+		if !ok {
+			tog.Error("【微信支付】 订单不存在")
+			c.JSON(200, map[string]interface{}{
+				"code":    "ERROR",
+				"message": "订单不存在",
+			})
+			return
+		}
+
+		go event.WxmpPayCallbackPush(*order)
+		c.JSON(200, map[string]interface{}{
+			"code":    "SUCCESS",
+			"message": "",
 		})
+
 	}
 }
