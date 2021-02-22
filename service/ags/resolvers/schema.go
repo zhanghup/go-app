@@ -27,7 +27,7 @@ type Resolver struct {
 
 func NewResolver(db *xorm.Engine) source.ResolverRoot {
 	dbs := txorm.NewEngine(db)
-	return &Resolver{
+	r := &Resolver{
 		DBS: func(ctx context.Context) txorm.ISession {
 			return dbs.NewSession(true, ctx)
 		},
@@ -44,10 +44,15 @@ func NewResolver(db *xorm.Engine) source.ResolverRoot {
 			ggg := gg.(*gin.Context)
 			return ggg
 		},
-		Wxmp:   wxmp.NewEngine(&cfg.Wxmp),
 		Me:     directive.MyInfo,
 		Loader: tgql.DataLoaden,
 	}
+
+	if cfg.Wxmp.Appid != "" {
+		r.Wxmp = wxmp.NewEngine(&cfg.Wxmp)
+	}
+
+	return r
 }
 
 func (this *mutationResolver) Token(ctx context.Context, uid, aid string) (string, error) {

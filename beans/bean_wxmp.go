@@ -26,7 +26,6 @@ type WxmpOrder struct {
 	Commit        *int64  `json:"commit"`
 	Price         *int    `json:"price"`
 	PriceUser     *int    `json:"price_user"`
-	PrepayId      *string `json:"prepay_id"`
 	TransactionId *string `json:"transaction_id"`
 	PayTime       *int64  `json:"pay_time"`
 	Message       *string `json:"message"`

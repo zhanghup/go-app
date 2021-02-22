@@ -46,7 +46,7 @@ func (this *ResolverTools) Pay(ctx context.Context, opt *PayOption) (*wxmp.PayRe
 	if err != nil {
 		return nil, err
 	}
-	return this.Wxmp.Pay(&wxmp.PayOption{
+	res, err := this.Wxmp.Pay(&wxmp.PayOption{
 		OutTradeNo:  id,
 		NotifyUrl:   cfg.Config.Host + "/zpx/wxmp/pay/callback",
 		Openid:      me.Openid,
@@ -57,6 +57,11 @@ func (this *ResolverTools) Pay(ctx context.Context, opt *PayOption) (*wxmp.PayRe
 		Currency:    opt.Currency,
 		GoodsTag:    opt.GoodsTag,
 	})
+	if err != nil{
+		return nil,err
+	}
+
+	return res, err
 }
 
 func (this *ResolverTools) PayCancelAction(ctx context.Context, id, ty string) (bool, error) {
@@ -96,6 +101,7 @@ func PayCallback(wxEngine wxmp.IEngine) func(c *gin.Context) {
 			state = :state,
 			price_user = :price,
 			pay_time = unix_timestamp(now()),
+			transaction_id = :transaction_id
 			message = :message
 			where id = :id
 		`, map[string]interface{}{

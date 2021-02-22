@@ -61,6 +61,10 @@ func (r *mutationResolver) Login(ctx context.Context, username string, password 
 }
 
 func (r *mutationResolver) LoginWxmp(ctx context.Context, code string) (string, error) {
+	if r.Wxmp == nil {
+		return "", errors.New("微信接口未初始化!!!")
+	}
+
 	res, err := r.Wxmp.Code2Session(code)
 	if err != nil {
 		return "", err
