@@ -101,7 +101,7 @@ func PayCallback(wxEngine wxmp.IEngine) func(c *gin.Context) {
 			state = :state,
 			price_user = :price,
 			pay_time = unix_timestamp(now()),
-			transaction_id = :transaction_id
+			transaction_id = :transaction_id,
 			message = :message
 			where id = :id
 		`, map[string]interface{}{
