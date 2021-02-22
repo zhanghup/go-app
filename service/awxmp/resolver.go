@@ -20,23 +20,25 @@ import (
 	"time"
 )
 
-func NewResolver() *Resolver {
+func NewResolver(wxEngine wxmp.IEngine) *Resolver {
 	return &Resolver{
-		NewResolverTools(),
+		NewResolverTools(wxEngine),
 	}
 }
 
 func Gin(g gin.IRouter, sc ...graphql.ExecutableSchema) {
+	wxEngine := wxmp.NewEngine(&cfg.Wxmp)
 	s := source.NewExecutableSchema(source.Config{
-		Resolvers: NewResolver(),
+		Resolvers: NewResolver(wxEngine),
 		Directives: source.DirectiveRoot{
 		},
 	})
 	if len(sc) > 0 {
 		s = sc[0]
 	}
+
 	ags.GinGql("/zpx/wxmp", g.Group("/", directive.WxmpAuth(ags.DefaultDB())), s, ags.DefaultDB())
-	g.POST("/zpx/wxmp/pay/callback", PayCallback)
+	g.POST("/zpx/wxmp/pay/callback", PayCallback(wxEngine))
 }
 
 type Resolver struct {
@@ -51,7 +53,7 @@ type ResolverTools struct {
 	Wxmp   wxmp.IEngine
 }
 
-func NewResolverTools() *ResolverTools {
+func NewResolverTools(wxEngine wxmp.IEngine) *ResolverTools {
 	dbs := txorm.NewEngine(ags.DefaultDB())
 	return &ResolverTools{
 		DBS: func(ctx context.Context) txorm.ISession {
@@ -67,10 +69,9 @@ func NewResolverTools() *ResolverTools {
 		},
 		Loader: tgql.DataLoaden,
 		Me:     directive.MyWxmpUser,
-		Wxmp:   wxmp.NewEngine(&cfg.Wxmp),
+		Wxmp:   wxEngine,
 	}
 }
-
 
 func (this *ResolverTools) Create(ctx context.Context, tab interface{}, obj interface{}) (string, error) {
 	id := ""
@@ -123,7 +124,7 @@ func (this *ResolverTools) Update(ctx context.Context, tab interface{}, id strin
 		if err != nil {
 			return err
 		}
-		if obj != nil{
+		if obj != nil {
 			_, err = sess.S().Table(tab).Where("id = ?", id).AllCols().Update(obj)
 		}
 		return err

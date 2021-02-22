@@ -129,6 +129,29 @@ func InitDict(db *xorm.Engine) {
 			{"1", "普通用户", "1", "", 0},
 		})
 	}
+
+	// WXMP
+	{
+		// 用户性别 WXMP001
+		InitDictCode(db, "WXMP", "001", "用户性别", 0, []DictInfoItem{
+			{"1", "未知", "0", "", 0},
+			{"2", "男性", "1", "", 0},
+			{"3", "女性", "2", "", 0},
+		})
+
+		// 支付类型 BUS001
+		InitDictCode(db, "WXMP", "002", "支付类型", 0, []DictInfoItem{
+		})
+
+		// 支付状态 WXMP001
+		InitDictCode(db, "WXMP", "003", "支付状态", 0, []DictInfoItem{
+			{"1", "未支付", "0", "", 0},
+			{"2", "已支付", "1", "", 0},
+			{"3", "已取消", "2", "", 0},
+			{"4", "支付成功", "3", "", 0},
+			{"5", "支付失败", "4", "", 0},
+		})
+	}
 }
 
 func InitDictItem(db *xorm.Engine, code, id, name, value, ext string, weight, disabled int) {

@@ -2,12 +2,13 @@ package awxmp
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/cfg"
+	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
+	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tog"
 	"github.com/zhanghup/go-tools/wx/wxmp"
 	"io"
@@ -67,12 +68,47 @@ func (this *ResolverTools) PayCancelAction(ctx context.Context, id, ty string) (
 	return err == nil, err
 }
 
-func PayCallback(c *gin.Context) {
-	data, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		tog.Error("【微信支付】 %s", err.Error())
-		return
+func PayCallback(wxEngine wxmp.IEngine) func(c *gin.Context) {
+	dbs := txorm.NewEngine(ags.DefaultDB())
+	return func(c *gin.Context) {
+		data, err := io.ReadAll(c.Request.Body)
+		if err != nil {
+			tog.Error("【微信支付】 %s", err.Error())
+			c.JSON(200, map[string]interface{}{
+				"code":    "ERROR",
+				"message": err.Error(),
+			})
+			return
+		}
+		go event.WxmpPayCallbackPush(data)
+		res, err := wxEngine.PayDecrypt(data)
+		if err != nil {
+			tog.Error("【微信支付】 %s", err.Error())
+			c.JSON(200, map[string]interface{}{
+				"code":    "ERROR",
+				"message": err.Error(),
+			})
+			return
+		}
+		dbs.SF(`update wxmp_order set 
+			updated = unix_timestamp(now()),
+			state = :state,
+			price_user = :price,
+			pay_time = unix_timestamp(now()),
+			message = :message
+			where id = :id
+		`, map[string]interface{}{
+			"id":             res.OutTradeNo,
+			"price":          res.Amount.PayerTotal,
+			"transaction_id": res.TransactionId,
+			"message":        res.TradeStateDesc,
+			"state": func() string {
+				if res.TradeState == "SUCCESS" {
+					return "3"
+				} else {
+					return "4"
+				}
+			}(),
+		})
 	}
-	go event.WxmpPayCallbackPush(data)
-	fmt.Println(string(data), "------------------")
 }
