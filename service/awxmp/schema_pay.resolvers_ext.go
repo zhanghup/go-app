@@ -5,10 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/gs"
-	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tog"
 	"github.com/zhanghup/go-tools/wx/wxmp"
 	"io"
@@ -57,15 +55,15 @@ func (this *ResolverTools) Pay(ctx context.Context, opt *PayOption) (*wxmp.PayRe
 		Currency:    opt.Currency,
 		GoodsTag:    opt.GoodsTag,
 	})
-	if err != nil{
-		return nil,err
+	if err != nil {
+		return nil, err
 	}
 
 	return res, err
 }
 
 func (this *ResolverTools) PayCancelAction(ctx context.Context, id, ty string) (bool, error) {
-	id, err := this.Sess(ctx).SF(`select id from wxmp_order where otype = ? and oid = ?`, ty, id).String()
+	id, err := gs.Sess(ctx).SF(`select id from wxmp_order where otype = ? and oid = ?`, ty, id).String()
 	if err != nil {
 		return false, err
 	}
@@ -74,7 +72,6 @@ func (this *ResolverTools) PayCancelAction(ctx context.Context, id, ty string) (
 }
 
 func PayCallback(wxEngine wxmp.IEngine) func(c *gin.Context) {
-	dbs := txorm.NewEngine(ags.DefaultDB())
 	return func(c *gin.Context) {
 		data, err := io.ReadAll(c.Request.Body)
 		if err != nil {
@@ -96,7 +93,7 @@ func PayCallback(wxEngine wxmp.IEngine) func(c *gin.Context) {
 			return
 		}
 
-		err = dbs.SF(`update wxmp_order set 
+		err = gs.DBS().SF(`update wxmp_order set 
 			updated = unix_timestamp(now()),
 			state = :state,
 			price_user = :price,
@@ -127,7 +124,7 @@ func PayCallback(wxEngine wxmp.IEngine) func(c *gin.Context) {
 		}
 
 		order := new(beans.WxmpOrder)
-		ok, err := ags.DefaultDB().Where("id = ?", res.OutTradeNo).Get(order)
+		ok, err := gs.DB().Where("id = ?", res.OutTradeNo).Get(order)
 		if err != nil {
 			tog.Error("【微信支付】 %s", err.Error())
 			c.JSON(200, map[string]interface{}{

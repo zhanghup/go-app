@@ -14,7 +14,6 @@ import (
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgql"
-	"github.com/zhanghup/go-tools/tog"
 	"github.com/zhanghup/go-tools/wx/wxmp"
 	"reflect"
 	"time"
@@ -27,7 +26,7 @@ func NewResolver(wxEngine wxmp.IEngine) *Resolver {
 }
 
 func Gin(g gin.IRouter, sc ...graphql.ExecutableSchema) {
-	wxEngine := wxmp.NewEngine(&gs.Wxmp)
+	wxEngine := wxmp.NewEngine(&gs.Config.Wxmp)
 	s := source.NewExecutableSchema(source.Config{
 		Resolvers: NewResolver(wxEngine),
 		Directives: source.DirectiveRoot{
@@ -37,7 +36,7 @@ func Gin(g gin.IRouter, sc ...graphql.ExecutableSchema) {
 		s = sc[0]
 	}
 
-	ags.GinGql("/zpx/wxmp", g.Group("/", directive.WxmpAuth(ags.DefaultDB())), s, ags.DefaultDB())
+	ags.GinGql("/zpx/wxmp", g.Group("/", directive.WxmpAuth()), s)
 	g.POST("/zpx/wxmp/pay/callback", PayCallback(wxEngine))
 }
 
@@ -46,27 +45,13 @@ type Resolver struct {
 }
 
 type ResolverTools struct {
-	DBS    func(ctx context.Context) txorm.ISession
-	Sess   func(ctx context.Context) txorm.ISession
 	Loader func(ctx context.Context) tgql.Loader
 	Me     func(ctx context.Context) *ca.WxmpUser
 	Wxmp   wxmp.IEngine
 }
 
 func NewResolverTools(wxEngine wxmp.IEngine) *ResolverTools {
-	dbs := txorm.NewEngine(ags.DefaultDB())
 	return &ResolverTools{
-		DBS: func(ctx context.Context) txorm.ISession {
-			return dbs.NewSession(true, ctx)
-		},
-		Sess: func(ctx context.Context) txorm.ISession {
-			sess := dbs.Session(ctx)
-			err := sess.Begin()
-			if err != nil {
-				tog.Error("【开启事务异常！！！】")
-			}
-			return sess
-		},
 		Loader: tgql.DataLoaden,
 		Me:     directive.MyWxmpUser,
 		Wxmp:   wxEngine,
@@ -75,7 +60,7 @@ func NewResolverTools(wxEngine wxmp.IEngine) *ResolverTools {
 
 func (this *ResolverTools) Create(ctx context.Context, tab interface{}, obj interface{}) (string, error) {
 	id := ""
-	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
+	err := gs.Sess(ctx).TS(func(sess txorm.ISession) error {
 		tools.Rft.DeepSet(tab, func(t reflect.Type, v reflect.Value, tf reflect.StructField) bool {
 			switch tf.Name {
 			case "Id":
@@ -119,7 +104,7 @@ func (this *ResolverTools) Create(ctx context.Context, tab interface{}, obj inte
 }
 
 func (this *ResolverTools) Update(ctx context.Context, tab interface{}, id string, obj interface{}) (bool, error) {
-	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
+	err := gs.Sess(ctx).TS(func(sess txorm.ISession) error {
 		_, err := sess.S().Table(tab).Where("id = ?", id).Update(tab)
 		if err != nil {
 			return err
@@ -134,7 +119,7 @@ func (this *ResolverTools) Update(ctx context.Context, tab interface{}, id strin
 }
 
 func (this *ResolverTools) Removes(ctx context.Context, table interface{}, ids []string) (bool, error) {
-	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
+	err := gs.Sess(ctx).TS(func(sess txorm.ISession) error {
 		_, err := sess.S().Table(table).In("id", ids).Delete(table)
 		return err
 	})

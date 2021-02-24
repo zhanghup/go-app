@@ -3,21 +3,18 @@ package directive
 import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/service/ca"
 	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
-	"xorm.io/xorm"
-
-	"github.com/gin-gonic/gin"
 )
 
-func WxmpAuth(db *xorm.Engine) gin.HandlerFunc {
+func WxmpAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tgin.DoCustom(c, func(c *gin.Context) (interface{}, string) {
-			res, err := WxmpAuthFunc(db, c)
+			res, err := WxmpAuthFunc(c)
 			if err != nil {
 				return res, err.Error()
 			}
@@ -26,9 +23,7 @@ func WxmpAuth(db *xorm.Engine) gin.HandlerFunc {
 	}
 }
 
-func WxmpAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
-	dbs := txorm.NewEngine(db)
-
+func WxmpAuthFunc(c *gin.Context) (interface{}, error) {
 	tok, _ := c.Cookie(gs.GIN_TOKEN)
 
 	if len(tok) == 0 {
@@ -67,7 +62,7 @@ func WxmpAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 	}
 
 	wxuser := beans.WxmpUser{}
-	ok, err := dbs.SF(`select * from wxmp_user where id = ?`, form.Uid).Get(&wxuser)
+	ok, err := gs.DBS().SF(`select * from wxmp_user where id = ?`, form.Uid).Get(&wxuser)
 	if err != nil {
 		return nil, errors.New("[4] 未授权")
 	}

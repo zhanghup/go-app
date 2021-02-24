@@ -5,6 +5,7 @@ package awxmp
 
 import (
 	"context"
+	"github.com/zhanghup/go-app/gs"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/awxmp/source"
@@ -17,7 +18,7 @@ func (r *mutationResolver) UserRegister(ctx context.Context, input source.NewUse
 	if err != nil {
 		return false, err
 	}
-	_, err = r.Sess(ctx).S().Table(beans.WxmpUser{}).Where("id = ?", me.Id).Update(map[string]interface{}{
+	_, err = gs.Sess(ctx).S().Table(beans.WxmpUser{}).Where("id = ?", me.Id).Update(map[string]interface{}{
 		"nickname":   user.Nickname,
 		"gender":     user.Gender,
 		"city":       user.City,
@@ -44,7 +45,7 @@ func (r *mutationResolver) UserRegisterMobile(ctx context.Context, input source.
 	if err != nil {
 		return false, err
 	}
-	_, err = r.Sess(ctx).S().Table(beans.WxmpUser{}).Where("id = ?", me.Id).Update(map[string]interface{}{
+	_, err = gs.Sess(ctx).S().Table(beans.WxmpUser{}).Where("id = ?", me.Id).Update(map[string]interface{}{
 		"mobile": mobile.PhoneNumber,
 	})
 	if err != nil {
@@ -65,6 +66,6 @@ func (r *queryResolver) MyInfo(ctx context.Context) (*beans.WxmpUser, error) {
 
 func (r *queryResolver) User(ctx context.Context) (*beans.WxmpUser, error) {
 	wxuser := new(beans.WxmpUser)
-	_, err := r.Sess(ctx).SF(`select * from wxmp_user where id = ?`, r.Resolver.Me(ctx).Id).Get(wxuser)
+	_, err := gs.Sess(ctx).SF(`select * from wxmp_user where id = ?`, r.Resolver.Me(ctx).Id).Get(wxuser)
 	return wxuser, err
 }

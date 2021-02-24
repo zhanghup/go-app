@@ -5,10 +5,11 @@ package awxmp
 
 import (
 	"context"
+	"github.com/zhanghup/go-app/gs"
 )
 
 func (r *mutationResolver) PayError(ctx context.Context, id string, typeArg string) (bool, error) {
-	err := r.Sess(ctx).SF(`
+	err := gs.Sess(ctx).SF(`
 		update 
 			wxmp_order 
 		set 
@@ -23,7 +24,7 @@ func (r *mutationResolver) PayError(ctx context.Context, id string, typeArg stri
 }
 
 func (r *mutationResolver) PayCancel(ctx context.Context, id string, typeArg string) (bool, error) {
-	err := r.Sess(ctx).SF(`
+	err := gs.Sess(ctx).SF(`
 		update 
 			wxmp_order 
 		set 
@@ -38,7 +39,7 @@ func (r *mutationResolver) PayCancel(ctx context.Context, id string, typeArg str
 }
 
 func (r *mutationResolver) PaySuccess(ctx context.Context, id string, typeArg string) (bool, error) {
-	err := r.Sess(ctx).SF(`
+	err := gs.Sess(ctx).SF(`
 		update 
 			wxmp_order 
 		set 
