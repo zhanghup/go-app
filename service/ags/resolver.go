@@ -82,7 +82,7 @@ func gqlschemaFmt(schema graphql.ExecutableSchema) func(c *gin.Context) {
 func GinGql(gqlpath string, gqlrouter gin.IRouter, gqlSchema graphql.ExecutableSchema) {
 	gqlrouter.POST(gqlpath, gqlschemaFmt(gqlSchema))
 	gqlrouter.GET(gqlpath, gqlschemaFmt(gqlSchema))
-	GinPlayground(gqlrouter, gqlpath+"/playground1", gqlpath)
+	gs.GinPlayground(gqlrouter, gqlpath+"/playground1", gqlpath)
 	gqlrouter.GET(gqlpath+"/playground2", func(c *gin.Context) {
 		playground.Handler("标题", gqlpath)(c.Writer, c.Request)
 	})

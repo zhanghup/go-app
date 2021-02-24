@@ -155,12 +155,16 @@ func MessageInit() IMessage {
 	if defaultMessage != nil {
 		return defaultMessage
 	}
-
 	defaultMessage = &message{
 		db:  gs.DB(),
 		dbs: gs.DBS(),
 	}
-
 	return defaultMessage
-
 }
+
+// 消息发送
+func MessageSend(tpl beans.MsgTemplate, uid, uname, otype, oid, defaultContent string, model map[string]string) error {
+	return defaultMessage.NewMessage(tpl, uid, uname, otype, oid, defaultContent, model)
+}
+
+

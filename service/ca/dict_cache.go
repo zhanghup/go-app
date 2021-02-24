@@ -2,6 +2,7 @@ package ca
 
 import (
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/tog"
@@ -15,7 +16,6 @@ type dictcacheinfo struct {
 
 type dictCache struct {
 	data tools.ICache
-	db   *xorm.Engine
 }
 
 var DictCache *dictCache
@@ -23,11 +23,11 @@ var DictCache *dictCache
 func (this *dictCache) init() error {
 	dicts := make([]beans.Dict, 0)
 	dictitems := make([]beans.DictItem, 0)
-	err := this.db.Find(&dicts)
+	err := gs.DB().Find(&dicts)
 	if err != nil {
 		return err
 	}
-	err = this.db.Find(&dictitems)
+	err = gs.DB().Find(&dictitems)
 	if err != nil {
 		return err
 	}

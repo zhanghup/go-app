@@ -5,10 +5,13 @@ import (
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
+	"github.com/zhanghup/go-tools/tog"
 	"xorm.io/xorm"
 )
 
 func InitDBTemplate(db *xorm.Engine) {
+	tog.Info("初始化数据库模板。。。")
+
 	dbs := txorm.NewEngine(db)
 
 	// 当前用户可以查看的用户列表

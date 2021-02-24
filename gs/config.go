@@ -2,7 +2,6 @@ package gs
 
 import (
 	rice "github.com/GeertJohan/go.rice"
-	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
@@ -51,13 +50,11 @@ func ConfigOf(conf interface{}) error {
 	return err
 }
 
-func init() {
-	event.XormDefaultInitSubscribeOnce(func(db *xorm.Engine) {
-		defaultDB = db
-		defaultDBS = txorm.NewEngine(db)
-		tog.Info("数据库初始化成功。。。")
+func Init(db *xorm.Engine) {
+	defaultDB = db
+	defaultDBS = txorm.NewEngine(db)
+	tog.Info("数据库初始化成功。。。")
 
-		defaultUploader = &uploader{db}
-		tog.Info("文件服务初始化成功。。。")
-	})
+	defaultUploader = &uploader{db}
+	tog.Info("文件服务初始化成功。。。")
 }

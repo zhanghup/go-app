@@ -2,7 +2,6 @@ package event
 
 import (
 	"github.com/zhanghup/go-app/beans"
-	"xorm.io/xorm"
 )
 
 const (
@@ -14,10 +13,6 @@ const (
 	user_remove       = "user:remove"
 	user_role         = "user:role"
 )
-
-// 数据库初始化事件
-func XormDefaultInit(db *xorm.Engine)                       { EventPublish(xorm_default_init, db) }
-func XormDefaultInitSubscribeOnce(fn func(db *xorm.Engine)) { EventSubscribe(xorm_default_init, fn) }
 
 // 数据字典更新事件
 func DictChange()                   { EventPublish(dict_change) }
