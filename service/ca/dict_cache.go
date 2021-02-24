@@ -6,7 +6,6 @@ import (
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/tog"
-	"xorm.io/xorm"
 )
 
 type dictcacheinfo struct {
@@ -101,26 +100,26 @@ func (this *dictCache) GetValue(dictCode, name string) string {
 	return ""
 }
 
-func init() {
-	event.XormDefaultInitSubscribeOnce(func(db *xorm.Engine) {
-		if DictCache != nil {
-			return
-		}
-		DictCache = &dictCache{
-			db:   db,
-			data: tools.CacheCreate(),
-		}
+func initDict() {
+	gs.InfoBegin("数据字典缓存")
+	if DictCache != nil {
+		return
+	}
+	DictCache = &dictCache{
+		data: tools.CacheCreate(),
+	}
 
+	err := DictCache.init()
+	if err != nil {
+		tog.Error(err.Error())
+		gs.InfoError("数据字典缓存")
+	} else {
+		gs.InfoSuccess("数据字典缓存")
+	}
+	go event.DictChangeSubscribe(func() {
 		err := DictCache.init()
 		if err != nil {
 			tog.Error(err.Error())
 		}
-		go event.DictChangeSubscribe(func() {
-			err := DictCache.init()
-			if err != nil {
-				tog.Error(err.Error())
-			}
-		})
 	})
-	return
 }

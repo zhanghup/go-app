@@ -2,13 +2,13 @@ package initia
 
 import (
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
-	"xorm.io/xorm"
 )
 
-func InitUser(db *xorm.Engine) {
-	ok, err := db.Table(beans.User{}).Where("id = ?", "root").Exist()
+func InitUser() {
+	ok, err := gs.DB().Table(beans.User{}).Where("id = ?", "root").Exist()
 	if err != nil {
 		panic(err)
 	}
@@ -16,7 +16,7 @@ func InitUser(db *xorm.Engine) {
 		return
 	}
 
-	err = txorm.NewEngine(db).TS(func(sess txorm.ISession) error {
+	err = gs.DBS().TS(func(sess txorm.ISession) error {
 
 		user := beans.User{
 			Bean: beans.Bean{

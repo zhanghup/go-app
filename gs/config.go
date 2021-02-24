@@ -50,11 +50,58 @@ func ConfigOf(conf interface{}) error {
 	return err
 }
 
+func InfoBegin(name string, items ...string) {
+	if len(items) > 0 {
+		str := "【%s】 "
+		ss := []interface{}{name}
+		for _, s := range items {
+			str += `- "%s" `
+			ss = append(ss, s)
+		}
+		str += "- 模块开始初始化......................."
+
+		tog.Info(str, ss...)
+	} else {
+		tog.Info("【%s】 模块开始初始化.......................", name)
+	}
+}
+
+func InfoSuccess(name string, items ...string) {
+	if len(items) > 0 {
+		str := "【%s】 "
+		ss := []interface{}{name}
+		for _, s := range items {
+			str += `- "%s" `
+			ss = append(ss, s)
+		}
+		str += "- 模块初始化.......................成功"
+		tog.Info(str, ss...)
+	} else {
+		tog.Info("【%s】 模块初始化.......................成功", name)
+	}
+}
+func InfoError(name string, items ...string) {
+	if len(items) > 0 {
+		str := "【%s】 "
+		ss := []interface{}{name}
+		for _, s := range items {
+			str += `- "%s" `
+			ss = append(ss, s)
+		}
+		str += "- 模块初始化.......................失败"
+		tog.Info(str, ss...)
+	} else {
+		tog.Info("【%s】 模块初始化.......................失败", name)
+	}
+}
+
 func Init(db *xorm.Engine) {
+	InfoBegin("数据库")
 	defaultDB = db
 	defaultDBS = txorm.NewEngine(db)
-	tog.Info("数据库初始化成功。。。")
+	InfoSuccess("数据库")
 
+	InfoBegin("文件服务")
 	defaultUploader = &uploader{db}
-	tog.Info("文件服务初始化成功。。。")
+	InfoSuccess("文件服务")
 }

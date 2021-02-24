@@ -1,4 +1,4 @@
-package ags
+package msg
 
 import (
 	"errors"
@@ -6,26 +6,12 @@ import (
 	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tog"
 	"strings"
 	"time"
-	"xorm.io/xorm"
 )
 
-type IMessage interface {
-	NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, defaultContent string, model map[string]string) error
-}
-
-type message struct {
-	db  *xorm.Engine
-	dbs txorm.IEngine
-}
-
-/*
-	实时消息推送
-*/
-func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, defaultContent string, model map[string]string) error {
+func NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, defaultContent string, model map[string]string) error {
 
 	if tpl.Target == nil || len(*tpl.Target) == 0 {
 		return errors.New("消息未指定需要推送的平台")
@@ -66,7 +52,7 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 
 	// 找到当前是否有已经存在的消息
 	oldInfo := beans.MsgInfo{}
-	ok, err := this.db.Where("receiver = ? and otype = ? and oid = ?", uid, otype, oid).Get(&oldInfo)
+	ok, err := gs.DB().Where("receiver = ? and otype = ? and oid = ?", uid, otype, oid).Get(&oldInfo)
 	if err != nil {
 		tog.Error("【消息推送】 Error: " + err.Error())
 		return err
@@ -94,14 +80,14 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 		if *oldInfo.State == "0" {
 			info.State = oldInfo.State
 		}
-		_, err = this.db.Where("id = ?", info.Id).Update(info)
+		_, err = gs.DB().Where("id = ?", info.Id).Update(info)
 		if err != nil {
 			tog.Error("【消息推送】 Error: " + err.Error())
 			return err
 		}
 	} else {
 		info.State = tools.PtrOfString("1") // 未读
-		_, err := this.db.Insert(info)
+		_, err := gs.DB().Insert(info)
 		if err != nil {
 			tog.Error("【消息推送】 Error: " + err.Error())
 			return err
@@ -131,7 +117,7 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 		ImgPath:      info.ImgPath,
 		Remark:       info.Remark,
 	}
-	_, err = this.db.Insert(history)
+	_, err = gs.DB().Insert(history)
 	if err != nil {
 		tog.Error("【消息推送】 Error: " + err.Error())
 		return err
@@ -143,28 +129,3 @@ func (this *message) NewMessage(tpl beans.MsgTemplate, uid, uname, otype, oid, d
 
 	return nil
 }
-
-var defaultMessage IMessage
-
-/*
-	初始化消息工具
-	@db: db为空，初始化默认消息工具
-		 db不为空，返回一个新的消息工具，但是默认的不会被替换
-*/
-func MessageInit() IMessage {
-	if defaultMessage != nil {
-		return defaultMessage
-	}
-	defaultMessage = &message{
-		db:  gs.DB(),
-		dbs: gs.DBS(),
-	}
-	return defaultMessage
-}
-
-// 消息发送
-func MessageSend(tpl beans.MsgTemplate, uid, uname, otype, oid, defaultContent string, model map[string]string) error {
-	return defaultMessage.NewMessage(tpl, uid, uname, otype, oid, defaultContent, model)
-}
-
-

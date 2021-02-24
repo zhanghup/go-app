@@ -2,6 +2,7 @@ package ca
 
 import (
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
 	"time"
@@ -50,24 +51,22 @@ func (this *wxmpUserCache) Clear() {
 
 var WxuserCache *wxmpUserCache
 
-func init() {
-	event.XormDefaultInitSubscribeOnce(func(db *xorm.Engine) {
-		WxuserCache = &wxmpUserCache{
-			usermap: tools.CacheCreate(true),
-			db:      db,
-		}
+func initWxmpuser() {
+	gs.InfoBegin("微信小程序用户缓存")
+	WxuserCache = &wxmpUserCache{
+		usermap: tools.CacheCreate(true),
+	}
+	gs.InfoSuccess("微信小程序用户缓存")
 
-		go event.WxmpUserRemoveSubscribe(func(user beans.WxmpUser) {
-			WxuserCache.Remove(*user.Id)
-		})
+	go event.WxmpUserRemoveSubscribe(func(user beans.WxmpUser) {
+		WxuserCache.Remove(*user.Id)
+	})
 
-		go event.WxmpUserUpdateSubscribe(func(user beans.WxmpUser) {
-			WxuserCache.Remove(*user.Id)
-		})
+	go event.WxmpUserUpdateSubscribe(func(user beans.WxmpUser) {
+		WxuserCache.Remove(*user.Id)
+	})
 
-		go event.WxmpUserLoginSubscribe(func(user beans.WxmpUser) {
-			WxuserCache.Remove(*user.Id)
-		})
-
+	go event.WxmpUserLoginSubscribe(func(user beans.WxmpUser) {
+		WxuserCache.Remove(*user.Id)
 	})
 }

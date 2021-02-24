@@ -12,13 +12,12 @@ import (
 	"github.com/zhanghup/go-tools/tgin"
 	"github.com/zhanghup/go-tools/tog"
 	"os"
-	"xorm.io/xorm"
 )
 
 type strujob struct {
 	name string
 	spec string
-	fn   func(db *xorm.Engine) error
+	fn   func() error
 	flag []bool
 }
 
@@ -26,23 +25,22 @@ type stru struct {
 	name      string
 	desc      string
 	box       *rice.Box
-	db        *xorm.Engine
 	jobinit   bool
 	jobs      []strujob
-	initFns   []func(db *xorm.Engine)
-	syncFns   []func(db *xorm.Engine)
-	routerfns []func(g *gin.Engine, db *xorm.Engine)
+	initFns   []func()
+	syncFns   []func()
+	routerfns []func(g *gin.Engine)
 	commonds  []*cli.Command
 
 	app *cli.App
 }
 
 type IBoot interface {
-	Cmd(fns ...func(db *xorm.Engine) []cli.Command) IBoot
-	Init(fns ...func(db *xorm.Engine)) IBoot
-	SyncTables(fn ...func(db *xorm.Engine)) IBoot
-	Jobs(name, spec string, fn func(db *xorm.Engine) error, flag ...bool) IBoot
-	Router(fn ...func(g *gin.Engine, db *xorm.Engine)) IBoot
+	Cmd(fns ...func() []cli.Command) IBoot
+	Init(fns ...func()) IBoot
+	SyncTables(fn ...func()) IBoot
+	Jobs(name, spec string, fn func() error, flag ...bool) IBoot
+	Router(fn ...func(g *gin.Engine)) IBoot
 	StartRouter()
 }
 
@@ -70,31 +68,26 @@ func Boot(box *rice.Box, name, desc string) IBoot {
 
 	// 是否需要初始化数据库
 	{
-		if client.db != nil {
-			return client
-		}
 		e, err := txorm.NewXorm(gs.Config.Database)
 		if err != nil {
 			tog.Error(err.Error())
 			panic(err)
 		}
-		client.db = e
-		initia.InitDBTemplate(e)
+		gs.Init(e)
+		initia.InitDBTemplate()
 	}
 
 	return client
 }
 
-/*
-	初始化默认的数据 - 必须初始化数据库
-*/
-func (this *stru) Init(fns ...func(db *xorm.Engine)) IBoot {
+/* 初始化默认的数据 - 必须初始化数据库 */
+func (this *stru) Init(fns ...func()) IBoot {
 	this.initFns = append(this.initFns, fns...)
 	return this
 }
 
 //  同步表结构
-func (this *stru) SyncTables(fn ...func(db *xorm.Engine)) IBoot {
+func (this *stru) SyncTables(fn ...func()) IBoot {
 	this.syncFns = append(this.syncFns, fn...)
 	return this
 }
@@ -106,7 +99,7 @@ func (this *stru) SyncTables(fn ...func(db *xorm.Engine)) IBoot {
 	@fn: 任务执行方法
 	@flag: 是否立即执行
 */
-func (this *stru) Jobs(name, spec string, fn func(db *xorm.Engine) error, flag ...bool) IBoot {
+func (this *stru) Jobs(name, spec string, fn func() error, flag ...bool) IBoot {
 	this.jobs = append(this.jobs, strujob{
 		name: name,
 		spec: spec,
@@ -117,15 +110,15 @@ func (this *stru) Jobs(name, spec string, fn func(db *xorm.Engine) error, flag .
 }
 
 // 自定义接口
-func (this *stru) Router(fn ...func(g *gin.Engine, db *xorm.Engine)) IBoot {
+func (this *stru) Router(fn ...func(g *gin.Engine)) IBoot {
 	this.routerfns = append(this.routerfns, fn...)
 	return this
 }
 
 // 自定义命令
-func (this *stru) Cmd(fns ...func(db *xorm.Engine) []cli.Command) IBoot {
+func (this *stru) Cmd(fns ...func() []cli.Command) IBoot {
 	for i := range fns {
-		cmds := fns[i](this.db)
+		cmds := fns[i]()
 		for j := range cmds {
 			this.commonds = append(this.commonds, &cmds[j])
 		}
@@ -137,7 +130,7 @@ func (this *stru) runWeb() error {
 	return tgin.NewGin(gs.Config.Web, func(g *gin.Engine) error {
 		// 开启定时任务
 		if len(this.jobs) > 0 {
-			err := job.InitJobs(this.db)
+			err := job.InitJobs()
 			if err != nil {
 				panic(err)
 			}
@@ -152,7 +145,7 @@ func (this *stru) runWeb() error {
 
 		// 初始化路由
 		for _, fn := range this.routerfns {
-			fn(g, this.db)
+			fn(g)
 		}
 		return nil
 	})
@@ -163,12 +156,12 @@ func (this *stru) StartRouter() {
 		Name:  "init",
 		Usage: "初始化基础数据数据",
 		Action: func(c *cli.Context) error {
-			initia.InitDict(this.db)
-			initia.InitUser(this.db)
-			initia.InitMsgTemplate(this.db)
+			initia.InitDict()
+			initia.InitUser()
+			initia.InitMsgTemplate()
 			if len(this.initFns) > 0 {
 				for _, f := range this.initFns {
-					f(this.db)
+					f()
 				}
 			}
 			return nil
@@ -179,10 +172,10 @@ func (this *stru) StartRouter() {
 		Name:  "sync",
 		Usage: "同步表结构到数据库",
 		Action: func(c *cli.Context) error {
-			beans.Sync(this.db)
+			beans.Sync(gs.DB())
 			if len(this.syncFns) > 0 {
 				for _, f := range this.syncFns {
-					f(this.db)
+					f()
 				}
 			}
 			return nil

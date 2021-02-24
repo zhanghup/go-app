@@ -4,18 +4,17 @@ import (
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-tools"
-	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tog"
 	"time"
-	"xorm.io/xorm"
 )
 
 type jobitem struct {
 	id    cron.EntryID
 	name  string
 	spec  string
-	fn    func(db *xorm.Engine) error // 为了可以手动停止，然后执行
+	fn    func() error // 为了可以手动停止，然后执行
 	flag  bool
 	isRun bool
 
@@ -26,23 +25,19 @@ var job *Jobs
 
 type Jobs struct {
 	job  *cron.Cron
-	db   *xorm.Engine
-	dbs  txorm.IEngine
 	data tools.ICache // 存定时任务
 }
 
-func InitJobs(db *xorm.Engine) error {
+func InitJobs() error {
 	if job != nil {
 		return nil
 	}
 	job = &Jobs{
 		job:  cron.New(cron.WithSeconds()),
-		db:   db,
-		dbs:  txorm.NewEngine(db),
 		data: tools.CacheCreate(),
 	}
 	l := make([]beans.Cron, 0)
-	err := db.Find(&l)
+	err := gs.DB().Find(&l)
 	if err != nil {
 		return err
 	}
@@ -68,7 +63,7 @@ func InitJobs(db *xorm.Engine) error {
 	action 	执行方法
 	flag 	是否立即执行
 */
-func AddJob(name, spec string, action func(db *xorm.Engine) error, flag ...bool) error {
+func AddJob(name, spec string, action func() error, flag ...bool) error {
 
 	id := tools.MD5([]byte(name))
 	if job.data.Get(id) == nil {
@@ -82,7 +77,7 @@ func AddJob(name, spec string, action func(db *xorm.Engine) error, flag ...bool)
 			Expression: &spec,
 			State:      tools.PtrOfString("start"),
 		}
-		_, err := job.db.Insert(&model)
+		_, err := gs.DB().Insert(&model)
 		if err != nil {
 			return err
 		}
@@ -108,7 +103,7 @@ func AddJob(name, spec string, action func(db *xorm.Engine) error, flag ...bool)
 			ji.fn = action
 			job.data.Set(id, ji)
 
-			_, err := job.db.Table(beans.Cron{}).Where("id = ?", id).Update(map[string]interface{}{
+			_, err := gs.DB().Table(beans.Cron{}).Where("id = ?", id).Update(map[string]interface{}{
 				"expression": spec,
 			})
 			if err != nil {
@@ -161,7 +156,7 @@ func Stop(id string) error {
 	if !ji.isRun {
 		return nil
 	}
-	_, err = job.db.Table(beans.Cron{}).Where("id = ?", id).Update(map[string]interface{}{
+	_, err = gs.DB().Table(beans.Cron{}).Where("id = ?", id).Update(map[string]interface{}{
 		"state": 0,
 	})
 	if err != nil {
@@ -181,7 +176,7 @@ func Start(id string) error {
 	if ji.isRun {
 		return nil
 	}
-	_, err = job.db.Table(beans.Cron{}).Where("id = ?", id).Update(map[string]interface{}{
+	_, err = gs.DB().Table(beans.Cron{}).Where("id = ?", id).Update(map[string]interface{}{
 		"state": 1,
 	})
 	if err != nil {
@@ -209,7 +204,7 @@ func Run(id string) func() {
 		}()
 
 		l1 := time.Now().UnixNano()
-		err := ji.fn(job.db)
+		err := ji.fn()
 		l2 := time.Now().UnixNano()
 
 		last := int64(float64(l2-l1) * 1000 / float64(time.Second))
@@ -221,7 +216,7 @@ func Run(id string) func() {
 		}
 
 		model := beans.Cron{}
-		ok, err := job.db.Where("id = ?", id).Get(&model)
+		ok, err := gs.DB().Where("id = ?", id).Get(&model)
 		if err != nil {
 			tog.Error(err.Error())
 			return
@@ -235,7 +230,7 @@ func Run(id string) func() {
 		model.Message = &message
 		model.Previous = model.Updated
 
-		_, err = job.db.Table(beans.Cron{}).Where("id = ?", id).Cols("last", "message", "previous", "updated", "result").Update(model)
+		_, err = gs.DB().Table(beans.Cron{}).Where("id = ?", id).Cols("last", "message", "previous", "updated", "result").Update(model)
 		if err != nil {
 			tog.Error(err.Error())
 			return
@@ -253,7 +248,7 @@ func Run(id string) func() {
 			Start:      tools.PtrOfInt64(l1 / int64(time.Second)),
 			End:        tools.PtrOfInt64(l2 / int64(time.Second)),
 		}
-		_, err = job.db.Insert(lg)
+		_, err = gs.DB().Insert(lg)
 		if err != nil {
 			tog.Error(err.Error())
 			return

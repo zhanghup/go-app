@@ -2,11 +2,11 @@ package ca
 
 import (
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
 	"strings"
 	"time"
-	"xorm.io/xorm"
 )
 
 type User struct {
@@ -35,7 +35,7 @@ func (this *User) EntityPermAdd(entity, mask string) {
 		this.permObjects[entity] = map[string]bool{}
 	}
 
-	if mask == ""{
+	if mask == "" {
 		return
 	}
 
@@ -57,7 +57,6 @@ func (this *User) EntityPerm(entity, opt string) bool {
 type userCache struct {
 	usermap  tools.ICache
 	tokenmap tools.ICache
-	db       *xorm.Engine
 }
 
 func (this *userCache) Set(token string, user User) {
@@ -107,28 +106,27 @@ func (this *userCache) Clear() {
 
 var UserCache *userCache
 
-func init() {
-	event.XormDefaultInitSubscribeOnce(func(db *xorm.Engine) {
-		UserCache = &userCache{
-			usermap:  tools.CacheCreate(true),
-			tokenmap: tools.CacheCreate(true),
-			db:       db,
-		}
+func initWebUser() {
+	gs.InfoBegin("web用户缓存")
+	UserCache = &userCache{
+		usermap:  tools.CacheCreate(true),
+		tokenmap: tools.CacheCreate(true),
+	}
+	gs.InfoSuccess("web用户缓存")
 
-		go event.UserRemoveSubscribe(func(user beans.User) {
-			UserCache.RemoveByUser(*user.Id)
-		})
+	go event.UserRemoveSubscribe(func(user beans.User) {
+		UserCache.RemoveByUser(*user.Id)
+	})
 
-		go event.UserUpdateSubscribe(func(user beans.User) {
-			UserCache.RemoveByUser(*user.Id)
-		})
+	go event.UserUpdateSubscribe(func(user beans.User) {
+		UserCache.RemoveByUser(*user.Id)
+	})
 
-		go event.UserLoginSubscribe(func(acc beans.Account, user beans.User) {
-			UserCache.RemoveByUser(*user.Id)
-		})
+	go event.UserLoginSubscribe(func(acc beans.Account, user beans.User) {
+		UserCache.RemoveByUser(*user.Id)
+	})
 
-		go event.UserRoleChangeSubscribe(func(user beans.User) {
-			UserCache.RemoveByUser(*user.Id)
-		})
+	go event.UserRoleChangeSubscribe(func(user beans.User) {
+		UserCache.RemoveByUser(*user.Id)
 	})
 }
