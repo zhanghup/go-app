@@ -6,6 +6,7 @@ package api
 import (
 	"context"
 	"errors"
+	"github.com/zhanghup/go-app/gs"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -123,7 +124,7 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 	}
 
 	{ // 更新角色
-		err := r.Sess(ctx).SF(`delete from role_user where uid = :uid`, map[string]interface{}{"uid": id}).Exec()
+		err := gs.Sess(ctx).SF(`delete from role_user where uid = :uid`, map[string]interface{}{"uid": id}).Exec()
 		if err != nil {
 			return false, err
 		}
@@ -146,7 +147,7 @@ func (r *mutationResolver) UserUpdate(ctx context.Context, id string, input sour
 }
 
 func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool, error) {
-	sess := r.Sess(ctx)
+	sess := gs.Sess(ctx)
 
 	if tools.StrContains(ids, "root") {
 		return false, errors.New("root用户无法删除")
@@ -154,7 +155,7 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 
 	users := make([]beans.User, 0)
 	{ // 查找当前需要删除的用户
-		err := r.DBS(ctx).E().In("id", ids).Find(&users)
+		err := gs.DBS().Engine().In("id", ids).Find(&users)
 		if err != nil {
 			return false, err
 		}
@@ -191,7 +192,7 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 }
 
 func (r *mutationResolver) UserWithRole(ctx context.Context, uid string, roles []string) (bool, error) {
-	sess := r.Sess(ctx)
+	sess := gs.Sess(ctx)
 	err := sess.TS(func(sess txorm.ISession) error {
 		err := sess.SF(`delete from role_user where uid = :uid`, map[string]interface{}{
 			"uid": uid,
@@ -236,7 +237,7 @@ func (r *mutationResolver) UserWithRole(ctx context.Context, uid string, roles [
 
 func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.Users, error) {
 	users := make([]beans.User, 0)
-	total, err := r.DBS(ctx).SF(`
+	total, err := gs.DBS().SF(`
 		select 
 			u.* 
 		from 

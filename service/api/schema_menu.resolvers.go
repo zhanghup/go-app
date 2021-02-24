@@ -5,6 +5,7 @@ package api
 
 import (
 	"context"
+	"github.com/zhanghup/go-app/gs"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -20,7 +21,7 @@ func (r *mutationResolver) MenuUpdate(ctx context.Context, id string, input sour
 }
 
 func (r *mutationResolver) MenuReload(ctx context.Context, menus []source.MenuLocal) (bool, error) {
-	err := r.Sess(ctx).SF("delete from menu").Exec()
+	err := gs.Sess(ctx).SF("delete from menu").Exec()
 	if err != nil {
 		return false, err
 	}
@@ -28,7 +29,7 @@ func (r *mutationResolver) MenuReload(ctx context.Context, menus []source.MenuLo
 	weight := 0
 	insert := func(pid *string, m source.MenuLocal) error {
 		weight += 1
-		err := r.Sess(ctx).Insert(beans.Menu{
+		err := gs.Sess(ctx).Insert(beans.Menu{
 			Bean: beans.Bean{
 				Id:     m.ID,
 				Status: tools.PtrOfString("1"),
@@ -72,7 +73,7 @@ func (r *mutationResolver) MenuReload(ctx context.Context, menus []source.MenuLo
 
 func (r *queryResolver) Menus(ctx context.Context, query source.QMenu) ([]beans.Menu, error) {
 	plans := make([]beans.Menu, 0)
-	err := r.DBS(ctx).SF(`
+	err := gs.DBS().SF(`
 		select 
 			p.* 
 		from 

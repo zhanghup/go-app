@@ -6,7 +6,7 @@ import (
 	"context"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/gin-gonic/gin"
-	"github.com/zhanghup/go-app/cfg"
+	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/awxmp/source"
 	"github.com/zhanghup/go-app/service/ca"
@@ -27,7 +27,7 @@ func NewResolver(wxEngine wxmp.IEngine) *Resolver {
 }
 
 func Gin(g gin.IRouter, sc ...graphql.ExecutableSchema) {
-	wxEngine := wxmp.NewEngine(&cfg.Wxmp)
+	wxEngine := wxmp.NewEngine(&gs.Wxmp)
 	s := source.NewExecutableSchema(source.Config{
 		Resolvers: NewResolver(wxEngine),
 		Directives: source.DirectiveRoot{

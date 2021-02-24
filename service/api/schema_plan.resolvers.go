@@ -5,6 +5,7 @@ package api
 
 import (
 	"context"
+	"github.com/zhanghup/go-app/gs"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -29,7 +30,7 @@ func (r *mutationResolver) PlanRemoves(ctx context.Context, ids []string) (bool,
 
 func (r *queryResolver) Plans(ctx context.Context, query source.QPlan) (*source.Plans, error) {
 	plans := make([]beans.Plan, 0)
-	i, err := r.DBS(ctx).SF(`
+	i, err := gs.DBS().SF(`
 		select 
 			* 
 		from 

@@ -3,6 +3,7 @@ package ags
 import (
 	"errors"
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
@@ -156,8 +157,8 @@ func MessageInit() IMessage {
 	}
 
 	defaultMessage = &message{
-		db:  defaultDB,
-		dbs: txorm.NewEngine(defaultDB),
+		db:  gs.DB(),
+		dbs: gs.DBS(),
 	}
 
 	return defaultMessage

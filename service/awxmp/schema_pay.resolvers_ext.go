@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/cfg"
+	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/service/ags"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-tools"
@@ -48,7 +48,7 @@ func (this *ResolverTools) Pay(ctx context.Context, opt *PayOption) (*wxmp.PayRe
 	}
 	res, err := this.Wxmp.Pay(&wxmp.PayOption{
 		OutTradeNo:  id,
-		NotifyUrl:   cfg.Config.Host + "/zpx/wxmp/pay/callback",
+		NotifyUrl:   gs.Config.Host + "/zpx/wxmp/pay/callback",
 		Openid:      me.Openid,
 		TotalPrice:  opt.Price,
 		Description: opt.Description,

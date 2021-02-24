@@ -1,4 +1,4 @@
-package ags
+package gs
 
 import (
 	"bytes"
@@ -231,31 +231,9 @@ func (this *uploader) GinRouter(auth gin.IRouter, any gin.IRouter) {
 
 var defaultUploader IUploader
 
-/*
-	初始化上传工具
-	@db: db为空，初始化默认上传器
-		 db不为空，返回一个新的上传器，但是默认的不会被替换
-*/
-func UploaderNew(db ...*xorm.Engine) IUploader {
-	if defaultUploader != nil && len(db) == 0 {
-		return defaultUploader
+func Uploader() IUploader {
+	if defaultUploader == nil {
+		panic("【文件服务】未初始化！！！")
 	}
-
-	var newUp *xorm.Engine
-	if len(db) == 0 {
-		newUp = defaultDB
-	} else {
-		newUp = db[0]
-	}
-
-	up := &uploader{
-		db: newUp,
-	}
-
-	if len(db) == 0 {
-		defaultUploader = up
-		return defaultUploader
-	} else {
-		return up
-	}
+	return defaultUploader
 }

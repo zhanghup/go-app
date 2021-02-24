@@ -6,6 +6,7 @@ package api
 import (
 	"context"
 	"errors"
+	"github.com/zhanghup/go-app/gs"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -30,7 +31,7 @@ func (r *mutationResolver) AccountCreate(ctx context.Context, input source.NewAc
 	acc.Password = input.Password
 	acc.Default = input.Default
 	if input.Default != nil && *input.Default == 1 {
-		err := r.Sess(ctx).SF("update account set `default` = 0 where uid = :uid", map[string]interface{}{"uid": input.UID}).Exec()
+		err := gs.Sess(ctx).SF("update account set `default` = 0 where uid = :uid", map[string]interface{}{"uid": input.UID}).Exec()
 		if err != nil {
 			return "", err
 		}
@@ -50,7 +51,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 
 	if acc.Salt == nil {
 		acc.Salt = tools.PtrOfUUID()
-		err := r.Sess(ctx).SF("update account set salt = :salt", map[string]interface{}{"salt": acc.Salt}).Exec()
+		err := gs.Sess(ctx).SF("update account set salt = :salt", map[string]interface{}{"salt": acc.Salt}).Exec()
 		if err != nil {
 			return false, err
 		}
@@ -69,7 +70,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 	}
 
 	if input.Default != nil && *input.Default == 1 {
-		err := r.Sess(ctx).SF("update account set `default` = 0 where uid = :uid", map[string]interface{}{"uid": acc.Uid}).Exec()
+		err := gs.Sess(ctx).SF("update account set `default` = 0 where uid = :uid", map[string]interface{}{"uid": acc.Uid}).Exec()
 		if err != nil {
 			return false, err
 		}
@@ -83,7 +84,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 
 func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bool, error) {
 	uids := make([]string, 0)
-	err := r.DBS(ctx).E().In("id", ids).Cols("uid").Find(&uids)
+	err := gs.DBS().Engine().In("id", ids).Cols("uid").Find(&uids)
 	if err != nil {
 		return false, err
 	}
@@ -96,7 +97,7 @@ func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bo
 
 func (r *queryResolver) Accounts(ctx context.Context, query source.QAccount) (*source.Accounts, error) {
 	account := make([]beans.Account, 0)
-	total, err := r.DBS(ctx).SF(`
+	total, err := gs.DBS().SF(`
 		select * from account 
 		where 1 = 1
 		{{ if .uid }} and account.uid = :uid {{ end }}

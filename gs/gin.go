@@ -1,4 +1,4 @@
-package directive
+package gs
 
 import (
 	"context"

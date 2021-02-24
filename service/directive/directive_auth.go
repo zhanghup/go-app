@@ -2,20 +2,18 @@ package directive
 
 import (
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/zhanghup/go-app/beans"
+	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/service/ca"
-	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
 	"time"
-	"xorm.io/xorm"
-
-	"github.com/gin-gonic/gin"
 )
 
-func WebAuth(db *xorm.Engine) gin.HandlerFunc {
+func WebAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tgin.DoCustom(c, func(c *gin.Context) (interface{}, string) {
-			res, err := WebAuthFunc(db, c)
+			res, err := WebAuthFunc(c)
 			if err != nil {
 				return res, err.Error()
 			}
@@ -24,13 +22,11 @@ func WebAuth(db *xorm.Engine) gin.HandlerFunc {
 	}
 }
 
-func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
-	dbs := txorm.NewEngine(db)
-
-	tok, _ := c.Cookie(GIN_TOKEN)
+func WebAuthFunc(c *gin.Context) (interface{}, error) {
+	tok, _ := c.Cookie(gs.GIN_TOKEN)
 
 	if len(tok) == 0 {
-		tok = c.GetHeader(GIN_AUTHORIZATION)
+		tok = c.GetHeader(gs.GIN_AUTHORIZATION)
 	}
 	if len(tok) == 0 {
 		return nil, errors.New("[1] 未授权")
@@ -47,14 +43,14 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 		// 5秒内的token变化不记录
 		if time.Now().Unix()-*user.Token.Updated > 5 {
 			*user.Token.Updated = time.Now().Unix()
-			_, err := db.Table(user.Token).Where("id = ?", user.TokenString).Update(user.Token)
+			_, err := gs.DB().Table(user.Token).Where("id = ?", user.TokenString).Update(user.Token)
 			if err != nil {
 				return err, errors.New("[3] 未授权")
 			}
 		}
 		ca.UserCache.Set(tok, user)
-		c.Set(GIN_USER, user)
-		c.SetCookie(GIN_TOKEN, user.TokenString, 2*60*60, "/", "", false, true)
+		c.Set(gs.GIN_USER, user)
+		c.SetCookie(gs.GIN_TOKEN, user.TokenString, 2*60*60, "/", "", false, true)
 		return nil, nil
 	}
 
@@ -62,7 +58,7 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 	// token 验证
 	{
 		token := beans.Token{}
-		ok, err := db.Table(token).Where("id = ?", tok).Get(&token)
+		ok, err := gs.DB().Table(token).Where("id = ?", tok).Get(&token)
 		if err != nil {
 			return err.Error(), errors.New("[4] 未授权")
 		}
@@ -77,7 +73,7 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 		}
 		*token.Ops += 1
 		*token.Expire = 7200
-		_, err = db.Table(token).Where("id = ?", token.Id).Update(token)
+		_, err = gs.DB().Table(token).Where("id = ?", token.Id).Update(token)
 		if err != nil {
 			return err.Error(), errors.New("[8] 未授权")
 		}
@@ -88,7 +84,7 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 	// 用户验证
 	{
 		u := beans.User{}
-		ok, err := db.Table(u).Where("id = ? and status = 1", *user.Token.Uid).Get(&u)
+		ok, err := gs.DB().Table(u).Where("id = ? and status = 1", *user.Token.Uid).Get(&u)
 		if err != nil {
 			return err.Error(), errors.New("[9] 未授权")
 		}
@@ -113,7 +109,7 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 			Object string `json:"object"`
 			Mask   string `json:"mask"`
 		}, 0)
-		err := dbs.SF(`
+		err := gs.DBS().SF(`
 				select p.object,p.mask from user u 
 				join role_user ru on u.id = ru.uid
 				join perm_object p on p.role = ru.role
@@ -127,13 +123,13 @@ func WebAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 		for i := range permObjects {
 			user.EntityPermAdd(permObjects[i].Object, permObjects[i].Mask)
 		}
-	}else{
+	} else {
 
 	}
 
-	c.Set(GIN_USER, user)
+	c.Set(gs.GIN_USER, user)
 	ca.UserCache.Set(user.TokenString, user)
-	c.SetCookie(GIN_TOKEN, user.TokenString, 2*60*60, "/", "", false, true)
+	c.SetCookie(gs.GIN_TOKEN, user.TokenString, 2*60*60, "/", "", false, true)
 	c.Next()
 	return nil, nil
 }

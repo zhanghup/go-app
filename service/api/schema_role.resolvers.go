@@ -5,6 +5,7 @@ package api
 
 import (
 	"context"
+	"github.com/zhanghup/go-app/gs"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -31,15 +32,15 @@ func (r *mutationResolver) RoleRemoves(ctx context.Context, ids []string) (bool,
 		return false, err
 	}
 	if ok {
-		err := r.Sess(ctx).SF(`delete from role_user where role in :roles`, map[string]interface{}{"roles": ids}).Exec()
+		err := gs.Sess(ctx).SF(`delete from role_user where role in :roles`, map[string]interface{}{"roles": ids}).Exec()
 		if err != nil {
 			return false, err
 		}
-		err = r.Sess(ctx).SF(`delete from perm where role in :roles`, map[string]interface{}{"roles": ids}).Exec()
+		err = gs.Sess(ctx).SF(`delete from perm where role in :roles`, map[string]interface{}{"roles": ids}).Exec()
 		if err != nil {
 			return false, err
 		}
-		err = r.Sess(ctx).SF(`delete from perm_object where role in :roles`, map[string]interface{}{"roles": ids}).Exec()
+		err = gs.Sess(ctx).SF(`delete from perm_object where role in :roles`, map[string]interface{}{"roles": ids}).Exec()
 		if err != nil {
 			return false, err
 		}
@@ -49,7 +50,7 @@ func (r *mutationResolver) RoleRemoves(ctx context.Context, ids []string) (bool,
 }
 
 func (r *mutationResolver) RolePermMenuCreate(ctx context.Context, id string, perms []string) (bool, error) {
-	err := r.Sess(ctx).SF(`delete from perm where role = :id and type = :type`, map[string]interface{}{
+	err := gs.Sess(ctx).SF(`delete from perm where role = :id and type = :type`, map[string]interface{}{
 		"type": "menu",
 		"id":   id,
 	}).Exec()
@@ -68,7 +69,7 @@ func (r *mutationResolver) RolePermMenuCreate(ctx context.Context, id string, pe
 			Role: &id,
 			Oid:  &o,
 		}
-		err := r.Sess(ctx).Insert(p)
+		err := gs.Sess(ctx).Insert(p)
 		if err != nil {
 			return false, err
 		}
@@ -78,7 +79,7 @@ func (r *mutationResolver) RolePermMenuCreate(ctx context.Context, id string, pe
 }
 
 func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, perms []source.IPermObj) (bool, error) {
-	sess := r.Sess(ctx)
+	sess := gs.Sess(ctx)
 
 	err := sess.TS(func(sess txorm.ISession) error {
 		err := sess.SF(`delete from perm_object where role = :id`, map[string]interface{}{
@@ -112,7 +113,7 @@ func (r *mutationResolver) RolePermObjCreate(ctx context.Context, id string, per
 }
 
 func (r *mutationResolver) RoleWithUser(ctx context.Context, role string, uids []string) (bool, error) {
-	sess := r.Sess(ctx)
+	sess := gs.Sess(ctx)
 	err := sess.TS(func(sess txorm.ISession) error {
 		err := sess.SF(`delete from role_user where role = :role`, map[string]interface{}{
 			"role": role,
@@ -145,7 +146,7 @@ func (r *mutationResolver) RoleWithUser(ctx context.Context, role string, uids [
 
 func (r *queryResolver) Roles(ctx context.Context, query source.QRole) (*source.Roles, error) {
 	roles := make([]beans.Role, 0)
-	total, err := r.DBS(ctx).SF(`
+	total, err := gs.DBS().SF(`
 		select u.* from role u
 		join with_role on u.id = with_role.id
 		where 1 = 1
@@ -164,13 +165,13 @@ func (r *queryResolver) Role(ctx context.Context, id string) (*beans.Role, error
 
 func (r *queryResolver) RoleUsers(ctx context.Context, id string) ([]string, error) {
 	res := make([]string, 0)
-	err := r.DBS(ctx).SF(`select uid from role_user where role = :id`, map[string]interface{}{"id": id}).Find(&res)
+	err := gs.DBS().SF(`select uid from role_user where role = :id`, map[string]interface{}{"id": id}).Find(&res)
 	return res, err
 }
 
 func (r *queryResolver) RolePerms(ctx context.Context, id string, typeArg *string) ([]string, error) {
 	result := make([]string, 0)
-	err := r.DBS(ctx).SF(`
+	err := gs.DBS().SF(`
 		select oid from perm where role = :role 
 		{{ if .type }} and type = :type {{ end }}
 	`, map[string]interface{}{
@@ -182,7 +183,7 @@ func (r *queryResolver) RolePerms(ctx context.Context, id string, typeArg *strin
 
 func (r *queryResolver) RolePermObjects(ctx context.Context, id string) ([]source.PermObj, error) {
 	result := make([]source.PermObj, 0)
-	err := r.DBS(ctx).SF(`
+	err := gs.DBS().SF(`
 		select object,mask from perm_object where role = :role 
 	`, map[string]interface{}{
 		"role": id,

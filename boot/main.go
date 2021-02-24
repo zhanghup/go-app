@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/urfave/cli/v2"
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/cfg"
+	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/initia"
 	"github.com/zhanghup/go-app/service/event"
 	"github.com/zhanghup/go-app/service/job"
@@ -53,7 +53,7 @@ type IBoot interface {
 	desc 服务描述
 */
 func Boot(box *rice.Box, name, desc string) IBoot {
-	cfg.InitConfig(box)
+	gs.ConfigInit(box)
 	client := &stru{
 		name:    name,
 		desc:    desc,
@@ -74,7 +74,7 @@ func Boot(box *rice.Box, name, desc string) IBoot {
 		if client.db != nil {
 			return client
 		}
-		e, err := txorm.NewXorm(cfg.DB)
+		e, err := txorm.NewXorm(gs.Config.Database)
 		if err != nil {
 			tog.Error(err.Error())
 			panic(err)
@@ -135,7 +135,7 @@ func (this *stru) Cmd(fns ...func(db *xorm.Engine) []cli.Command) IBoot {
 }
 
 func (this *stru) runWeb() error {
-	return tgin.NewGin(cfg.Web, func(g *gin.Engine) error {
+	return tgin.NewGin(gs.Config.Web, func(g *gin.Engine) error {
 		// 通知各个组件，数据库初始化已经完成
 		event.XormDefaultInit(this.db)
 

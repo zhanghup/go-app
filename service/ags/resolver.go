@@ -12,6 +12,7 @@ import (
 	rice "github.com/GeertJohan/go.rice"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/service/ags/resolvers"
 	"github.com/zhanghup/go-app/service/ags/source"
 	"github.com/zhanghup/go-app/service/directive"
@@ -22,10 +23,9 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	"xorm.io/xorm"
 )
 
-func gqlschemaFmt(db *xorm.Engine, schema graphql.ExecutableSchema) func(c *gin.Context) {
+func gqlschemaFmt(schema graphql.ExecutableSchema) func(c *gin.Context) {
 	srv := handler.New(schema)
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.Websocket{
@@ -47,15 +47,15 @@ func gqlschemaFmt(db *xorm.Engine, schema graphql.ExecutableSchema) func(c *gin.
 			},
 		},
 		InitFunc: func(ctx context.Context, initPayload transport.InitPayload) (context.Context, error) {
-			gtx := ctx.Value(directive.GIN_CONTEXT).(*gin.Context)
-			_, err := directive.WebAuthFunc(db, gtx)
+			gtx := ctx.Value(gs.GIN_CONTEXT).(*gin.Context)
+			_, err := directive.WebAuthFunc(gtx)
 			return ctx, err
 		},
 	})
 	srv.Use(extension.Introspection{})
 	srv.AroundResponses(func(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
 		// 统一建立session
-		sess := txorm.NewEngine(db).Session(ctx)
+		sess := gs.DBS().Session(ctx)
 		ctx = context.WithValue(ctx, txorm.CONTEXT_SESSION, sess)
 		res := next(ctx)
 		if len(res.Errors) > 0 {
@@ -69,20 +69,19 @@ func gqlschemaFmt(db *xorm.Engine, schema graphql.ExecutableSchema) func(c *gin.
 		return res
 	})
 
-
-	hu := tgql.DataLoadenMiddleware(db, srv)
+	hu := tgql.DataLoadenMiddleware(gs.DB(), srv)
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
 		// 统一关联gin对象
-		ctx = context.WithValue(ctx, directive.GIN_CONTEXT, c)
+		ctx = context.WithValue(ctx, gs.GIN_CONTEXT, c)
 		c.Header("Content-Type", "application/json")
 		hu.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
 	}
 }
 
-func GinGql(gqlpath string, gqlrouter gin.IRouter, gqlSchema graphql.ExecutableSchema, db *xorm.Engine) {
-	gqlrouter.POST(gqlpath, gqlschemaFmt(db, gqlSchema))
-	gqlrouter.GET(gqlpath, gqlschemaFmt(db, gqlSchema))
+func GinGql(gqlpath string, gqlrouter gin.IRouter, gqlSchema graphql.ExecutableSchema) {
+	gqlrouter.POST(gqlpath, gqlschemaFmt(gqlSchema))
+	gqlrouter.GET(gqlpath, gqlschemaFmt(gqlSchema))
 	GinPlayground(gqlrouter, gqlpath+"/playground1", gqlpath)
 	gqlrouter.GET(gqlpath+"/playground2", func(c *gin.Context) {
 		playground.Handler("标题", gqlpath)(c.Writer, c.Request)
@@ -90,8 +89,8 @@ func GinGql(gqlpath string, gqlrouter gin.IRouter, gqlSchema graphql.ExecutableS
 }
 
 func GinAgs(auth, any gin.IRouter) {
-	GinGql("/zpx/ags", any, source.NewExecutableSchema(source.Config{Resolvers: resolvers.NewResolver(defaultDB)}), defaultDB)
-	defaultUploader.GinRouter(auth.Group("/zpx/ags", directive.WebAuth(defaultDB)), any.Group("/zpx/ags"))
+	GinGql("/zpx/ags", any, source.NewExecutableSchema(source.Config{Resolvers: resolvers.NewResolver(gs.DB())}))
+	gs.Uploader().GinRouter(auth.Group("/zpx/ags", directive.WebAuth()), any.Group("/zpx/ags"))
 
 }
 

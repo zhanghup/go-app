@@ -5,6 +5,7 @@ package api
 
 import (
 	"context"
+	"github.com/zhanghup/go-app/gs"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -18,7 +19,7 @@ func (r *mutationResolver) MsgTemplateUpdate(ctx context.Context, id string, inp
 
 func (r *queryResolver) MsgTemplates(ctx context.Context, query source.QMsgTemplate) ([]beans.MsgTemplate, error) {
 	tpls := make([]beans.MsgTemplate, 0)
-	err := r.DBS(ctx).SF(`
+	err := gs.DBS().SF(`
 		select 
 			tpl.* 
 		from 
@@ -40,7 +41,7 @@ func (r *queryResolver) MsgTemplate(ctx context.Context, id string) (*beans.MsgT
 
 func (r *queryResolver) MsgInfos(ctx context.Context, query source.QMsgInfo) ([]beans.MsgInfo, error) {
 	infos := make([]beans.MsgInfo, 0)
-	_, err := r.DBS(ctx).SF(`
+	_, err := gs.DBS().SF(`
 		select info.* from msg_info info
 		where 1 = 1
 		{{ if .receiver }} and info.receiver = :receiver {{ end }}
@@ -65,7 +66,7 @@ func (r *queryResolver) MsgInfos(ctx context.Context, query source.QMsgInfo) ([]
 
 func (r *queryResolver) MsgHistorys(ctx context.Context, query source.QMsgHistory) ([]beans.MsgHistory, error) {
 	infos := make([]beans.MsgHistory, 0)
-	_, err := r.DBS(ctx).SF(`
+	_, err := gs.DBS().SF(`
 		select his.* from msg_history his
 		where 1 = 1
 		{{ if .info }} and his.info = :info {{ end }}

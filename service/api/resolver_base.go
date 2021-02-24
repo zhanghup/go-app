@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"reflect"
@@ -10,7 +11,7 @@ import (
 
 func (this *ResolverTools) Create(ctx context.Context, tab interface{}, obj interface{}) (string, error) {
 	id := ""
-	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
+	err := gs.Sess(ctx).TS(func(sess txorm.ISession) error {
 		tools.Rft.DeepSet(tab, func(t reflect.Type, v reflect.Value, tf reflect.StructField) bool {
 			switch tf.Name {
 			case "Id":
@@ -54,7 +55,7 @@ func (this *ResolverTools) Create(ctx context.Context, tab interface{}, obj inte
 }
 
 func (this *ResolverTools) Update(ctx context.Context, tab interface{}, id string, obj interface{}) (bool, error) {
-	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
+	err := gs.Sess(ctx).TS(func(sess txorm.ISession) error {
 		_, err := sess.S().Table(tab).Where("id = ?", id).Update(tab)
 		if err != nil {
 			return err
@@ -69,7 +70,7 @@ func (this *ResolverTools) Update(ctx context.Context, tab interface{}, id strin
 }
 
 func (this *ResolverTools) Removes(ctx context.Context, table interface{}, ids []string) (bool, error) {
-	err := this.Sess(ctx).TS(func(sess txorm.ISession) error {
+	err := gs.Sess(ctx).TS(func(sess txorm.ISession) error {
 		_, err := sess.S().Table(table).In("id", ids).Delete(table)
 		return err
 	})

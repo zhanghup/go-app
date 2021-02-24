@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/zhanghup/go-app/beans"
-	"github.com/zhanghup/go-app/cfg"
+	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/service/ca"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
@@ -29,10 +29,10 @@ func WxmpAuth(db *xorm.Engine) gin.HandlerFunc {
 func WxmpAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 	dbs := txorm.NewEngine(db)
 
-	tok, _ := c.Cookie(GIN_TOKEN)
+	tok, _ := c.Cookie(gs.GIN_TOKEN)
 
 	if len(tok) == 0 {
-		tok = c.GetHeader(GIN_AUTHORIZATION)
+		tok = c.GetHeader(gs.GIN_AUTHORIZATION)
 	}
 	if len(tok) == 0 {
 		return nil, errors.New("[1] 未授权")
@@ -46,7 +46,7 @@ func WxmpAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 	// token 验证
 	{
 		token, err := jwt.ParseWithClaims(tok, &form, func(token *jwt.Token) (interface{}, error) {
-			return []byte(tools.MD5([]byte(cfg.DB.Uri))), nil
+			return []byte(tools.MD5([]byte(gs.Config.Database.Uri))), nil
 		})
 
 		if err != nil {
@@ -61,7 +61,7 @@ func WxmpAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 	user, ok := ca.WxuserCache.Get(form.Uid)
 	if ok {
 		ca.WxuserCache.Set(tok, user)
-		c.Set(GIN_WXUSER, user)
+		c.Set(gs.GIN_WXUSER, user)
 		c.Next()
 		return nil, nil
 	}
@@ -112,7 +112,7 @@ func WxmpAuthFunc(db *xorm.Engine, c *gin.Context) (interface{}, error) {
 		user.TokenString = tok
 	}
 
-	c.Set(GIN_WXUSER, user)
+	c.Set(gs.GIN_WXUSER, user)
 	ca.WxuserCache.Set(user.Id, user)
 	c.Next()
 	return nil, nil

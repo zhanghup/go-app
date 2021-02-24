@@ -6,6 +6,7 @@ package api
 import (
 	"context"
 	"errors"
+	"github.com/zhanghup/go-app/gs"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -21,7 +22,7 @@ func (r *mutationResolver) MyMsgInfoConfirm(ctx context.Context, id string, inpu
 		return false, errors.New("消息id不存在,id:" + id)
 	}
 
-	err = r.Sess(ctx).SF(`
+	err = gs.Sess(ctx).SF(`
 		update 
 			msg_info 
 		set 
@@ -51,7 +52,7 @@ func (r *mutationResolver) MyMsgInfoRead(ctx context.Context, id string) (bool, 
 		return false, errors.New("消息id不存在,id:" + id)
 	}
 
-	err = r.Sess(ctx).SF(`
+	err = gs.Sess(ctx).SF(`
 		update 
 			msg_info 
 		set 

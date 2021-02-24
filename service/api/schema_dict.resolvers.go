@@ -5,6 +5,7 @@ package api
 
 import (
 	"context"
+	"github.com/zhanghup/go-app/gs"
 	"time"
 
 	"github.com/zhanghup/go-app/beans"
@@ -103,7 +104,7 @@ func (r *mutationResolver) DictItemRemoves(ctx context.Context, ids []string) (b
 
 func (r *mutationResolver) DictItemSort(ctx context.Context, code string, items []string) (bool, error) {
 	for i, o := range items {
-		err := r.Sess(ctx).SF(`update dict_item set weight = :weight where id = :id and code = :code`, map[string]interface{}{"weight": i, "id": o, "code": code}).Exec()
+		err := gs.Sess(ctx).SF(`update dict_item set weight = :weight where id = :id and code = :code`, map[string]interface{}{"weight": i, "id": o, "code": code}).Exec()
 		if err != nil {
 			return false, err
 		}
@@ -116,7 +117,7 @@ func (r *queryResolver) Dicts(ctx context.Context, query *source.QDict) ([]beans
 		query = &source.QDict{}
 	}
 	dicts := make([]beans.Dict, 0)
-	err := r.DBS(ctx).SF(`
+	err := gs.DBS().SF(`
 		select 
 			u.* 
 		from 

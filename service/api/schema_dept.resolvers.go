@@ -5,6 +5,7 @@ package api
 
 import (
 	"context"
+	"github.com/zhanghup/go-app/gs"
 
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/service/api/source"
@@ -39,7 +40,7 @@ func (r *mutationResolver) DeptRemoves(ctx context.Context, ids []string) (bool,
 func (r *queryResolver) Depts(ctx context.Context, query source.QDept) (*source.Depts, error) {
 	depts := make([]beans.Dept, 0)
 
-	i, err := r.DBS(ctx).SF(`
+	i, err := gs.DBS().SF(`
 		select 
 			* 
 		from 
@@ -65,7 +66,7 @@ func (r *queryResolver) Dept(ctx context.Context, id string) (*beans.Dept, error
 
 func (r *queryResolver) DeptTree(ctx context.Context) (interface{}, error) {
 	depts := make([]beans.Dept, 0)
-	err := r.DBS(ctx).E().Find(&depts)
+	err := gs.DBS().Engine().Find(&depts)
 	if err != nil {
 		return nil, err
 	}
