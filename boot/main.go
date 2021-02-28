@@ -7,6 +7,7 @@ import (
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/initia"
+	"github.com/zhanghup/go-app/service/ca"
 	"github.com/zhanghup/go-app/service/job"
 	"github.com/zhanghup/go-tools/database/txorm"
 	"github.com/zhanghup/go-tools/tgin"
@@ -75,6 +76,7 @@ func Boot(box *rice.Box, name, desc string) IBoot {
 		}
 		gs.Init(e)
 		initia.InitDBTemplate()
+		ca.Init()
 	}
 
 	return client
