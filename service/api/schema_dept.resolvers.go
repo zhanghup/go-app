@@ -66,7 +66,7 @@ func (r *queryResolver) Dept(ctx context.Context, id string) (*beans.Dept, error
 
 func (r *queryResolver) DeptTree(ctx context.Context) (interface{}, error) {
 	depts := make([]beans.Dept, 0)
-	err := gs.DBS().Engine().Find(&depts)
+	err := gs.DB().Find(&depts)
 	if err != nil {
 		return nil, err
 	}

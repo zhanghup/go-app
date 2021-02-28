@@ -55,7 +55,7 @@ func gqlschemaFmt(schema graphql.ExecutableSchema) func(c *gin.Context) {
 	srv.Use(extension.Introspection{})
 	srv.AroundResponses(func(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
 		// 统一建立session
-		sess := gs.DBS().Session(ctx)
+		sess := gs.DBA().Session(ctx)
 		ctx = context.WithValue(ctx, txorm.CONTEXT_SESSION, sess)
 		res := next(ctx)
 		if len(res.Errors) > 0 {

@@ -84,7 +84,7 @@ func (r *mutationResolver) AccountUpdate(ctx context.Context, id string, input s
 
 func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bool, error) {
 	uids := make([]string, 0)
-	err := gs.DBS().Engine().In("id", ids).Cols("uid").Find(&uids)
+	err := gs.DB().In("id", ids).Cols("uid").Find(&uids)
 	if err != nil {
 		return false, err
 	}

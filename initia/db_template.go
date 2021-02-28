@@ -35,7 +35,7 @@ func InitDBTemplate() {
 func InitDBTemplateFn(name, sqlstr string) {
 	gs.InfoSuccess(`数据库模板`, name)
 
-	gs.DBS().TemplateFuncAdd(name, func(ctx context.Context) string {
+	gs.DBA().TemplateFuncAdd(name, func(ctx context.Context) string {
 		user := directive.MyInfo(ctx)
 		return tools.StrTmp(sqlstr, map[string]interface{}{
 			"uid":   user.Id,

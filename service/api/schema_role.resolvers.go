@@ -146,7 +146,7 @@ func (r *mutationResolver) RoleWithUser(ctx context.Context, role string, uids [
 
 func (r *queryResolver) Roles(ctx context.Context, query source.QRole) (*source.Roles, error) {
 	roles := make([]beans.Role, 0)
-	total, err := gs.DBS().SF(`
+	total, err := gs.DBS(ctx).SF(`
 		select u.* from role u
 		join with_role on u.id = with_role.id
 		where 1 = 1

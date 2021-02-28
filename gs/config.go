@@ -98,7 +98,7 @@ func InfoError(name string, items ...string) {
 func Init(db *xorm.Engine) {
 	InfoBegin("数据库")
 	defaultDB = db
-	defaultDBS = txorm.NewEngine(db)
+	defaultDBA = txorm.NewEngine(db)
 	InfoSuccess("数据库")
 
 	InfoBegin("文件服务")

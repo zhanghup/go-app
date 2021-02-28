@@ -8,7 +8,7 @@ import (
 )
 
 var defaultDB *xorm.Engine
-var defaultDBS txorm.IEngine
+var defaultDBA txorm.IEngine
 
 func DB() *xorm.Engine {
 	if defaultDB == nil {
@@ -17,15 +17,22 @@ func DB() *xorm.Engine {
 	return defaultDB
 }
 
-func DBS() txorm.IEngine {
-	if defaultDBS == nil {
+func DBA() txorm.IEngine {
+	if defaultDBA == nil {
 		panic("【数据库[DBS]】未初始化！！！")
 	}
-	return defaultDBS
+	return defaultDBA
+}
+
+func DBS(ctx ...context.Context) txorm.ISession {
+	if defaultDBA == nil {
+		panic("【数据库[DBS]】未初始化！！！")
+	}
+	return defaultDBA.NewSession(true, ctx...)
 }
 
 func Sess(ctx context.Context) txorm.ISession {
-	sess := defaultDBS.Session(ctx)
+	sess := defaultDBA.Session(ctx)
 	err := sess.Begin()
 	if err != nil {
 		tog.Error("【数据库[DBS]】开启事务异常！！！")

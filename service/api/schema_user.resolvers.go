@@ -155,7 +155,7 @@ func (r *mutationResolver) UserRemoves(ctx context.Context, ids []string) (bool,
 
 	users := make([]beans.User, 0)
 	{ // 查找当前需要删除的用户
-		err := gs.DBS().Engine().In("id", ids).Find(&users)
+		err := gs.DB().In("id", ids).Find(&users)
 		if err != nil {
 			return false, err
 		}
