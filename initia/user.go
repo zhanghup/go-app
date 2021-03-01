@@ -16,7 +16,7 @@ func InitUser() {
 		return
 	}
 
-	err = gs.DBS().TS(func(sess txorm.ISession) error {
+	err = gs.DBS(gs.Background).TS(func(sess txorm.ISession) error {
 
 		user := beans.User{
 			Bean: beans.Bean{

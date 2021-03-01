@@ -8,7 +8,7 @@ model:
   package: source
 resolver:
   layout: follow-schema
-  dir: resolvers
+  dir: .
   filename: resolver.go
   type: Resolver
 omit_slice_element_pointers: true

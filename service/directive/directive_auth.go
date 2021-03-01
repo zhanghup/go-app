@@ -109,7 +109,7 @@ func WebAuthFunc(c *gin.Context) (interface{}, error) {
 			Object string `json:"object"`
 			Mask   string `json:"mask"`
 		}, 0)
-		err := gs.DBS().SF(`
+		err := gs.DBS(gs.Background).SF(`
 				select p.object,p.mask from user u 
 				join role_user ru on u.id = ru.uid
 				join perm_object p on p.role = ru.role

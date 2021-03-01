@@ -97,7 +97,7 @@ func (r *mutationResolver) AccountRemoves(ctx context.Context, ids []string) (bo
 
 func (r *queryResolver) Accounts(ctx context.Context, query source.QAccount) (*source.Accounts, error) {
 	account := make([]beans.Account, 0)
-	total, err := gs.DBS().SF(`
+	total, err := gs.DBS(ctx).SF(`
 		select * from account 
 		where 1 = 1
 		{{ if .uid }} and account.uid = :uid {{ end }}

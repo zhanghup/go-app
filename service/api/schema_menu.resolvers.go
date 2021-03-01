@@ -73,7 +73,7 @@ func (r *mutationResolver) MenuReload(ctx context.Context, menus []source.MenuLo
 
 func (r *queryResolver) Menus(ctx context.Context, query source.QMenu) ([]beans.Menu, error) {
 	plans := make([]beans.Menu, 0)
-	err := gs.DBS().SF(`
+	err := gs.DBS(ctx).SF(`
 		select 
 			p.* 
 		from 

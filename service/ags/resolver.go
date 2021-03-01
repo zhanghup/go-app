@@ -13,7 +13,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/zhanghup/go-app/gs"
-	"github.com/zhanghup/go-app/service/ags/resolvers"
 	"github.com/zhanghup/go-app/service/ags/source"
 	"github.com/zhanghup/go-app/service/directive"
 	"github.com/zhanghup/go-tools"
@@ -89,7 +88,7 @@ func GinGql(gqlpath string, gqlrouter gin.IRouter, gqlSchema graphql.ExecutableS
 }
 
 func GinAgs(auth, any gin.IRouter) {
-	GinGql("/zpx/ags", any, source.NewExecutableSchema(source.Config{Resolvers: resolvers.NewResolver(gs.DB())}))
+	GinGql("/zpx/ags", any, source.NewExecutableSchema(source.Config{Resolvers: NewResolver()}))
 	gs.Uploader().GinRouter(auth.Group("/zpx/ags", directive.WebAuth()), any.Group("/zpx/ags"))
 
 }

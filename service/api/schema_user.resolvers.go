@@ -237,7 +237,7 @@ func (r *mutationResolver) UserWithRole(ctx context.Context, uid string, roles [
 
 func (r *queryResolver) Users(ctx context.Context, query source.QUser) (*source.Users, error) {
 	users := make([]beans.User, 0)
-	total, err := gs.DBS().SF(`
+	total, err := gs.DBS(ctx).SF(`
 		select 
 			u.* 
 		from 

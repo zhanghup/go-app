@@ -1,4 +1,4 @@
-package resolvers
+package ags
 
 import (
 	"context"
@@ -10,7 +10,6 @@ import (
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/tgql"
 	"github.com/zhanghup/go-tools/wx/wxmp"
-	"xorm.io/xorm"
 )
 
 type Resolver struct {
@@ -19,7 +18,7 @@ type Resolver struct {
 	Wxmp   wxmp.IEngine
 }
 
-func NewResolver(db *xorm.Engine) source.ResolverRoot {
+func NewResolver() source.ResolverRoot {
 	r := &Resolver{
 		Me:     directive.MyInfo,
 		Loader: tgql.DataLoaden,

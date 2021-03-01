@@ -40,7 +40,7 @@ func (r *mutationResolver) DeptRemoves(ctx context.Context, ids []string) (bool,
 func (r *queryResolver) Depts(ctx context.Context, query source.QDept) (*source.Depts, error) {
 	depts := make([]beans.Dept, 0)
 
-	i, err := gs.DBS().SF(`
+	i, err := gs.DBS(ctx).SF(`
 		select 
 			* 
 		from 

@@ -62,7 +62,7 @@ func WxmpAuthFunc(c *gin.Context) (interface{}, error) {
 	}
 
 	wxuser := beans.WxmpUser{}
-	ok, err := gs.DBS().SF(`select * from wxmp_user where id = ?`, form.Uid).Get(&wxuser)
+	ok, err := gs.DBS(gs.Background).SF(`select * from wxmp_user where id = ?`, form.Uid).Get(&wxuser)
 	if err != nil {
 		return nil, errors.New("[4] 未授权")
 	}

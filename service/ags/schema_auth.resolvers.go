@@ -1,4 +1,4 @@
-package resolvers
+package ags
 
 // This file will be automatically regenerated based on the schema, any resolver implementations
 // will be copied through when generating and any unknown code will be moved to the end.
@@ -6,7 +6,8 @@ package resolvers
 import (
 	"context"
 	"errors"
-	"github.com/dgrijalva/jwt-go"
+
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/zhanghup/go-app/beans"
 	"github.com/zhanghup/go-app/gs"
 	"github.com/zhanghup/go-app/service/ca"

@@ -1,6 +1,7 @@
 package gs
 
 import (
+	"context"
 	rice "github.com/GeertJohan/go.rice"
 	"github.com/zhanghup/go-tools"
 	"github.com/zhanghup/go-tools/database/txorm"
@@ -16,6 +17,10 @@ const (
 	GIN_AUTHORIZATION = "Authorization"
 	GIN_USER          = "user_info"
 	GIN_WXUSER        = "wxuser_info"
+)
+
+var (
+	Background = context.Background()
 )
 
 type config struct {

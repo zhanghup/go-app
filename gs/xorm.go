@@ -19,23 +19,23 @@ func DB() *xorm.Engine {
 
 func DBA() txorm.IEngine {
 	if defaultDBA == nil {
-		panic("【数据库[DBS]】未初始化！！！")
+		panic("【数据库[DBA]】未初始化！！！")
 	}
 	return defaultDBA
 }
 
-func DBS(ctx ...context.Context) txorm.ISession {
+func DBS(ctx context.Context) txorm.ISession {
 	if defaultDBA == nil {
 		panic("【数据库[DBS]】未初始化！！！")
 	}
-	return defaultDBA.NewSession(true, ctx...)
+	return defaultDBA.NewSession(true, ctx)
 }
 
 func Sess(ctx context.Context) txorm.ISession {
 	sess := defaultDBA.Session(ctx)
 	err := sess.Begin()
 	if err != nil {
-		tog.Error("【数据库[DBS]】开启事务异常！！！")
+		tog.Error("【数据库[SESSION]】开启事务异常！！！")
 	}
 	return sess
 }

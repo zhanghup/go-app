@@ -39,7 +39,7 @@ func (r *mutationResolver) CronRun(ctx context.Context, id string) (bool, error)
 
 func (r *queryResolver) Crons(ctx context.Context, query source.QCron) (*source.Crons, error) {
 	users := make([]beans.Cron, 0)
-	total, err := gs.DBS().SF(`
+	total, err := gs.DBS(ctx).SF(`
 		select * from cron u
 		where 1 = 1
 		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
@@ -61,7 +61,7 @@ func (r *queryResolver) Cron(ctx context.Context, id string) (*beans.Cron, error
 
 func (r *queryResolver) CronLogs(ctx context.Context, query source.QCronLog) (*source.CronLogs, error) {
 	users := make([]beans.CronLog, 0)
-	total, err := gs.DBS().SF(`
+	total, err := gs.DBS(ctx).SF(`
 		select * from cron_log u
 		where 1 = 1
 		{{ if .keyword }} and u.name like concat("%",:keyword,"%") {{ end }}
