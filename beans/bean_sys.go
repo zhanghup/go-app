@@ -72,8 +72,11 @@ type DictItem struct {
 // 权限设置
 type Role struct {
 	Bean `xorm:"extends"`
+	Type *string `json:"type"` // 角色类型
+	Code *string `json:"code"` // 角色编码
 	Name *string `json:"name"` // 角色名称
 	Desc *string `json:"desc"` // 描述
+	Pid  *string `json:"pid"`  // 父角色
 }
 type RoleUser struct {
 	Bean `xorm:"extends"`
